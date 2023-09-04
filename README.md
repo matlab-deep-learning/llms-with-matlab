@@ -2,7 +2,7 @@
 
 This repository contains example code to demonstrate how to connect MATLAB to the OpenAI™ Chat Completions API (which powers ChatGPT™). This allows you to leverage the natural language processing capabilities of GPT models directly within your MATLAB environment.
 
-The functionality shown here simply serve as an interface to the ChatGPT API. You should be familiar with the limitations and risks associated with using this technology as well as with [OpenAI terms and policies](https://openai.com/policies). You are responsible for any fees OpenAI may charge for the use of their API.
+The functionality shown here simply serves as an interface to the ChatGPT API. You should be familiar with the limitations and risks associated with using this technology as well as with [OpenAI terms and policies](https://openai.com/policies). You are responsible for any fees OpenAI may charge for the use of their API.
 
 ## Setup 
 1. Clone the repository to your local machine.
@@ -43,7 +43,7 @@ To get started, you can either create an `openAIChat` object and use its methods
 
 ### Simple call without preserving chat history
 
-In some situations, you will want to use GPT models without preserving chat history. For example, when you want to perform independent queries in a programatic way. 
+In some situations, you will want to use GPT models without preserving chat history. For example, when you want to perform independent queries in a programmatic way. 
 
 Here's a simple example of how to use the `openAIChat` for sentiment analysis:
 
@@ -51,14 +51,15 @@ Here's a simple example of how to use the `openAIChat` for sentiment analysis:
 % Initialize the OpenAI Chat object, passing a system prompt
 
 % The system prompt tells the assistant how to behave, in this case, as a sentiment analyzer
-systemPrompt = "You are a sentiment analyser, you will look at a sentence and output a single word that classifier that sentence (positive or negative)."+....
+systemPrompt = "You are a sentiment analyser. You will look at a sentence and output"+...
+    " a single word that classifies that sentence as either 'positive' or 'negative'."+....
     "Examples: \n"+...
-    "The project was a complete failure.\n"+...
-    "negative\n\n"+...  
+    "The project was a complete failure. \n"+...
+    "negative \n\n"+...  
     "The team successfully completed the project ahead of schedule."+...
-    "positive\n\n"+...
-    "His attitude was terribly discouraging to the team.\n"+...
-    "negative\n\n";
+    "positive \n\n"+...
+    "His attitude was terribly discouraging to the team. \n"+...
+    "negative \n\n";
 
 chat = openAIChat(systemPrompt);
 
@@ -90,7 +91,7 @@ history = addUserMessage(history, "What is an eigenvalue?");
 [text, response] = generate(chat, history)
 ```
 
-The output `text` will contain the answer and `response` will contain the full response, which you need to include in the hystory as follows
+The output `text` will contain the answer and `response` will contain the full response, which you need to include in the history as follows
 ```matlab
 history = addResponseMessage(history, response);
 ```
@@ -121,7 +122,7 @@ Then you can pass the functions to the chat API as follows:
 
 ```matlab
 chat = openAIChat("You are a helpful assistant", Functions=f);
-````
+```
 
 The model will automatically determine if the function should be called based on the user input:
 
