@@ -1,88 +1,107 @@
 classdef(Sealed) openAIChat
-% openAIChat - A class for interacting with the OpenAI Chat API.
+%openAIChat - Chat completion API from OpenAI.
+%
+%   CHAT = openAIChat(systemPrompt) creates an openAIChat object with the
+%   specified system prompt.
+%
+%   CHAT = openAIChat(systemPrompt, Name=Value) specifies additional options
+%   using one or more name-value arguments:
+%
+%   'Functions'             - An array of openAIFunction objects representing
+%                             custom functions to be used during chat completions.
+%
+%   'ModelName'              - The name of the model to use for chat completions.
+%                             The default value is "gpt-3.5-turbo"
+%
+%   'Temperature'            - The temperature value for controlling the randomness
+%                             of the output. The default value is 1
+%
+%   'TopProbabilityMass'     - The top probability mass value for controlling the
+%                             diversity of the output. The default value is 1
+%
+%   'StopSequences'          - Vector of strings that when encountered, will
+%                             stop the generation of tokens. The default
+%                             value is empty.
+%
+%   'ApiKey'                 - The API key for accessing the OpenAI Chat API.
+%
+%   'PresencePenalty'        - The penalty value for using a token in the response
+%                             that has already been used.  The default value is 0.
+%
+%   'FrequencyPenalty'       - The penalty value for using a token that is frequent
+%                             in the training data.  The default value is 0.
+%
+%   openAIChat Functions:
+%       openAIChat           - Chat completion API from OpenAI.
+%       generate             - Generate a response using the openAIChat instance.
 %
 %   openAIChat Properties:
-%       ModelName            - The name of the model to use for chat completion.
-%       Temperature          - Controls the randomness of the output. Higher values
-%                              make the output more random.
-%       TopProbabilityMass   - Controls the diversity of the output. Higher values
-%                              make the output more diverse.
-%       StopSequences        - A cell array of strings that, when encountered,
-%                              will stop the generation of tokens.
-%       PresencePenalty      - Controls the penalty for using a token in the
+%       ModelName            - Model name
+%
+%       Temperature          - Temperature of generation
+%
+%       TopProbabilityMass   - Top probability mass to consider for generation
+%
+%       StopSequences        - Sequences to stop the generation of tokens.
+%
+%       PresencePenalty      - Penalty for using a token in the
 %                              response that has already been used.
-%       FrequencyPenalty     - Controls the penalty for using a token that is
+%
+%       FrequencyPenalty     - Penalty for using a token that is
 %                              frequent in the training data.
-%       SystemPrompt         - The system prompt to start the conversation.
 %
-%   openAIChat Methods:
-%       openAIChat - Create an openAIChat object.
+%       SystemPrompt         - System prompt
 %
-%   openAIChat Constants:
-%       AvailableModels - A list of available models for chat completion.
+%       AvailableModels      - List of available models.
+%
+%       FunctionsNames       - Names of the functions that the model can
+%                              request calls
 
 % Copyright 2023 The MathWorks, Inc.
 
     properties
+        %MODELNAME   Model name.
         ModelName
+
+        %TEMPERATURE   Temperature of generation.
         Temperature
+
+        %TOPPROBABILITYMASS   Top probability mass to consider for generation.
         TopProbabilityMass
+
+        %STOPSEQUENCES   Sequences to stop the generation of tokens.
         StopSequences
+
+        %PRESENCEPENALTY   Penalty for using a token in the response that has already been used.
         PresencePenalty
+
+        %FREQUENCYPENALTY   Penalty for using a token that is frequent in the training data.
         FrequencyPenalty
+
+        %SYSTEMPROMPT   System prompt.
         SystemPrompt = []
     end
 
-    properties(SetAccess=private)
-        Functions
+    properties(SetAccess=private)  
+        %FUNCTIONSNAMES   Names of the functions that the model can request calls
         FunctionsNames
     end
 
     properties(Access=private)
+        Functions
         FunctionsStruct
         ApiKey    
     end
 
     properties(Constant)
+        %AVAILABLEMODELS   List of available models.
         AvailableModels = ["gpt-4", "gpt-4-0613", "gpt-4-32k", "gpt-4-32k-0613",...
             "gpt-3.5-turbo", "gpt-3.5-turbo-0613", "gpt-3.5-turbo-16k",... 
             "gpt-3.5-turbo-16k-0613"]
     end
 
     methods
-        function this = openAIChat(systemPrompt, nvp)
-            %openAIChat - Create an openAIChat object.
-            %
-            %   chatObj = openAIChat(systemPrompt) creates an openAIChat object with the
-            %   specified system prompt.
-            %
-            %   chatObj = openAIChat(systemPrompt, nvp) creates an openAIChat object with
-            %   additional name-value pairs for customizing the chat behavior.
-            %
-            %   Name-Value Pair Arguments (Optional):
-            %   'Functions'         - An array of openAIFunction objects representing
-            %                         custom functions to be used during chat completions.
-            %
-            %   'ModelName'         - The name of the model to use for chat completion.
-            %                         Default: "gpt-3.5-turbo"
-            %
-            %   'Temperature'       - The temperature value for controlling the randomness
-            %                         of the output. Default: 1
-            %
-            %   'TopProbabilityMass'- The top probability mass value for controlling the
-            %                         diversity of the output. Default: 1
-            %
-            %   'StopSequences'     - A cell array of strings that, when encountered, will
-            %                         stop the generation of tokens. Default: {}
-            %
-            %   'ApiKey'            - The API key for accessing the OpenAI Chat API.
-            %
-            %   'PresencePenalty'   - The penalty value for using a token in the response
-            %                         that has already been used. Default: 0
-            %
-            %   'FrequencyPenalty'  - The penalty value for using a token that is frequent
-            %                         in the training data. Default: 0
-            
+        function this = openAIChat(systemPrompt, nvp)           
             arguments
                 systemPrompt                       {llms.utils.mustBeTextOrEmpty} = []
                 nvp.Functions                (1,:) {mustBeA(nvp.Functions, "openAIFunction")} = openAIFunction.empty
@@ -122,35 +141,29 @@ classdef(Sealed) openAIChat
 
         function [text, message, response] = generate(this, messages, nvp)
             %generate   Generate a response using the openAIChat instance.
-            %   [TEXT, MESSAGE, RESPONSE] = generate(THIS, MESSAGES, NVP) generates a response
-            %   using the openAIChat instance with the specified MESSAGES and optional
+            %
+            %   [TEXT, MESSAGE, RESPONSE] = generate(CHAT, MESSAGES) generates a response
+            %   with the specified MESSAGES and optional
             %   name-value pair arguments.
             %
-            %   Input Arguments:
-            %     THIS               - openAIChat instance.
-            %                          openAIChat object
+            %   [TEXT, MESSAGE, RESPONSE] = generate(_______, Name=Value) specifies additional options
+            %   using one or more name-value arguments:
             %
-            %     MESSAGES           - Messages for generating the response.
-            %                          struct array
-            %
-            %     NVP                - Name-value pair arguments:
             %       NumCompletions   - Number of completions to generate.
-            %                          positive integer scalar (default: 1)
+            %                          The default value is 1.
             %
             %       MaxNumTokens     - Maximum number of tokens in the generated response.
-            %                          positive scalar (default: inf)
+            %                          The default value is inf.
             %
             %       FunctionCall     - Function call to execute before generating the
-            %                          response.
-            %                          string scalar | character vector (default: [])
-            %
+            %                          response. The default value is empty.
+            
             arguments
                 this                    (1,1) openAIChat
                 messages                (1,1) {mustBeValidMsgs}
                 nvp.NumCompletions      (1,1) {mustBePositive, mustBeInteger} = 1
                 nvp.MaxNumTokens        (1,1) {mustBePositive} = inf
                 nvp.FunctionCall        {mustBeValidFunctionCall(this, nvp.FunctionCall)} = []
-                nvp.Stream              (1,1) {logical} = false
             end
 
             functionCall = convertFunctionCall(this, nvp.FunctionCall);
@@ -283,7 +296,7 @@ end
 
 function mustBeValidStop(value)
 mustBeNonzeroLengthText(value);
-% This restriction is set by the OpenAI api
+% This restriction is set by the OpenAI API
 if numel(value)>4
     error("llms:stopSequencesMustHaveMax4Elements", llms.utils.errorMessageCatalog.getMessage("llms:stopSequencesMustHaveMax4Elements"));
 end

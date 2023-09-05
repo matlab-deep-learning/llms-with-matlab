@@ -1,4 +1,11 @@
-function response = sendRequest(parameters, token, endpoint, consumer)
+function response = sendRequest(parameters, token, endpoint)
+% This function is undocumented and will change in a future release
+
+%sendRequest Sends a request to an ENDPOINT using PARAMETERS and 
+%   api key TOKEN.
+
+%   Copyright 2023 The MathWorks, Inc.
+
     % Define the headers for the API request
     
     headers = matlab.net.http.HeaderField('Content-Type', 'application/json');
@@ -6,10 +13,6 @@ function response = sendRequest(parameters, token, endpoint, consumer)
     % Define the request message
     request = matlab.net.http.RequestMessage('post',headers,parameters);
     % Send the request and store the response
-    if nargin==3
-        response = send(request, matlab.net.URI(endpoint));
-    else
-        response = send(request, matlab.net.URI(endpoint),[],consumer);
-    end   
+    response = send(request, matlab.net.URI(endpoint));
 end
 

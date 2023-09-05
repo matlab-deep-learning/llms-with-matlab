@@ -1,51 +1,41 @@
 classdef (Sealed) openAIFunction
-% openAIFunction Class representing a function to use with openAIChat
-% This class provides a representation of a function for use with the OpenAI
-% chat completion API, including its name, description, and parameters.
+%openAIFunction   Define a function
+%
+%   FUNC = openAIFunction(NAME, DESCRIPTION) creates an open AI function
+%   object with the specified NAME and DESCRIPTION.
+%
+%   openAIFunction Functions:
+%       openAIFunction - Define a function.
+%       addParameter   - Add parameter to the function.
 %
 %   openAIFunction Properties:
-%       FunctionName - Name of the function.
-%       Description  - Description of the function.
-%
-%   openAIFunction Methods:
-%       openAIFunction - Create an openAIfunction object.
-%       addParameter   - Adds a parameter to the function.
+%       FunctionName   - Name of the function.
+%       Description    - Description of the function.
+%       Parameters     - Parameters of function.
 %
 %   Example:
 %     % Create an OpenAI function object
-%     f = openAIFunction("editDistance", "Find edit distance between two strings or documents");
+%     func = openAIFunction("editDistance", "Find edit distance between two strings or documents");
 %
 %     % Add two parameter with type and description
-%     f = addParameter(f, "str1", type="string", description="Source string.");
-%     f = addParameter(f, "str2", type="string", description="Target string.");
+%     func = addParameter(func, "str1", type="string", description="Source string.");
+%     func = addParameter(func, "str2", type="string", description="Target string.");
 
 % Copyright 2023 The MathWorks, Inc.
 
     properties(SetAccess=private)
-        % FUNCTIONNAME - Name of the function.
+        %FUNCTIONNAME   Name of the function.
         FunctionName
 
-        % DESCRIPTION - Description of the function.
+        %DESCRIPTION   Description of the function.
         Description
 
-        % PARAMETERS - Struct containing the parameters of function.
+        %PARAMETERS   Parameters of function.
         Parameters = struct()
     end
 
     methods
         function this = openAIFunction(name, description)
-            % openAIFunction Create an open AI function object.
-            %   FUNC = openAIFunction(NAME, DESCRIPTION) creates an open AI function
-            %   object with the specified NAME and DESCRIPTION.
-            %
-            %   Example:
-            %   % Create an open AI function object
-            %   func = openAIFunction("myFunction", "This is a function example");
-            %
-            %   % Display the function name and description
-            %   disp(func.FunctionName);
-            %   disp(func.Description);
-
             arguments
                 name (1,1) {mustBeNonzeroLengthText}
                 description {llms.utils.mustBeTextOrEmpty} = []
@@ -56,46 +46,29 @@ classdef (Sealed) openAIFunction
         end
 
         function this = addParameter(this, parameterName, propertyName, propertyValue, nvp)
-            %addParameter   Add a parameter to the function signature
-            %   THIS = addParameter(THIS, PARAMETERNAME, PROPERTYNAME, PROPERTYVALUE)
-            %   adds a parameter to the function signature with name
-            %   PARAMETERNAME and properties PROPERTYNAME with value
-            %   PROPERTYVALUE. PROPERTYNAME and PROPERTYVALUE can be specified  
-            %   repeatedly.
+            %addParameter   Add parameter to the function
             %
-            %   THIS = addParameter(____, RequiredParameter=tf), specifies
+            %   FUNC = addParameter(FUNC, parameterName, propertyName, propertyValue)
+            %   adds a parameter to the function signature with name parameterName and
+            %   properties propertyName with value PROPERTYVALUE. Inputs propertyName and
+            %   propertyValue can be specified repeatedly. The values
+            %   accepted for propertyNames are "type", "description" and
+            %   "enum". Each propertyName will accept different for propertyValue: 
+            %   - type: accepts "string", "number", "integer", "object", "boolean",
+            %       "null" and any combination of those values.
+            %   - description: accepts text scalar.
+            %   - enum: accepts string vectors of text.
+            %
+            %   FUNC = addParameter(____, RequiredParameter=TF), specifies
             %   if the parameter is required.
             %
-            %   Input Arguments:
-            %     THIS             - The OpenAI function object
-            %                        scalar
-            %
-            %     PARAMETERNAME    - Name of the parameter
-            %                        string scalar | character vector
-            %
-            %     PROPERTYNAME     - Name of the property.
-            %                        It can take the following values:
-            %                        - type
-            %                        - description
-            %                        - enum
-            %                        
-            %     PROPERTYVALUE    - Value of the property. The accepted
-            %                        value depends on PROPERTYNAME:
-            %                        - type: accepts "string", "number", "integer",
-            %                        "object", "boolean", "null" and any
-            %                        combination of those values.
-            %                        - description: accepts a string
-            %                        scalar.
-            %                        - enum: accepts string vectors.
-            %                        
-            %
             %   Example:
-            %     % Create an OpenAI function object
-            %     f = openAIFunction("editDistance", "Find edit distance between two strings or documents");
+            %   % Create an OpenAI function object
+            %   f = openAIFunction("editDistance", "Find edit distance between two strings or documents");
             %
-            %     % Add two parameter with type and description
-            %     f = addParameter(f, "str1", type="string", description="Source string.");
-            %     f = addParameter(f, "str2", type="string", description="Target string.");
+            %   % Add two parameter with type and description
+            %   f = addParameter(f, "str1", type="string", description="Source string.");
+            %   f = addParameter(f, "str2", type="string", description="Target string.");
 
             arguments
                 this (1,1) openAIFunction
@@ -172,8 +145,7 @@ classdef (Sealed) openAIFunction
                 if numel(requiredArguments)==1
                     % This will force jsonencode to see "required" as an array
                     funStruct.parameters.required = {funStruct.parameters.required};
-                end
-                 
+                end           
             end
         end
     end

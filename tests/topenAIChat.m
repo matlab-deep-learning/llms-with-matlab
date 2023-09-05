@@ -24,7 +24,6 @@ classdef topenAIChat < matlab.unittest.TestCase
             chat = openAIChat(systemPrompt, Functions=functions, ModelName=modelName, ...
                 Temperature=temperature, TopProbabilityMass=topP, StopSequences=stop, ApiKey=apiKey,...
                 FrequencyPenalty=frequenceP, PresencePenalty=presenceP);
-            testCase.verifyEqual(chat.Functions, functions);
             testCase.verifyEqual(chat.ModelName, modelName);
             testCase.verifyEqual(chat.Temperature, temperature);
             testCase.verifyEqual(chat.TopProbabilityMass, topP);

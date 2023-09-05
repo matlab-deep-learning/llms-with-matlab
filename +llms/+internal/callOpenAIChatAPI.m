@@ -1,18 +1,41 @@
 function [text, message, response] = callOpenAIChatAPI(messages, functions, nvp)
-    arguments
-        messages                
-        functions               
-        nvp.FunctionCall              
-        nvp.ModelName              
-        nvp.Temperature         
-        nvp.TopProbabilityMass               
-        nvp.NumCompletions      
-        nvp.StopSequences                
-        nvp.MaxNumTokens           
-        nvp.PresencePenalty                                   
-        nvp.FrequencyPenalty                                      
-        nvp.ApiKey      
-    end
+% This function is undocumented and will change in a future release
+
+%callOpenAIChatAPI Calls the openAI chat completions API.
+%
+%   MESSAGES and FUNCTIONS should be structs matching the json format 
+%   required by the OpenAI Chat Completions API.
+%   Ref: https://platform.openai.com/docs/guides/gpt/chat-completions-api
+%
+%   Currently, the supported NVP are, including the equivalent name in the API:              
+%    - FunctionCall (function_call)             
+%    - ModelName (model)
+%    - Temperature (temperature)
+%    - TopProbabilityMass (top_p)        
+%    - NumCompletions (n)
+%    - StopSequences (stop)           
+%    - MaxNumTokens (max_tokens)          
+%    - PresencePenalty (presence_penalty)                         
+%    - FrequencyPenalty (frequence_penalty)                    
+%    - ApiKey 
+%   More details on the parameters: https://platform.openai.com/docs/api-reference/chat/create
+
+%   Copyright 2023 The MathWorks, Inc.
+
+arguments
+    messages
+    functions
+    nvp.FunctionCall
+    nvp.ModelName
+    nvp.Temperature
+    nvp.TopProbabilityMass
+    nvp.NumCompletions
+    nvp.StopSequences
+    nvp.MaxNumTokens
+    nvp.PresencePenalty
+    nvp.FrequencyPenalty
+    nvp.ApiKey
+end
 
     END_POINT = "https://api.openai.com/v1/chat/completions";
 
@@ -35,6 +58,9 @@ function [text, message, response] = callOpenAIChatAPI(messages, functions, nvp)
 end
 
 function parameters = buildParametersCall(messages, functions, nvp)
+    % Builds a struct in the format that is expected by the API, combining
+    % MESSAGES, FUNCTIONS and parameters in NVP.
+
     parameters = struct();
     parameters.messages = messages;
     if ~isempty(functions)

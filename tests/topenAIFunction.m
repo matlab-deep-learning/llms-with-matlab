@@ -92,7 +92,8 @@ classdef topenAIFunction < matlab.unittest.TestCase
         end
 
         function singleRequiredArgumentGetsConvertedToArray(testCase)
-            expectedJson = '{"name":"getCurrentWeather","parameters":{"type":"object","properties":{"location":{}},"required":["location"]}}';
+            expectedJson = ['{"name":"getCurrentWeather","parameters":' ...
+                '{"type":"object","properties":{"location":{}},"required":["location"]}}'];
 
             funObj = openAIFunction("getCurrentWeather");
             funObj = addParameter(funObj, "location");

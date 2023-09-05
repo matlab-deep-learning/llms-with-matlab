@@ -1,66 +1,41 @@
 classdef (Sealed) openAIMessages   
-    %openAIMessages - Store and manage messages
-    %   Creates an object to store and manage messages.
+    %openAIMessages - Create an object to manage and store messages in a conversation.
+    %   messages = openAIMessages creates an openAIMessages object.
     %
-    %   openAIMessages Properties:
-    %       Messages - Cell array of messages in the conversation.
-    %
-    %   openAIMessages Methods:
-    %       openAIMessages - Create an object to manage messages in a conversation.
-    %       addSystemMessage - Add system message.
-    %       addUserMessage - Add a user message.
+    %   openAIMessages functions:
+    %       addSystemMessage   - Add system message.
+    %       addUserMessage     - Add user message.
     %       addFunctionMessage - Add a function message.
     %       addResponseMessage - Add a response message.
-    %       removeMessage - Remove a message.
+    %       removeMessage      - Remove message from history.
     %
-    %   Example:
-    %     % Create object with system prompt
-    %     systemPrompt = "You are a helpful AI Assistant."
-    %     messages = openAIMessages(systemPrompt);
+    %   openAIMessages properties:
+    %       Messages           - Messages in the conversation history.
 
     % Copyright 2023 The MathWorks, Inc.
 
     properties(SetAccess=private)
-        % MESSAGES - Cell array of messages in the conversation.
+        %MESSAGES - Messages in the conversation history.
         Messages = {}
     end
     
     methods
-        function this = openAIMessages
-            % openAIMessages Create an object to manage messages in a conversation.
-            %   MESSAGES = openAIMessages creates an empty openAIMessages object.
-            %
-            %   Example:
-            %     % Creates messages
-            %     messages = openAIMessages;
-        end
-
         function this = addSystemMessage(this, name, content)
             %addSystemMessage   Add system message.
-            %   MESSAGES = addSystemMessage(MESSAGES, NAME, CONTENT) adds a system message with the
-            %   specified NAME and CONTENT.
             %
-            %   Input Arguments:
-            %     MESSAGES    - openAIMessages instance.
-            %                   openAIMessages object
-            %
-            %     NAME        - Name of the system message.
-            %                   string scalar | character vector
-            %
-            %     CONTENT     - Content of the system message.
-            %                   string scalar | character vector
+            %   MESSAGES = addSystemMessage(MESSAGES, NAME, CONTENT) adds a system
+            %   message with the specified NAME and CONTENT. NAME and CONTENT
+            %   must be text scalars.
             %
             %   Example:
-            %     % Create object with system prompt
-            %     systemPrompt = "You are a helpful AI Assistant. " + ...
-            %         "You translate sentences from English to Portuguese";
-            %     messages = openAIMessages(systemPrompt);
+            %   % Create messages object
+            %   messages = openAIMessages;
             %
-            %    % Add system messages to provide examples of the conversation
-            %    messages = addSystemMessage(messages, "example_user", "Hello, how are you?");
-            %    messages = addSystemMessage(messages, "example_assistant", "Olá, como vai?");
-            %    messages = addSystemMessage(messages, "example_user", "The sky is beautiful today");
-            %    messages = addSystemMessage(messages, "example_assistant", "O céu está lindo hoje.");
+            %   % Add system messages to provide examples of the conversation
+            %   messages = addSystemMessage(messages, "example_user", "Hello, how are you?");
+            %   messages = addSystemMessage(messages, "example_assistant", "Olá, como vai?");
+            %   messages = addSystemMessage(messages, "example_user", "The sky is beautiful today");
+            %   messages = addSystemMessage(messages, "example_assistant", "O céu está lindo hoje.");
 
             arguments
                 this (1,1) openAIMessages 
@@ -77,23 +52,17 @@ classdef (Sealed) openAIMessages
         end
 
         function this = addUserMessage(this, content)
-            %addUserMessage   Add a user message.
-            %   MESSAGES = addUserMessage( MESSAGES, CONTENT) adds a user message 
-            %   with the specified CONTENT
+            %addUserMessage   Add user message.
             %
-            %   Input Arguments:
-            %      MESSAGES    - openAIMessages instance.
-            %                    openAIMessages object
-            %
-            %     CONTENT      - Content of the user message.
-            %                    string scalar | character vector
+            %   MESSAGES = addUserMessage(MESSAGES, CONTENT) adds a user message
+            %   the specified CONTENT. CONTENT must be a text scalar.
             %
             %   Example:
-            %     % Create object with system prompt
-            %     messages = openAIMessages("You are a helpful AI Assistant.");
+            %   % Create messages object
+            %   messages = openAIMessages;
             %
-            %    % Add user message
-            %    messages = addSystemMessage(messages, "Where is Natick located?");
+            %   % Add user message
+            %   messages = addUserMessage(messages, "Where is Natick located?");
 
             arguments
                 this (1,1) openAIMessages
@@ -109,28 +78,19 @@ classdef (Sealed) openAIMessages
         end
 
         function this = addFunctionMessage(this, name, content)
-            % addFunctionMessage   Add a function message.
-            %   MESSAGES = addFunctionMessage(MESSAGES, NAME, CONTENT) adds a function 
-            %   message with the specified NAME and CONTENT.
+            %addFunctionMessage   Add function message.
             %
-            %   Input Arguments:
-            %     MESSAGES    - openAIMessages instance.
-            %                   openAIMessages object
-            %
-            %     NAME        - Name of the function 
-            %                   string scalar | character vector
-            %
-            %     CONTENT     - Content of the output obtained from the function
-            %                   string scalar | character vector
+            %   MESSAGES = addFunctionMessage(MESSES, NAME, CONTENT) adds a function
+            %   message with the specified NAME and CONTENT. NAME and
+            %   CONTENT must be text scalars.
             %
             %   Example:
+            %   % Create messages object
+            %   messages = openAIMessages;
             %
-            %    % Create object with system prompt
-            %    messages = openAIMessages("You are a helpful AI Assistant.");
-            %
-            %    % Add function message, containing the result of 
-            %    % calling strcat("Hello", " World")
-            %    messages = addFunctionMessage(messages, "strcat", "Hello World");
+            %   % Add function message, containing the result of 
+            %   % calling strcat("Hello", " World")
+            %   messages = addFunctionMessage(messages, "strcat", "Hello World");
 
             arguments
                 this (1,1) openAIMessages
@@ -147,26 +107,30 @@ classdef (Sealed) openAIMessages
         end
        
         function this = addResponseMessage(this, messageStruct)
-            % addResponseMessage   Add a response message.
-            %   MESSAGES = addResponseMessage(MESSAGES, MESSAGESTRUCT) adds a response message with
-            %   the specified message structure to the openAIMessages instance.
+            %addResponseMessage   Add response message.
             %
-            %   Input Arguments:
-            %     THIS           - openAIMessages instance.
-            %                      openAIMessages object
-            %     MESSAGESTRUCT  - Structure representing the response message.
-            %                      struct scalar
+            %   MESSAGES = addResponseMessage(MESSAGES, messageStruct) adds a response
+            %   message with the specified messageStruct. The input
+            %   messageStruct should be a struct with field 'role' and
+            %   value 'assistant' and with field 'content'. This response
+            %   can be obtained from calling the GENERATE function.
             %
             %   Example:
             %
-            %   % Create object with system prompt
-            %   messages = openAIMessages("You are a helpful AI Assistant.");
+            %   % Create a chat object
+            %   chat = openAIChat("You are a helpful AI Assistant.");
             %
-            %   % Create an assistant message
-            %   msg = struct("role", "assistant", "content", "How can I help?");
+            %   % Create messages object
+            %   messages = openAIMessages;
             %
-            %   % Add message as a response
-            %   addResponseMessage(messages, msg);
+            %   % Add user message
+            %   messages = addUserMessage(messages, "What is the capital of England?");
+            %
+            %   % Generate a response
+            %   [text, response] = generate(chat, messages);
+            %
+            %   % Add response to history
+            %   messages = addResponseMessage(messages, response);
 
             arguments
                 this (1,1) openAIMessages
@@ -190,15 +154,23 @@ classdef (Sealed) openAIMessages
         end
 
         function this = removeMessage(this, idx)
-            %removeMessage   Remove a message.
-            %   THIS = removeMessage(THIS, IDX) removes a message at the specified index from
-            %   the openAIMessages instance.
+            %removeMessage   Remove message.
             %
-            %   Input Arguments:
-            %     THIS  - openAIMessages instance.
-            %             openAIMessages object
-            %     IDX   - Index of the message to be removed.
-            %             positive integer scalar
+            %   MESSAGES = removeMessage(MESSAGES, IDX) removes a message at the specified
+            %   IDX from MESSAGES. IDX must be a positive integer.
+            %
+            %   Example:
+            %
+            %   % Create messages object
+            %   messages = openAIMessages;
+            %
+            %   % Add user messages
+            %   messages = addUserMessage(messages, "What is the capital of England?");
+            %   messages = addUserMessage(messages, "What is the capital of Italy?");
+            %
+            %   % Remove the first message
+            %   messages = removeMessage(messages,1);
+
             arguments
                 this (1,1) openAIMessages
                 idx (1,1) {mustBeInteger, mustBePositive}
