@@ -1,7 +1,19 @@
 classdef topenAIChat < matlab.unittest.TestCase
-% Tests for topenAIChat
+% Tests for openAIChat
 
 %   Copyright 2023 The MathWorks, Inc.
+
+    methods (TestClassSetup)
+        function saveEnvVar(testCase)
+            % Ensures key is not in environment variable for tests
+            openAIEnvVar = "OPENAI_API_KEY";
+            if isenv(openAIEnvVar)
+                key = getenv(openAIEnvVar);
+                unsetenv(openAIEnvVar);
+                testCase.addTeardown(@(x) setenv(openAIEnvVar, x), key);
+            end
+        end
+    end
 
     properties(TestParameter)
         InvalidConstructorInput = iGetInvalidConstructorInput;
@@ -11,6 +23,15 @@ classdef topenAIChat < matlab.unittest.TestCase
     
     methods(Test)
         % Test methods
+        function generateAcceptsSingleStringAsInput(testCase)
+            chat = openAIChat(ApiKey="this-is-not-a-real-key");
+            testCase.verifyWarningFree(@()generate(chat,"This is okay"));
+        end
+
+        function keyNotFound(testCase)
+            testCase.verifyError(@()openAIChat, "llms:keyMustBeSpecified");
+        end
+
         function constructChatWithAllNVP(testCase)
             functions = openAIFunction("funName");
             modelName = "gpt-3.5-turbo";
@@ -32,13 +53,8 @@ classdef topenAIChat < matlab.unittest.TestCase
             testCase.verifyEqual(chat.PresencePenalty, presenceP);
         end
 
-        function generateAcceptsSingleStringAsInput(testCase)
-            chat = openAIChat;
-            testCase.verifyWarningFree(@()generate(chat,"This is okay"));
-        end
-
         function errorsWhenPassingFunctionCallWithEmptyFunctions(testCase)
-            chat = openAIChat;
+            chat = openAIChat(ApiKey="this-is-not-a-real-key");
             testCase.verifyError(@()generate(chat,"input", FunctionCall="bla"), "llms:mustSetFunctionsForCall");
         end
 
@@ -48,12 +64,12 @@ classdef topenAIChat < matlab.unittest.TestCase
 
         function invalidInputsGenerate(testCase, InvalidGenerateInput)
             f = openAIFunction("validfunction");
-            chat = openAIChat(Functions=f);
+            chat = openAIChat(Functions=f, ApiKey="this-is-not-a-real-key");
             testCase.verifyError(@()generate(chat,InvalidGenerateInput.Input{:}), InvalidGenerateInput.Error);
         end
 
         function invalidSetters(testCase, InvalidValuesSetters)
-            chat = openAIChat;
+            chat = openAIChat(ApiKey="this-is-not-a-real-key");
             function assignValueToProperty(property, value)
                 chat.(property) = value;
             end
@@ -188,7 +204,7 @@ invalidConstructorInput = struct( ...
     ...
     "InvalidModelNameType",struct( ...
         "Input",{{ "ModelName", 0 }},...
-        "Error","MATLAB:validators:mustBeNonzeroLengthText"),...
+        "Error","MATLAB:validators:mustBeMember"),...
     ...
     "InvalidModelNameSize",struct( ...
         "Input",{{ "ModelName", ["gpt-3.5-turbo",  "gpt-3.5-turbo"] }},...

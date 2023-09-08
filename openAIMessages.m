@@ -44,18 +44,14 @@ classdef (Sealed) openAIMessages
             end
 
             newMessage = struct("role", "system", "name", name, "content", content);
-            if isempty(this.Messages)
-                this.Messages = {newMessage};
-            else
-                this.Messages{end+1} = newMessage;
-            end
+            this.Messages{end+1} = newMessage;
         end
 
         function this = addUserMessage(this, content)
             %addUserMessage   Add user message.
             %
             %   MESSAGES = addUserMessage(MESSAGES, CONTENT) adds a user message
-            %   the specified CONTENT. CONTENT must be a text scalar.
+            %   with the specified CONTENT to MESSAGES. CONTENT must be a text scalar.
             %
             %   Example:
             %   % Create messages object
@@ -70,11 +66,7 @@ classdef (Sealed) openAIMessages
             end
 
             newMessage = struct("role", "user", "content", content);
-            if isempty(this.Messages)
-                this.Messages = {newMessage};
-            else
-                this.Messages{end+1} = newMessage;
-            end
+            this.Messages{end+1} = newMessage;
         end
 
         function this = addFunctionMessage(this, name, content)
@@ -99,11 +91,7 @@ classdef (Sealed) openAIMessages
             end
 
             newMessage = struct("role", "function", "name", name, "content", content);
-            if isempty(this.Messages)
-                this.Messages = {newMessage};
-            else
-                this.Messages{end+1} = newMessage;
-            end
+            this.Messages{end+1} = newMessage;
         end
        
         function this = addResponseMessage(this, messageStruct)
@@ -192,7 +180,7 @@ classdef (Sealed) openAIMessages
             end
 
             if isempty(arguments)
-                % Default assistant call
+                % Default assistant response
                  newMessage = struct("role", "assistant", "content", contentOrfunctionName);
             else
                 % function_call message

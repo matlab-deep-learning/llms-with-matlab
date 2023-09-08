@@ -17,7 +17,7 @@ classdef (Sealed) openAIFunction
 %     % Create an OpenAI function object
 %     func = openAIFunction("editDistance", "Find edit distance between two strings or documents");
 %
-%     % Add two parameter with type and description
+%     % Add two parameters with type and description
 %     func = addParameter(func, "str1", type="string", description="Source string.");
 %     func = addParameter(func, "str2", type="string", description="Target string.");
 
@@ -50,23 +50,24 @@ classdef (Sealed) openAIFunction
             %
             %   FUNC = addParameter(FUNC, parameterName, propertyName, propertyValue)
             %   adds a parameter to the function signature with name parameterName and
-            %   properties propertyName with value PROPERTYVALUE. Inputs propertyName and
+            %   property propertyName with value propertyValue. Inputs propertyName and
             %   propertyValue can be specified repeatedly. The values
             %   accepted for propertyNames are "type", "description" and
-            %   "enum". Each propertyName will accept different for propertyValue: 
+            %   "enum". Each propertyName will accept different values 
+            %   for propertyValue: 
             %   - type: accepts "string", "number", "integer", "object", "boolean",
             %       "null" and any combination of those values.
             %   - description: accepts text scalar.
             %   - enum: accepts string vectors of text.
             %
-            %   FUNC = addParameter(____, RequiredParameter=TF), specifies
+            %   FUNC = addParameter(__, RequiredParameter=TF), specifies
             %   if the parameter is required.
             %
             %   Example:
             %   % Create an OpenAI function object
             %   f = openAIFunction("editDistance", "Find edit distance between two strings or documents");
             %
-            %   % Add two parameter with type and description
+            %   % Add two parameters with type and description
             %   f = addParameter(f, "str1", type="string", description="Source string.");
             %   f = addParameter(f, "str2", type="string", description="Target string.");
 

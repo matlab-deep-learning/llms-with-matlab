@@ -1,5 +1,5 @@
 classdef(Sealed) openAIChat
-%openAIChat - Chat completion API from OpenAI.
+%openAIChat Chat completion API from OpenAI.
 %
 %   CHAT = openAIChat(systemPrompt) creates an openAIChat object with the
 %   specified system prompt.
@@ -7,17 +7,17 @@ classdef(Sealed) openAIChat
 %   CHAT = openAIChat(systemPrompt, Name=Value) specifies additional options
 %   using one or more name-value arguments:
 %
-%   'Functions'             - An array of openAIFunction objects representing
+%   'Functions'              - An array of openAIFunction objects representing
 %                             custom functions to be used during chat completions.
 %
 %   'ModelName'              - The name of the model to use for chat completions.
-%                             The default value is "gpt-3.5-turbo"
+%                             The default value is "gpt-3.5-turbo".
 %
 %   'Temperature'            - The temperature value for controlling the randomness
-%                             of the output. The default value is 1
+%                             of the output. The default value is 1.
 %
 %   'TopProbabilityMass'     - The top probability mass value for controlling the
-%                             diversity of the output. The default value is 1
+%                             diversity of the output. The default value is 1.
 %
 %   'StopSequences'          - Vector of strings that when encountered, will
 %                             stop the generation of tokens. The default
@@ -36,11 +36,11 @@ classdef(Sealed) openAIChat
 %       generate             - Generate a response using the openAIChat instance.
 %
 %   openAIChat Properties:
-%       ModelName            - Model name
+%       ModelName            - Model name.
 %
-%       Temperature          - Temperature of generation
+%       Temperature          - Temperature of generation.
 %
-%       TopProbabilityMass   - Top probability mass to consider for generation
+%       TopProbabilityMass   - Top probability mass to consider for generation.
 %
 %       StopSequences        - Sequences to stop the generation of tokens.
 %
@@ -50,12 +50,12 @@ classdef(Sealed) openAIChat
 %       FrequencyPenalty     - Penalty for using a token that is
 %                              frequent in the training data.
 %
-%       SystemPrompt         - System prompt
+%       SystemPrompt         - System prompt.
 %
 %       AvailableModels      - List of available models.
 %
-%       FunctionsNames       - Names of the functions that the model can
-%                              request calls
+%       FunctionNames        - Names of the functions that the model can
+%                              request calls.
 
 % Copyright 2023 The MathWorks, Inc.
 
@@ -83,8 +83,8 @@ classdef(Sealed) openAIChat
     end
 
     properties(SetAccess=private)  
-        %FUNCTIONSNAMES   Names of the functions that the model can request calls
-        FunctionsNames
+        %FUNCTIONNAMES   Names of the functions that the model can request calls
+        FunctionNames
     end
 
     properties(Access=private)
@@ -105,7 +105,9 @@ classdef(Sealed) openAIChat
             arguments
                 systemPrompt                       {llms.utils.mustBeTextOrEmpty} = []
                 nvp.Functions                (1,:) {mustBeA(nvp.Functions, "openAIFunction")} = openAIFunction.empty
-                nvp.ModelName                (1,1) {mustBeValidModelName} = "gpt-3.5-turbo"
+                nvp.ModelName                (1,1) {mustBeMember(nvp.ModelName,["gpt-4", "gpt-4-0613", "gpt-4-32k", "gpt-4-32k-0613",...
+                                                        "gpt-3.5-turbo", "gpt-3.5-turbo-0613", "gpt-3.5-turbo-16k",... 
+                                                        "gpt-3.5-turbo-16k-0613"])} = "gpt-3.5-turbo"
                 nvp.Temperature              (1,1) {mustBeValidTemperature} = 1
                 nvp.TopProbabilityMass       (1,1) {mustBeValidTopP} = 1
                 nvp.StopSequences            (1,:) {mustBeValidStop} = {}
@@ -116,11 +118,11 @@ classdef(Sealed) openAIChat
 
             if ~isempty(nvp.Functions)
                 this.Functions = nvp.Functions;
-                [this.FunctionsStruct, this.FunctionsNames] = functionAsStruct(nvp.Functions);
+                [this.FunctionsStruct, this.FunctionNames] = functionAsStruct(nvp.Functions);
             else
                 this.Functions = [];
                 this.FunctionsStruct = [];
-                this.FunctionsNames = [];
+                this.FunctionNames = [];
             end
             
             if ~isempty(systemPrompt)
@@ -136,7 +138,7 @@ classdef(Sealed) openAIChat
             this.StopSequences = nvp.StopSequences;
             this.PresencePenalty = nvp.PresencePenalty;
             this.FrequencyPenalty = nvp.FrequencyPenalty;
-            this.ApiKey = llms.internal.checkEnvOrNVP(nvp);
+            this.ApiKey = llms.internal.getApiKeyFromNvpOrEnv(nvp);
         end
 
         function [text, message, response] = generate(this, messages, nvp)
@@ -146,7 +148,7 @@ classdef(Sealed) openAIChat
             %   with the specified MESSAGES and optional
             %   name-value pair arguments.
             %
-            %   [TEXT, MESSAGE, RESPONSE] = generate(_______, Name=Value) specifies additional options
+            %   [TEXT, MESSAGE, RESPONSE] = generate(__, Name=Value) specifies additional options
             %   using one or more name-value arguments:
             %
             %       NumCompletions   - Number of completions to generate.
@@ -230,17 +232,17 @@ classdef(Sealed) openAIChat
         function mustBeValidFunctionCall(this, functionCall)
             if ~isempty(functionCall)
                 mustBeTextScalar(functionCall);
-                if isempty(this.FunctionsNames)
+                if isempty(this.FunctionNames)
                     error("llms:mustSetFunctionsForCall", llms.utils.errorMessageCatalog.getMessage("llms:mustSetFunctionsForCall"));
                 end
-                mustBeMember(functionCall, ["none","auto", this.FunctionsNames]);
+                mustBeMember(functionCall, ["none","auto", this.FunctionNames]);
             end
         end
 
         function functionCall = convertFunctionCall(this, functionCall)
             % If functionCall is not empty, then it must be in
             % the format {"name", functionCall}
-            if ~isempty(functionCall)&&ismember(functionCall, this.FunctionsNames)
+            if ~isempty(functionCall)&&ismember(functionCall, this.FunctionNames)
                 functionCall = struct("name", functionCall);
             end
 
@@ -249,14 +251,14 @@ classdef(Sealed) openAIChat
 end
 
 
-function [functionsStruct, functionsNames] = functionAsStruct(functions)
+function [functionsStruct, functionNames] = functionAsStruct(functions)
 numFunctions = numel(functions);
 functionsStruct = cell(1, numFunctions);
-functionsNames = strings(1, numFunctions);
+functionNames = strings(1, numFunctions);
 
 for i = 1:numFunctions
     functionsStruct{i} = encodeStruct(functions(i));
-    functionsNames(i) = functions(i).FunctionName;
+    functionNames(i) = functions(i).FunctionName;
 end
 end
 
@@ -282,11 +284,6 @@ end
 function mustBeValidTopP(value)
 mustBeNonnegative(value);
 mustBeLessThanOrEqual(value,1);
-end
-
-function mustBeValidModelName(value)
-mustBeNonzeroLengthText(value);
-mustBeMember(value,openAIChat.AvailableModels);
 end
 
 function mustBeValidTemperature(value)

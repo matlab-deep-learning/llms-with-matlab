@@ -1,7 +1,7 @@
-function key = checkEnvOrNVP(nvp)
+function key = getApiKeyFromNvpOrEnv(nvp)
 % This function is undocumented and will change in a future release
 
-%checkEnvOrNVP Retrieves an API key from a Name-Value Pair struct or environment variable.
+%getApiKeyFromNvpOrEnv Retrieves an API key from a Name-Value Pair struct or environment variable.
 %
 %   This function takes a struct nvp containing name-value pairs and checks
 %   if it contains a field called "ApiKey". If the field is not found, 
