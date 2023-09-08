@@ -28,6 +28,13 @@ classdef topenAIChat < matlab.unittest.TestCase
             testCase.verifyWarningFree(@()generate(chat,"This is okay"));
         end
 
+        function generateAcceptsMessagesAsInput(testCase)
+            chat = openAIChat(ApiKey="this-is-not-a-real-key");
+            messages = openAIMessages;
+            messages = addUserMessage(messages, "This should be okay.");
+            testCase.verifyWarningFree(@()generate(chat,messages));
+        end
+
         function keyNotFound(testCase)
             testCase.verifyError(@()openAIChat, "llms:keyMustBeSpecified");
         end

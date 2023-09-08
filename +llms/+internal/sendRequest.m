@@ -8,7 +8,7 @@ function response = sendRequest(parameters, token, endpoint)
 
     % Define the headers for the API request
     
-    headers = [matlab.net.http.HeaderField('Content-Type', 'application/json');
+    headers = [matlab.net.http.HeaderField('Content-Type', 'application/json')...
                matlab.net.http.HeaderField('Authorization', "Bearer " + token)];
     % Define the request message
     request = matlab.net.http.RequestMessage('post',headers,parameters);
