@@ -147,14 +147,11 @@ Then the model can give a more precise answer based on the result of the functio
 ```
 
 ## Examples
-To learn how to use this in testing workflows, see [Examples](/examples/). 
+To learn how to use this in your workflows, see [Examples](/examples/). 
 
-- [ExampleBasicUsage.mlx](/examples/ExampleBasicUsage.mlx): A beginner's guide to using ChatGPT with a focus on parameter settings like temperature for controlling text generation.
-- [ExampleSummarization.mlx](/examples/ExampleSummarization.mlx):  Learn to create concise summaries of long texts with ChatGPT.
-- [ExampleChatBot.mlx](/examples/ExampleChatBot.mlx): Build a conversational chatbot capable of handling various dialogue scenarios using ChatGPT.
-- [ExampleRetrievalAugmentedGeneration.mlx](/examples/ExampleRetrievalAugmentedGeneration.mlx): Enhance ChatGPT responses by integrating data retrieved from a separate knowledge base.
-- [ExampleRobotControl.mlx](/examples/ExampleRobotControl.mlx): Translate natural language commands into robotic actions using ChatGPT.
-- [ExampleAgentCreation.mlx](/examples/ExampleAgentCreation.mlx): Learn how to create agents capable of execting MATLAB functions.
+- [ExampleSummarization.m](/examples/ExampleSummarization.m):  Learn to create concise summaries of long texts with ChatGPT.
+- [ExampleChatBot.m](/examples/ExampleChatBot.mlx): Build a conversational chatbot capable of handling various dialogue scenarios using ChatGPT.
+- [ExampleFunctionCalling.m](/examples/ExampleFunctionCalling.m): Learn how to create agents capable of executing MATLAB functions.
 
 ## License
 
