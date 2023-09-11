@@ -185,7 +185,7 @@ classdef (Sealed) openAIMessages
             else
                 % function_call message
                 functionCall = struct("name", contentOrfunctionName, "arguments", arguments);
-                newMessage = struct("role", "assistant", "content", [], "function_call", functionCall);
+                newMessage = struct("role", "assistant", "content", "", "function_call", functionCall);
             end
             
             if isempty(this.Messages)
