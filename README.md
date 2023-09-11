@@ -150,7 +150,7 @@ Then the model can give a more precise answer based on the result of the functio
 To learn how to use this in your workflows, see [Examples](/examples/). 
 
 - [ExampleSummarization.m](/examples/ExampleSummarization.m):  Learn to create concise summaries of long texts with ChatGPT.
-- [ExampleChatBot.m](/examples/ExampleChatBot.mlx): Build a conversational chatbot capable of handling various dialogue scenarios using ChatGPT.
+- [ExampleChatBot.m](/examples/ExampleChatBot.m): Build a conversational chatbot capable of handling various dialogue scenarios using ChatGPT.
 - [ExampleFunctionCalling.m](/examples/ExampleFunctionCalling.m): Learn how to create agents capable of executing MATLAB functions.
 
 ## License
