@@ -1,4 +1,4 @@
-# Large Language Models (LLMs) with MATLAB®
+# Large Language Models (LLMs) with MATLAB® [![Open in MATLAB Online](https://www.mathworks.com/images/responsive/global/open-in-matlab-online.svg)](<link>)
 
 This repository contains example code to demonstrate how to connect MATLAB to the OpenAI™ Chat Completions API (which powers ChatGPT™). This allows you to leverage the natural language processing capabilities of GPT models directly within your MATLAB environment.
 
