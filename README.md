@@ -1,10 +1,22 @@
-# Large Language Models with MATLAB®
+# Large Language Models (LLMs) with MATLAB®
 
 This repository contains example code to demonstrate how to connect MATLAB to the OpenAI™ Chat Completions API (which powers ChatGPT™). This allows you to leverage the natural language processing capabilities of GPT models directly within your MATLAB environment.
 
-The functionality shown here simply serves as an interface to the ChatGPT API. You should be familiar with the limitations and risks associated with using this technology as well as with [OpenAI terms and policies](https://openai.com/policies). You are responsible for any fees OpenAI may charge for the use of their API.
+The functionality shown here serves as an interface to the ChatGPT API. To start using the ChatGPT API, you first need to obtain the OpenAI API keys. You are responsible for any fees OpenAI may charge for the use of their API. 
 
-## Setup 
+The current LLMs supported are:
+- gpt-3.5-turbo
+- gpt-3.5-turbo-0613
+- gpt-3.5-turbo-16k
+- gpt-3.5-turbo-16k-0613
+- gpt-4
+- gpt-4-0613
+- gpt-4-32k
+- gpt-4-32k-0613
+
+For details on the specification of each model, check the official [OpenAI documentation](https://platform.openai.com/docs/models).
+
+## Setup
 1. Clone the repository to your local machine.
 
     ```bash
@@ -21,29 +33,32 @@ The functionality shown here simply serves as an interface to the ChatGPT API. Y
 
 4. Set up your OpenAI API key. You can either:
     - Pass it directly to the `openAIChat` class, using the nvp `ApiKey`
-    - Or set it as an environment variable.
+    - Or set it as an environment variable using [`setenv`](https://www.mathworks.com/help/matlab/ref/setenv.html) or [`loadenv`](https://www.mathworks.com/help/matlab/ref/loadenv.html):
     ```matlab
     setenv("OPENAI_API_KEY","your key here")
     ```
+    or
+    ```matlab
+    loadenv(filename)
+    ```
+
 
 ### MathWorks Products (https://www.mathworks.com)
 
-Requires MATLAB release R2023a or newer
-- Text Analytics Toolbox™
-
+- Requires MATLAB release R2023a or newer.
 
 ### 3rd Party Products:
-3p:
+
 - An active OpenAI API subscription and API key.
 
 
-## Getting Started 
+## Getting Started
 
 To get started, you can either create an `openAIChat` object and use its methods or use it in a more complex setup, as needed.
 
 ### Simple call without preserving chat history
 
-In some situations, you will want to use GPT models without preserving chat history. For example, when you want to perform independent queries in a programmatic way. 
+In some situations, you will want to use GPT models without preserving chat history. For example, when you want to perform independent queries in a programmatic way.
 
 Here's a simple example of how to use the `openAIChat` for sentiment analysis:
 
@@ -64,7 +79,7 @@ systemPrompt = "You are a sentiment analyser. You will look at a sentence and ou
 chat = openAIChat(systemPrompt);
 
 % Generate a response, passing a new sentence for classification
-text = generate(chat, "The team is feeling very motivated")
+text = generate(chat,"The team is feeling very motivated")
 % Should output "positive"
 ```
 
@@ -87,7 +102,7 @@ chat = openAIChat("You are a helpful AI assistant.");
 Add a user message to the history and pass it to `generate`
 
 ```matlab
-history = addUserMessage(history, "What is an eigenvalue?");
+history = addUserMessage(history,"What is an eigenvalue?");
 [text, response] = generate(chat, history)
 ```
 
@@ -98,60 +113,135 @@ history = addResponseMessage(history, response);
 
 You can keep interacting with the API and since we are saving the history, it will know about previous interactions.
 ```matlab
-history = addUserMessage(history, "Generate MATLAB code that computes that");
-[text, response] = generate(chat, history);
+history = addUserMessage(history,"Generate MATLAB code that computes that");
+[text, response] = generate(chat,history);
 % Will generate code to compute the eigenvalue
 ```
 
-### Passing functions to API
+### Calling MATLAB functions with the API
 
-You can define functions that the API is allowed to request calls using `openAIFunction`. For example, to define the `editDistance` function for string values, you can do as follows:
+The optional parameter `functions` can be used to provide function specifications to the API. The purpose of this is to enable models to generate function arguments which adhere to the provided specifications. 
+Note that the API is not able to directly call any function, so you should call the function and pass the values to the API directly. This process can be automated as shown in [ExampleFunctionCalling.m](/examples/ExampleFunctionCalling.m), but it's important to consider that ChatGPT can hallucinate function names, so avoid executing any arbitrary generated functions and only allow the execution of functions that you have defined. 
 
-```matlab
-f = openAIFunction("editDistance", "Find edit distance between two strings or documents");
-```
+For example, if you want to use the API for mathematical operations such as `sind`, instead of letting the model generate the result and risk running into hallucinations, you can give the model direct access to the function as follows:
 
-You also have to define what parameters the function can take, providing details on the properties of each parameter. The properties can be `type`, `description` or `enum`.
 
 ```matlab
-f = addParameter(f, "str1", type="string", description="Source string.");
-f = addParameter(f, "str2", type="string", description="Target string.");
+f = openAIFunction("sind","Sine of argument in degrees");
+f = addParameter(f,"x",type="number",description="Angle in degrees.");
+chat = openAIChat("You are a helpful assistant.",Functions=f);
 ```
 
-Then you can pass the functions to the chat API as follows:
+When the model identifies that it could use the defined functions to answer a query, it will return a `function_call` request, instead of directly generating the response:
 
 ```matlab
-chat = openAIChat("You are a helpful assistant", Functions=f);
+messages = addUserMessage(messages, "What is the sine of 30?");
+[text, response] = generate(chat, messages);
 ```
 
-The model will automatically determine if the function should be called based on the user input:
+The variable `response` should contain a request for a function call.
+```bash
+>> response
+
+response = 
+
+  struct with fields:
+
+             role: 'assistant'
+          content: []
+    function_call: [1×1 struct]
+
+>> response.function_call
+
+ans = 
+
+  struct with fields:
+
+         name: 'sind'
+    arguments: '{↵  "x": 30↵}'
+```
+
+You can then call the function `sind` with the specified argument and return the value to the API add a function message to the history:
 
 ```matlab
-history = openAIMessages;
-history = addUserMessage(history, "What is the edit distance between MathWorks and MATLAB?");
-
-[text, response] = generate(chat, history);
+% Arguments are returned as a json, so you need to decode it first
+args = jsondecode(response.function_call.arguments);
+result = sind(args.x);
+messages = addFunctionMessage(messages,"sind","x="+result);
+[text, response] = generate(chat, messages);
 ```
 
-If the model sends back an empty `text` and a response containing a field `function_call`, it means it's requesting that you call a function. The model is not able to automatically execute a function. 
+The model then will use the function result to generate a more precise response:
 
-Once you have the result of the requested function, you can add the value to the history as a function message:
+```shell
+>> text
 
-```
-history = addFunctionMessage(history, "editDistance", "8"); 
+text = 
+
+    "The sine of 30 degrees is approximately 0.5."
 ```
 
-Then the model can give a more precise answer based on the result of the function:
+### Extracting structured information with the API
+
+Another useful application for defining functions is extract structured information from some text. You can just pass a function with the output format that you would like the model to output and the information you want to extract. For example, consider the following piece of text:
+
+```matlab
+patientReport = "Patient John Doe, a 45-year-old male, presented " + ...
+    "with a two-week history of persistent cough and fatigue. " + ...
+    "Chest X-ray revealed an abnormal shadow in the right lung." + ...
+    " A CT scan confirmed a 3cm mass in the right upper lobe," + ...
+    " suggestive of lung cancer. The patient has been referred " + ...
+    "for biopsy to confirm the diagnosis.";
 ```
-[text, response] = generate(chat, history);
+
+If you want to extract information from this text, you can define a function as follows:
+```matlab
+f = openAIFunction("extractPatientData","Extracts data about a patient from a record");
+f = addParameter(f,"patientName",type="string",description="Name of the patient");
+f = addParameter(f,"patientAge",type="number",description="Age of the patient");
+f = addParameter(f,"patientSymptoms",type="string",description="Symptoms that the patient is having.");
 ```
+
+Note that this function does not need to exist, since it will only be used to extract the Name, Age and Symptoms of the patient and it does not need to be called:
+
+```matlab
+chat = openAIChat("You are helpful assistant that reads patient records and extracts information", ...
+    Functions=f);
+messages = openAIMessages;
+messages = addUserMessage(messages,"Extract the information from the report:" + newline + patientReport);
+[text, response] = generate(chat, messages);
+```
+
+The model should return the extracted information as a function call:
+```shell
+>> response
+
+response = 
+
+  struct with fields:
+
+             role: 'assistant'
+          content: []
+    function_call: [1×1 struct]
+
+>> response.function_call
+
+ans = 
+
+  struct with fields:
+
+         name: 'extractPatientData'
+    arguments: '{↵  "patientName": "John Doe",↵  "patientAge": 45,↵  "patientSymptoms": "persistent cough, fatigue"↵}'
+```
+
+You can extract the arguments and write the data to a table, for example.
 
 ## Examples
-To learn how to use this in your workflows, see [Examples](/examples/). 
+To learn how to use this in your workflows, see [Examples](/examples/).
 
-- [ExampleSummarization.m](/examples/ExampleSummarization.m):  Learn to create concise summaries of long texts with ChatGPT.
-- [ExampleChatBot.m](/examples/ExampleChatBot.mlx): Build a conversational chatbot capable of handling various dialogue scenarios using ChatGPT.
-- [ExampleFunctionCalling.m](/examples/ExampleFunctionCalling.m): Learn how to create agents capable of executing MATLAB functions.
+- [ExampleSummarization.m](/examples/ExampleSummarization.m):  Learn to create concise summaries of long texts with ChatGPT. (Requires Text Analytics Toolbox™)
+- [ExampleChatBot.m](/examples/ExampleChatBot.m): Build a conversational chatbot capable of handling various dialogue scenarios using ChatGPT. (Requires Text Analytics Toolbox)
+- [ExampleFunctionCalling.m](/examples/ExampleFunctionCalling.m): Learn how to create agents capable of executing MATLAB functions. 
 
 ## License
 

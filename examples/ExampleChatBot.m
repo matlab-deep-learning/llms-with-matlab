@@ -2,13 +2,15 @@
 % This script orchestrates a chat interaction with the OpenAI Chat Completions API, taking user
 % inputs, maintaining a word count, and ensuring the chat remains within a 
 % predefined word limit. 
+% 
+% Running this example will start an interactive ChatBot in your terminal and it can be ended
+% by pressing Ctrl+C or typing "end".
 
 % Set the maximum allowable number of words per chat session
 wordLimit = 2000;
 
 % Define the keyword that, when entered by the user, ends the chat session
 stopWord = "end";
-
 
 modelName = "gpt-3.5-turbo";
 chat = openAIChat("You are a helpful assistant.", ModelName=modelName);
