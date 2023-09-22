@@ -2,7 +2,7 @@
 
 This repository contains example code to demonstrate how to connect MATLAB to the OpenAI™ Chat Completions API (which powers ChatGPT™). This allows you to leverage the natural language processing capabilities of GPT models directly within your MATLAB environment.
 
-The functionality shown here serves as an interface to the ChatGPT API. To start using the ChatGPT API, you first need to obtain the OpenAI API keys. You are responsible for any fees OpenAI may charge for the use of their API. 
+The functionality shown here serves as an interface to the ChatGPT API. To start using the ChatGPT API, you first need to obtain the OpenAI API keys. You are responsible for any fees OpenAI may charge for the use of their API. You should be familiar with the limitations and risks associated with using this technology, and you agree that you shall be solely responsible for full compliance with any terms that may apply to your use of the OpenAI Chat Completions API.
 
 The current LLMs supported are:
 - gpt-3.5-turbo
