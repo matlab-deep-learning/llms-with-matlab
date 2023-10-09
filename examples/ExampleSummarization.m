@@ -6,8 +6,8 @@
 % piece of text extracted from a webpage hosted by MathWorks.
 
 % Initiating a ChatGPT session with the role defined as a professional summarizer
-chat = openAIChat("You are a professional summarizer, create a summary of the provided text, be it an article, post, conversation, or passage.");
-
+chat = openAIChat("You are a professional summarizer, create a summary of the provided text, be it an article," + ...
+    " post, conversation, or passage.");
 
 url = "https://www.mathworks.com/help/textanalytics";
 code = webread(url);
@@ -19,11 +19,11 @@ shortTextSummary = generate(chat, shortText)
 %% Summarizing large documents
 % This section of the script demonstrates how to incrementally summarize a large text
 % by breaking it into smaller chunks and summarizing each chunk step by
-% step. It uses as input text Romeo and Juliet, by William Shakespeare,
-% from The Project Gutenberg.
+% step. It uses as input text Alice's Adventures in Wonderland by
+% Lewis Carroll from Project Gutenberg.
 
 options = weboptions(Timeout=30);
-code = webread("https://www.gutenberg.org/files/1513/1513-h/1513-h.htm", options);
+code = webread("https://www.gutenberg.org/files/11/11-h/11-h.htm", options);
 longText = extractHTMLText(string(code));
 
 incrementalSummary = longText;

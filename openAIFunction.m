@@ -2,7 +2,7 @@ classdef (Sealed) openAIFunction
 %openAIFunction   Define a function
 %
 %   FUNC = openAIFunction(NAME, DESCRIPTION) creates an open AI function
-%   object with the specified NAME and DESCRIPTION.
+%   object with the specified name and description.
 %
 %   openAIFunction Functions:
 %       openAIFunction - Define a function.
@@ -48,28 +48,27 @@ classdef (Sealed) openAIFunction
         function this = addParameter(this, parameterName, propertyName, propertyValue, nvp)
             %addParameter   Add parameter to the function
             %
-            %   FUNC = addParameter(FUNC, parameterName, propertyName, propertyValue)
-            %   adds a parameter to the function signature with name parameterName and
-            %   property propertyName with value propertyValue. Inputs propertyName and
-            %   propertyValue can be specified repeatedly. The values
-            %   accepted for propertyNames are "type", "description" and
-            %   "enum". Each propertyName will accept different values 
-            %   for propertyValue: 
-            %   - type: accepts "string", "number", "integer", "object", "boolean",
-            %       "null" and any combination of those values.
-            %   - description: accepts text scalar.
-            %   - enum: accepts string vectors of text.
+            %   FCN = addParameter(FCN,paramName,propName1,value1, ..., propNameN,valueN)
+            %   adds the specified parameter and corresponding property names and values to the
+            %   function signature. The property names must be 
+            %   "type", "description", or "enum".
+            %   The values depend on the property name:
+            %   - Values corresponding to "type" must be any combination of "string",
+            %   "number", "integer", "object", "boolean", "null".
+            %   - Values corresponding to "description" must be a string scalar.
+            %   - Value corresponging to "enum" must be string vectors.
             %
-            %   FUNC = addParameter(__, RequiredParameter=TF), specifies
-            %   if the parameter is required.
+            %   FCN = addParameter(__,RequiredParameter=TF), specifies
+            %   if the parameter is a required parameter.
             %
             %   Example:
             %   % Create an OpenAI function object
             %   f = openAIFunction("editDistance", "Find edit distance between two strings or documents");
             %
             %   % Add two parameters with type and description
-            %   f = addParameter(f, "str1", type="string", description="Source string.");
-            %   f = addParameter(f, "str2", type="string", description="Target string.");
+            %   f = addParameter(f,"str1","type","string","description","Source string.");
+            %   f = addParameter(f,"str2","type","string" ,"description","Target string.");
+
 
             arguments
                 this (1,1) openAIFunction

@@ -24,7 +24,7 @@ classdef (Sealed) openAIMessages
             %addSystemMessage   Add system message.
             %
             %   MESSAGES = addSystemMessage(MESSAGES, NAME, CONTENT) adds a system
-            %   message with the specified NAME and CONTENT. NAME and CONTENT
+            %   message with the specified name and content. NAME and CONTENT
             %   must be text scalars.
             %
             %   Example:
@@ -51,7 +51,7 @@ classdef (Sealed) openAIMessages
             %addUserMessage   Add user message.
             %
             %   MESSAGES = addUserMessage(MESSAGES, CONTENT) adds a user message
-            %   with the specified CONTENT to MESSAGES. CONTENT must be a text scalar.
+            %   with the specified content to MESSAGES. CONTENT must be a text scalar.
             %
             %   Example:
             %   % Create messages object
@@ -73,7 +73,7 @@ classdef (Sealed) openAIMessages
             %addFunctionMessage   Add function message.
             %
             %   MESSAGES = addFunctionMessage(MESSES, NAME, CONTENT) adds a function
-            %   message with the specified NAME and CONTENT. NAME and
+            %   message with the specified name and content. NAME and
             %   CONTENT must be text scalars.
             %
             %   Example:
@@ -145,7 +145,7 @@ classdef (Sealed) openAIMessages
             %removeMessage   Remove message.
             %
             %   MESSAGES = removeMessage(MESSAGES, IDX) removes a message at the specified
-            %   IDX from MESSAGES. IDX must be a positive integer.
+            %   index from MESSAGES. IDX must be a positive integer.
             %
             %   Example:
             %

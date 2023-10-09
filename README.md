@@ -4,19 +4,18 @@ This repository contains example code to demonstrate how to connect MATLAB to th
 
 The functionality shown here serves as an interface to the ChatGPT API. To start using the ChatGPT API, you first need to obtain the OpenAI API keys. You are responsible for any fees OpenAI may charge for the use of their API. You should be familiar with the limitations and risks associated with using this technology, and you agree that you shall be solely responsible for full compliance with any terms that may apply to your use of the OpenAI Chat Completions API.
 
-The current LLMs supported are:
+Some of the current LLMs supported are:
 - gpt-3.5-turbo
-- gpt-3.5-turbo-0613
-- gpt-3.5-turbo-16k
-- gpt-3.5-turbo-16k-0613
 - gpt-4
-- gpt-4-0613
-- gpt-4-32k
-- gpt-4-32k-0613
 
 For details on the specification of each model, check the official [OpenAI documentation](https://platform.openai.com/docs/models).
 
 ## Setup
+
+If you would like to use this repository with MATLAB Online, simply click [![Open in MATLAB Online](https://www.mathworks.com/images/responsive/global/open-in-matlab-online.svg)](https://matlab.mathworks.com/open/github/v1?repo=matlab-deep-learning/llms-with-matlab)
+
+If you would like to use it with MATLAB Desktop, proceed with the following steps:
+
 1. Clone the repository to your local machine.
 
     ```bash
@@ -41,7 +40,6 @@ For details on the specification of each model, check the official [OpenAI docum
     ```matlab
     loadenv(filename)
     ```
-
 
 ### MathWorks Products (https://www.mathworks.com)
 
