@@ -26,6 +26,8 @@ classdef topenAIChat < matlab.unittest.TestCase
         function generateAcceptsSingleStringAsInput(testCase)
             chat = openAIChat(ApiKey="this-is-not-a-real-key");
             testCase.verifyWarningFree(@()generate(chat,"This is okay"));
+            chat = openAIChat(ApiKey='this-is-not-a-real-key');
+            testCase.verifyWarningFree(@()generate(chat,"This is okay"));
         end
 
         function generateAcceptsMessagesAsInput(testCase)
@@ -307,7 +309,7 @@ invalidConstructorInput = struct( ...
     ...
     "InvalidApiKeySize",struct( ...
         "Input",{{ "ApiKey" ["abc" "abc"] }},...
-        "Error","MATLAB:validation:IncompatibleSize"));
+        "Error","MATLAB:validators:mustBeTextScalar"));
 end
 
 function invalidGenerateInput = iGetInvalidGenerateInput
@@ -355,4 +357,3 @@ invalidGenerateInput = struct( ...
             "Input",{{ validMessages  "FunctionCall" ["validfunction", "validfunction"] }},...
             "Error","MATLAB:validators:mustBeTextScalar"));
 end
-

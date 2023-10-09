@@ -39,11 +39,11 @@ classdef (Sealed) openAIMessages
 
             arguments
                 this (1,1) openAIMessages 
-                name (1,1) {mustBeNonzeroLengthText}
-                content (1,1) {mustBeNonzeroLengthText}
+                name {mustBeNonzeroLengthTextScalar}
+                content {mustBeNonzeroLengthTextScalar}
             end
 
-            newMessage = struct("role", "system", "name", name, "content", content);
+            newMessage = struct("role", "system", "name", string(name), "content", string(content));
             this.Messages{end+1} = newMessage;
         end
 
@@ -62,10 +62,10 @@ classdef (Sealed) openAIMessages
 
             arguments
                 this (1,1) openAIMessages
-                content (1,1) {mustBeNonzeroLengthText}
+                content {mustBeNonzeroLengthTextScalar}
             end
 
-            newMessage = struct("role", "user", "content", content);
+            newMessage = struct("role", "user", "content", string(content));
             this.Messages{end+1} = newMessage;
         end
 
@@ -86,11 +86,11 @@ classdef (Sealed) openAIMessages
 
             arguments
                 this (1,1) openAIMessages
-                name (1,1) {mustBeNonzeroLengthText}
-                content (1,1) {mustBeNonzeroLengthText}
+                name {mustBeNonzeroLengthTextScalar}
+                content {mustBeNonzeroLengthTextScalar}
             end
 
-            newMessage = struct("role", "function", "name", name, "content", content);
+            newMessage = struct("role", "function", "name", string(name), "content", string(content));
             this.Messages{end+1} = newMessage;
         end
        
@@ -133,7 +133,7 @@ classdef (Sealed) openAIMessages
             if isfield(messageStruct, "function_call")
                 funCall = messageStruct.function_call;
                 validateAssistantWithFunctionCall(funCall)
-                this = addAssistantMessage(this,funCall.name, funCall.arguments);
+                this = addAssistantMessage(this, funCall.name, funCall.arguments);
             else
                 % Simple assistant response
                 validateRegularAssistant(messageStruct.content);
@@ -195,6 +195,11 @@ classdef (Sealed) openAIMessages
             end
         end
     end
+end
+
+function mustBeNonzeroLengthTextScalar(content)
+mustBeNonzeroLengthText(content)
+mustBeTextScalar(content)
 end
 
 function validateRegularAssistant(content)
