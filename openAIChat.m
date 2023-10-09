@@ -52,8 +52,6 @@ classdef(Sealed) openAIChat
 %
 %       SystemPrompt         - System prompt.
 %
-%       AvailableModels      - List of available models.
-%
 %       FunctionNames        - Names of the functions that the model can
 %                              request calls.
 
@@ -93,25 +91,18 @@ classdef(Sealed) openAIChat
         ApiKey    
     end
 
-    properties(Constant)
-        %AVAILABLEMODELS   List of available models.
-        AvailableModels = ["gpt-4", "gpt-4-0613", "gpt-4-32k", "gpt-4-32k-0613",...
-            "gpt-3.5-turbo", "gpt-3.5-turbo-0613", "gpt-3.5-turbo-16k",... 
-            "gpt-3.5-turbo-16k-0613"]
-    end
-
     methods
         function this = openAIChat(systemPrompt, nvp)           
             arguments
                 systemPrompt                       {llms.utils.mustBeTextOrEmpty} = []
                 nvp.Functions                (1,:) {mustBeA(nvp.Functions, "openAIFunction")} = openAIFunction.empty
-                nvp.ModelName                (1,1) {mustBeMember(nvp.ModelName,["gpt-4", "gpt-4-0613", "gpt-4-32k", "gpt-4-32k-0613",...
+                nvp.ModelName                (1,1) {mustBeMember(nvp.ModelName,["gpt-4", "gpt-4-0613", "gpt-4-32k", ...
                                                         "gpt-3.5-turbo", "gpt-3.5-turbo-0613", "gpt-3.5-turbo-16k",... 
                                                         "gpt-3.5-turbo-16k-0613"])} = "gpt-3.5-turbo"
                 nvp.Temperature              (1,1) {mustBeValidTemperature} = 1
                 nvp.TopProbabilityMass       (1,1) {mustBeValidTopP} = 1
                 nvp.StopSequences            (1,:) {mustBeValidStop} = {}
-                nvp.ApiKey                   (1,1) {mustBeNonzeroLengthText} 
+                nvp.ApiKey                   {mustBeNonzeroLengthTextScalar} 
                 nvp.PresencePenalty          (1,1) {mustBeValidPenalty} = 0
                 nvp.FrequencyPenalty         (1,1) {mustBeValidPenalty} = 0
             end
@@ -250,6 +241,10 @@ classdef(Sealed) openAIChat
     end
 end
 
+function mustBeNonzeroLengthTextScalar(content)
+mustBeNonzeroLengthText(content)
+mustBeTextScalar(content)
+end
 
 function [functionsStruct, functionNames] = functionAsStruct(functions)
 numFunctions = numel(functions);
@@ -269,7 +264,7 @@ if isa(value, "openAIMessages")
     end
 else
     try 
-        mustBeNonzeroLengthText(value);
+        mustBeNonzeroLengthTextScalar(value);
     catch ME
         error("llms:mustBeMessagesOrTxt", llms.utils.errorMessageCatalog.getMessage("llms:mustBeMessagesOrTxt"));
     end
