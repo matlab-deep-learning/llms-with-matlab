@@ -4,32 +4,32 @@ classdef(Sealed) openAIChat
 %   CHAT = openAIChat(systemPrompt) creates an openAIChat object with the
 %   specified system prompt.
 %
-%   CHAT = openAIChat(systemPrompt, Name=Value) specifies additional options
+%   CHAT = openAIChat(systemPrompt,ApiKey=key) uses the specified API key
+%
+%   CHAT = openAIChat(systemPrompt,Name=Value) specifies additional options
 %   using one or more name-value arguments:
 %
-%   'Functions'              - An array of openAIFunction objects representing
+%   Functions               - Array of openAIFunction objects representing
 %                             custom functions to be used during chat completions.
 %
-%   'ModelName'              - The name of the model to use for chat completions.
+%   ModelName               - Name of the model to use for chat completions.
 %                             The default value is "gpt-3.5-turbo".
 %
-%   'Temperature'            - The temperature value for controlling the randomness
-%                             of the output. The default value is 1.
+%   Temperature             - Temperature value for controlling the randomness
+%                             of the output. Default value is 1.
 %
-%   'TopProbabilityMass'     - The top probability mass value for controlling the
-%                             diversity of the output. The default value is 1.
+%   TopProbabilityMass      - Top probability mass value for controlling the
+%                             diversity of the output. Default value is 1.
 %
-%   'StopSequences'          - Vector of strings that when encountered, will
-%                             stop the generation of tokens. The default
+%   StopSequences           - Vector of strings that when encountered, will
+%                             stop the generation of tokens. Default
 %                             value is empty.
 %
-%   'ApiKey'                 - The API key for accessing the OpenAI Chat API.
+%   PresencePenalty         - Penalty value for using a token in the response
+%                             that has already been used. Default value is 0.
 %
-%   'PresencePenalty'        - The penalty value for using a token in the response
-%                             that has already been used.  The default value is 0.
-%
-%   'FrequencyPenalty'       - The penalty value for using a token that is frequent
-%                             in the training data.  The default value is 0.
+%   FrequencyPenalty         - Penalty value for using a token that is frequent
+%                             in the training data. Default value is 0.
 %
 %   openAIChat Functions:
 %       openAIChat           - Chat completion API from OpenAI.
@@ -145,20 +145,19 @@ classdef(Sealed) openAIChat
             %generate   Generate a response using the openAIChat instance.
             %
             %   [TEXT, MESSAGE, RESPONSE] = generate(CHAT, MESSAGES) generates a response
-            %   with the specified MESSAGES and optional
-            %   name-value pair arguments.
+            %   with the specified MESSAGES.
             %
             %   [TEXT, MESSAGE, RESPONSE] = generate(__, Name=Value) specifies additional options
             %   using one or more name-value arguments:
             %
             %       NumCompletions   - Number of completions to generate.
-            %                          The default value is 1.
+            %                          Default value is 1.
             %
             %       MaxNumTokens     - Maximum number of tokens in the generated response.
-            %                          The default value is inf.
+            %                          Default value is inf.
             %
             %       FunctionCall     - Function call to execute before generating the
-            %                          response. The default value is empty.
+            %                          response, specified as a string array. Default value is empty.
             
             arguments
                 this                    (1,1) openAIChat
