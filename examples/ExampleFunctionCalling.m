@@ -39,20 +39,18 @@ code = webread(urlQuery,options);
 % Extract individual paper entries from the API response and use ChatGPT 
 % to determine whether each paper is related to the specified topic.
 
-pattern = '<entry>(.*?)</entry>';
-
 % ChatGPT will parse the XML file, so we only need to extract the relevant
 % entries.
-matches = regexp(code, pattern, 'tokens');
+entries = extractBetween(code, '<entry>', '</entry>');
 
 % Determine the topic of interest
 topic = "Embedding documents or sentences";
 
 % Loop over the entries and see if they are relevant to the topic of
 % interest.
-for i = 1:length(matches)
+for i = 1:length(entries)
     prompt =  "Given the following paper:" + newline +...
-        string(matches{i})+ newline +...
+        string(entries{i})+ newline +...
         "Is it related to the topic: "+ topic +"?" + ...
         " Answer 'yes' or 'no'.";
     [text, response] = generate(chat, prompt);
@@ -60,7 +58,7 @@ for i = 1:length(matches)
     % If the model classifies this entry as relevant, then it tries to
     % request a function call.
     if contains("yes", text, IgnoreCase=true)
-        prompt =  "Given the following paper:" + newline + string(matches{i})+ newline +...
+        prompt =  "Given the following paper:" + newline + string(entries{i})+ newline +...
             "Given the topic: "+ topic + newline + "Write the details to a table.";
         [text, response] = generate(chat, prompt);
 
