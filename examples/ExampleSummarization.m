@@ -39,11 +39,19 @@ summarizer = openAIChat("You are a professional summarizer.");
 
 % Looping process to gradually summarize the text chunk by chunk, reducing
 % the chunk size with each iteration. 
+numCalls = 0;
 while numel(chunks)>1
     summarizedChunks = strings(size(chunks));
+    numCalls = numCalls + numel(chunks);
+    % Add a limit to the number of calls, to ensure you are not making
+    % more calls than what is expected. You can change this value to match
+    % what is needed for your application.
+    if numCalls > 20
+        error("Document is too long to be summarized.")
+    end
 
     for i = 1:length(chunks)
-     summarizedChunks(i) = generate(summarizer, "Summarize this content:" + newline + chunks(i));
+     summarizedChunks(i) = generate(summarizer, "Summarize this content:" + newline + chunks(i));     
     end
     
     % Merging the summarized chunks to serve as the base for the next iteration
