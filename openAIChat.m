@@ -57,10 +57,7 @@ classdef(Sealed) openAIChat
 
 % Copyright 2023 The MathWorks, Inc.
 
-    properties
-        %MODELNAME   Model name.
-        ModelName
-
+    properties        
         %TEMPERATURE   Temperature of generation.
         Temperature
 
@@ -74,15 +71,18 @@ classdef(Sealed) openAIChat
         PresencePenalty
 
         %FREQUENCYPENALTY   Penalty for using a token that is frequent in the training data.
-        FrequencyPenalty
-
-        %SYSTEMPROMPT   System prompt.
-        SystemPrompt = []
+        FrequencyPenalty        
     end
 
     properties(SetAccess=private)  
         %FUNCTIONNAMES   Names of the functions that the model can request calls
         FunctionNames
+
+        %MODELNAME   Model name.
+        ModelName
+
+        %SYSTEMPROMPT   System prompt.
+        SystemPrompt = []
     end
 
     properties(Access=private)
@@ -99,12 +99,12 @@ classdef(Sealed) openAIChat
                 nvp.ModelName                (1,1) {mustBeMember(nvp.ModelName,["gpt-4", "gpt-4-0613", "gpt-4-32k", ...
                                                         "gpt-3.5-turbo", "gpt-3.5-turbo-0613", "gpt-3.5-turbo-16k",... 
                                                         "gpt-3.5-turbo-16k-0613"])} = "gpt-3.5-turbo"
-                nvp.Temperature              (1,1) {mustBeValidTemperature} = 1
-                nvp.TopProbabilityMass       (1,1) {mustBeValidTopP} = 1
-                nvp.StopSequences            (1,:) {mustBeValidStop} = {}
-                nvp.ApiKey                   {mustBeNonzeroLengthTextScalar} 
-                nvp.PresencePenalty          (1,1) {mustBeValidPenalty} = 0
-                nvp.FrequencyPenalty         (1,1) {mustBeValidPenalty} = 0
+                nvp.Temperature                    {mustBeValidTemperature} = 1
+                nvp.TopProbabilityMass             {mustBeValidTopP} = 1
+                nvp.StopSequences                  {mustBeValidStop} = {}
+                nvp.ApiKey                         {mustBeNonzeroLengthTextScalar} 
+                nvp.PresencePenalty                {mustBeValidPenalty} = 0
+                nvp.FrequencyPenalty               {mustBeValidPenalty} = 0
             end
 
             if ~isempty(nvp.Functions)
@@ -180,40 +180,46 @@ classdef(Sealed) openAIChat
         function this = set.Temperature(this, temperature)
             arguments
                 this openAIChat
-                temperature (1,1) {mustBeValidTemperature}
+                temperature 
             end
+            mustBeValidTemperature(temperature);
+            
             this.Temperature = temperature;
         end
 
         function this = set.TopProbabilityMass(this,topP)
             arguments
                 this openAIChat
-                topP (1,1) {mustBeValidTopP}
+                topP
             end
+            mustBeValidTopP(topP);
             this.TopProbabilityMass = topP;
         end
 
         function this = set.StopSequences(this,stop)
             arguments
                 this openAIChat
-                stop (1,:) {mustBeValidStop}
+                stop 
             end
+            mustBeValidStop(stop);
             this.StopSequences = stop;
         end
 
         function this = set.PresencePenalty(this,penalty)
             arguments
                 this openAIChat
-                penalty (1,1) {mustBeValidPenalty}
+                penalty 
             end
+            mustBeValidPenalty(penalty)
             this.PresencePenalty = penalty;
         end
 
         function this = set.FrequencyPenalty(this,penalty)
             arguments
                 this openAIChat
-                penalty (1,1) {mustBeValidPenalty}
+                penalty
             end
+            mustBeValidPenalty(penalty)
             this.FrequencyPenalty = penalty;
         end
     end
@@ -271,24 +277,24 @@ end
 end
 
 function mustBeValidPenalty(value)
-mustBeLessThanOrEqual(value,2);
-mustBeGreaterThanOrEqual(value,-2);
+validateattributes(value, {'numeric'}, {'real', 'scalar', 'nonsparse', '<=', 2, '>=', -2})
 end
 
 function mustBeValidTopP(value)
-mustBeNonnegative(value);
-mustBeLessThanOrEqual(value,1);
+validateattributes(value, {'numeric'}, {'real', 'scalar', 'nonnegative', 'nonsparse', '<=', 1})
 end
 
 function mustBeValidTemperature(value)
-mustBeNonnegative(value);
-mustBeLessThanOrEqual(value,2)
+validateattributes(value, {'numeric'}, {'real', 'scalar', 'nonnegative', 'nonsparse', '<=', 2})
 end
 
 function mustBeValidStop(value)
-mustBeNonzeroLengthText(value);
-% This restriction is set by the OpenAI API
-if numel(value)>4
-    error("llms:stopSequencesMustHaveMax4Elements", llms.utils.errorMessageCatalog.getMessage("llms:stopSequencesMustHaveMax4Elements"));
+if ~isempty(value)
+    mustBeVector(value);
+    mustBeNonzeroLengthText(value);
+    % This restriction is set by the OpenAI API
+    if numel(value)>4
+        error("llms:stopSequencesMustHaveMax4Elements", llms.utils.errorMessageCatalog.getMessage("llms:stopSequencesMustHaveMax4Elements"));
+    end
 end
 end
