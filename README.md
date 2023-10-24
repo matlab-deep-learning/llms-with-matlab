@@ -119,7 +119,7 @@ history = addUserMessage(history,"Generate MATLAB code that computes that");
 ### Calling MATLAB functions with the API
 
 The optional parameter `functions` can be used to provide function specifications to the API. The purpose of this is to enable models to generate function arguments which adhere to the provided specifications. 
-Note that the API is not able to directly call any function, so you should call the function and pass the values to the API directly. This process can be automated as shown in [ExampleFunctionCalling.m](/examples/ExampleFunctionCalling.m), but it's important to consider that ChatGPT can hallucinate function names, so avoid executing any arbitrary generated functions and only allow the execution of functions that you have defined. 
+Note that the API is not able to directly call any function, so you should call the function and pass the values to the API directly. This process can be automated as shown in [ExampleFunctionCalling.mlx](/examples/ExampleFunctionCalling.mlx), but it's important to consider that ChatGPT can hallucinate function names, so avoid executing any arbitrary generated functions and only allow the execution of functions that you have defined. 
 
 For example, if you want to use the API for mathematical operations such as `sind`, instead of letting the model generate the result and risk running into hallucinations, you can give the model direct access to the function as follows:
 
@@ -237,9 +237,9 @@ You can extract the arguments and write the data to a table, for example.
 ## Examples
 To learn how to use this in your workflows, see [Examples](/examples/).
 
-- [ExampleSummarization.m](/examples/ExampleSummarization.m):  Learn to create concise summaries of long texts with ChatGPT. (Requires Text Analytics Toolbox™)
-- [ExampleChatBot.m](/examples/ExampleChatBot.m): Build a conversational chatbot capable of handling various dialogue scenarios using ChatGPT. (Requires Text Analytics Toolbox)
-- [ExampleFunctionCalling.m](/examples/ExampleFunctionCalling.m): Learn how to create agents capable of executing MATLAB functions. 
+- [ExampleSummarization.mlx](/examples/ExampleSummarization.mlx):  Learn to create concise summaries of long texts with ChatGPT. (Requires Text Analytics Toolbox™)
+- [ExampleChatBot.mlx](/examples/ExampleChatBot.mlx): Build a conversational chatbot capable of handling various dialogue scenarios using ChatGPT. (Requires Text Analytics Toolbox)
+- [ExampleFunctionCalling.mlx](/examples/ExampleFunctionCalling.mlx): Learn how to create agents capable of executing MATLAB functions. 
 
 ## License
 
