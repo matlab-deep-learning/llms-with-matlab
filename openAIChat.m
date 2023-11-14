@@ -99,10 +99,6 @@ classdef(Sealed) openAIChat
                 nvp.ModelName                (1,1) {mustBeMember(nvp.ModelName,["gpt-4", "gpt-4-0613", "gpt-4-32k", ...
                                                         "gpt-3.5-turbo", "gpt-3.5-turbo-0613", "gpt-3.5-turbo-16k",... 
                                                         "gpt-3.5-turbo-16k-0613", "gpt-4-1106-preview"])} = "gpt-3.5-turbo"
-<<<<<<< HEAD
-
-=======
->>>>>>> bd6aa28 (New model and example)
                 nvp.Temperature                    {mustBeValidTemperature} = 1
                 nvp.TopProbabilityMass             {mustBeValidTopP} = 1
                 nvp.StopSequences                  {mustBeValidStop} = {}
