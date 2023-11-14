@@ -30,15 +30,16 @@ If you would like to use it with MATLAB Desktop, proceed with the following step
     addpath('path/to/llms-with-matlab');
     ```
 
-4. Set up your OpenAI API key. You can either:
-    - Pass it directly to the `openAIChat` class, using the nvp `ApiKey`
-    - Or set it as an environment variable using [`setenv`](https://www.mathworks.com/help/matlab/ref/setenv.html) or [`loadenv`](https://www.mathworks.com/help/matlab/ref/loadenv.html):
-    ```matlab
-    setenv("OPENAI_API_KEY","your key here")
+4. Set up your OpenAI API key. Create a `.env` file in the project root directory with the following content.
+
     ```
-    or
+    OPENAI_API_KEY=<your key>
+    ```
+    
+    Then load your `.env` file as follows:
+
     ```matlab
-    loadenv(filename)
+    loadenv(".env")
     ```
 
 ### MathWorks Products (https://www.mathworks.com)
@@ -240,6 +241,7 @@ To learn how to use this in your workflows, see [Examples](/examples/).
 - [ExampleSummarization.mlx](/examples/ExampleSummarization.mlx):  Learn to create concise summaries of long texts with ChatGPT. (Requires Text Analytics Toolbox™)
 - [ExampleChatBot.mlx](/examples/ExampleChatBot.mlx): Build a conversational chatbot capable of handling various dialogue scenarios using ChatGPT. (Requires Text Analytics Toolbox)
 - [ExampleFunctionCalling.mlx](/examples/ExampleFunctionCalling.mlx): Learn how to create agents capable of executing MATLAB functions. 
+- [ExampleRetrievalAugmentedGeneration.mlx](/examples/ExampleRetrievalAugmentedGeneration.mlx): Learn about retrieval augmented generation with a simple use case. (Requires Text Analytics Toolbox™)
 
 ## License
 
