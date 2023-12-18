@@ -54,6 +54,9 @@ classdef(Sealed) openAIChat
 %
 %       FunctionNames        - Names of the functions that the model can
 %                              request calls.
+%
+%       TimeOut              - Connection Timeout in seconds (default: 10 secs)
+%
 
 % Copyright 2023 The MathWorks, Inc.
 
@@ -71,10 +74,13 @@ classdef(Sealed) openAIChat
         PresencePenalty
 
         %FREQUENCYPENALTY   Penalty for using a token that is frequent in the training data.
-        FrequencyPenalty        
+        FrequencyPenalty
     end
 
-    properties(SetAccess=private)  
+    properties(SetAccess=private) 
+        %TIMEOUT    Connection timeout in seconds (default 10 secs)
+        TimeOut
+
         %FUNCTIONNAMES   Names of the functions that the model can request calls
         FunctionNames
 
@@ -88,7 +94,7 @@ classdef(Sealed) openAIChat
     properties(Access=private)
         Functions
         FunctionsStruct
-        ApiKey    
+        ApiKey
     end
 
     methods
@@ -97,14 +103,15 @@ classdef(Sealed) openAIChat
                 systemPrompt                       {llms.utils.mustBeTextOrEmpty} = []
                 nvp.Functions                (1,:) {mustBeA(nvp.Functions, "openAIFunction")} = openAIFunction.empty
                 nvp.ModelName                (1,1) {mustBeMember(nvp.ModelName,["gpt-4", "gpt-4-0613", "gpt-4-32k", ...
-                                                        "gpt-3.5-turbo", "gpt-3.5-turbo-0613", "gpt-3.5-turbo-16k",... 
-                                                        "gpt-3.5-turbo-16k-0613", "gpt-4-1106-preview"])} = "gpt-3.5-turbo"
+                                                        "gpt-3.5-turbo", "gpt-3.5-turbo-16k",... 
+                                                        "gpt-4-1106-preview","gpt-3.5-turbo-1106"])} = "gpt-3.5-turbo"
                 nvp.Temperature                    {mustBeValidTemperature} = 1
                 nvp.TopProbabilityMass             {mustBeValidTopP} = 1
                 nvp.StopSequences                  {mustBeValidStop} = {}
                 nvp.ApiKey                         {mustBeNonzeroLengthTextScalar} 
                 nvp.PresencePenalty                {mustBeValidPenalty} = 0
                 nvp.FrequencyPenalty               {mustBeValidPenalty} = 0
+                nvp.TimeOut                  (1,1) {mustBeReal,mustBePositive} = 10
             end
 
             if ~isempty(nvp.Functions)
@@ -130,6 +137,7 @@ classdef(Sealed) openAIChat
             this.PresencePenalty = nvp.PresencePenalty;
             this.FrequencyPenalty = nvp.FrequencyPenalty;
             this.ApiKey = llms.internal.getApiKeyFromNvpOrEnv(nvp);
+            this.TimeOut = nvp.TimeOut;
         end
 
         function [text, message, response] = generate(this, messages, nvp)
@@ -174,7 +182,7 @@ classdef(Sealed) openAIChat
                 TopProbabilityMass=this.TopProbabilityMass, NumCompletions=nvp.NumCompletions,...
                 StopSequences=this.StopSequences, MaxNumTokens=nvp.MaxNumTokens, ...
                 PresencePenalty=this.PresencePenalty, FrequencyPenalty=this.FrequencyPenalty, ...
-                ApiKey=this.ApiKey);
+                ApiKey=this.ApiKey,TimeOut=this.TimeOut);
         end
 
         function this = set.Temperature(this, temperature)

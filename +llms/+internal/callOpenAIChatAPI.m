@@ -18,6 +18,7 @@ function [text, message, response] = callOpenAIChatAPI(messages, functions, nvp)
 %    - PresencePenalty (presence_penalty)
 %    - FrequencyPenalty (frequence_penalty)
 %    - ApiKey
+%    - TimeOut
 %   More details on the parameters: https://platform.openai.com/docs/api-reference/chat/create
 %
 %   Example
@@ -63,13 +64,14 @@ arguments
     nvp.PresencePenalty = 0
     nvp.FrequencyPenalty = 0
     nvp.ApiKey = ""
+    nvp.TimeOut = 10
 end
 
 END_POINT = "https://api.openai.com/v1/chat/completions";
 
 parameters = buildParametersCall(messages, functions, nvp);
 
-response = llms.internal.sendRequest(parameters,nvp.ApiKey, END_POINT);
+response = llms.internal.sendRequest(parameters,nvp.ApiKey, END_POINT, nvp.TimeOut);
 
 % If call errors, "choices" will not be part of response.Body.Data, instead
 % we get response.Body.Data.error
