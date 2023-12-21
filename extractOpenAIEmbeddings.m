@@ -34,7 +34,7 @@ parameters = struct("input",text,"model",nvp.ModelName);
 
 response = llms.internal.sendRequest(parameters,key, END_POINT, nvp.TimeOut);
 
-if isfield(response, "data")
+if isfield(response.Body.Data, "data")
     emb = [response.Body.Data.data.embedding];
     emb = emb';
 else

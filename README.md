@@ -235,6 +235,24 @@ ans =
 
 You can extract the arguments and write the data to a table, for example.
 
+### Obtaining embeddings
+
+You can extract embeddings from your text with OpenAI using the function `extractOpenAIEmbeddings` as follows:
+```matlab
+exampleText = "Here is an example!";
+emb = extractOpenAIEmbeddings(exampleText);
+```
+
+The resulting embedding is a vector that captures the semantics of your text and can be used on tasks such as retrieval augmented generation and clustering.
+
+```
+>> size(emb)
+
+ans =
+
+           1        1536
+```
+
 ## Examples
 To learn how to use this in your workflows, see [Examples](/examples/).
 
