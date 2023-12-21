@@ -108,7 +108,7 @@ classdef(Sealed) openAIChat
                 nvp.Temperature                    {mustBeValidTemperature} = 1
                 nvp.TopProbabilityMass             {mustBeValidTopP} = 1
                 nvp.StopSequences                  {mustBeValidStop} = {}
-                nvp.ApiKey                         {mustBeNonzeroLengthTextScalar} 
+                nvp.ApiKey                         {llms.utils.mustBeNonzeroLengthTextScalar} 
                 nvp.PresencePenalty                {mustBeValidPenalty} = 0
                 nvp.FrequencyPenalty               {mustBeValidPenalty} = 0
                 nvp.TimeOut                  (1,1) {mustBeReal,mustBePositive} = 10
