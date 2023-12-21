@@ -254,11 +254,6 @@ classdef(Sealed) openAIChat
     end
 end
 
-function mustBeNonzeroLengthTextScalar(content)
-mustBeNonzeroLengthText(content)
-mustBeTextScalar(content)
-end
-
 function [functionsStruct, functionNames] = functionAsStruct(functions)
 numFunctions = numel(functions);
 functionsStruct = cell(1, numFunctions);
@@ -277,7 +272,7 @@ if isa(value, "openAIMessages")
     end
 else
     try 
-        mustBeNonzeroLengthTextScalar(value);
+        llms.utils.mustBeNonzeroLengthTextScalar(value);
     catch ME
         error("llms:mustBeMessagesOrTxt", llms.utils.errorMessageCatalog.getMessage("llms:mustBeMessagesOrTxt"));
     end
