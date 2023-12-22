@@ -10,7 +10,7 @@ arguments
     token
     endpoint
     timeout
-    streamFun
+    streamFun = []
 end
 
 % Define the headers for the API request
