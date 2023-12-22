@@ -31,6 +31,9 @@ classdef(Sealed) openAIChat
 %   FrequencyPenalty         - Penalty value for using a token that is frequent
 %                             in the training data. Default value is 0.
 %
+%   StreamFun               - Function to callback when streaming the
+%                             result
+%
 %   openAIChat Functions:
 %       openAIChat           - Chat completion API from OpenAI.
 %       generate             - Generate a response using the openAIChat instance.
@@ -95,6 +98,7 @@ classdef(Sealed) openAIChat
         Functions
         FunctionsStruct
         ApiKey
+        StreamFun
     end
 
     methods
@@ -112,6 +116,13 @@ classdef(Sealed) openAIChat
                 nvp.PresencePenalty                {mustBeValidPenalty} = 0
                 nvp.FrequencyPenalty               {mustBeValidPenalty} = 0
                 nvp.TimeOut                  (1,1) {mustBeReal,mustBePositive} = 10
+                nvp.StreamFun                (1,1) {mustBeA(nvp.StreamFun,'function_handle')}
+            end
+
+            if isfield(nvp,"StreamFun")
+                this.StreamFun = nvp.StreamFun;
+            else
+                this.StreamFun = [];
             end
 
             if ~isempty(nvp.Functions)
@@ -182,7 +193,7 @@ classdef(Sealed) openAIChat
                 TopProbabilityMass=this.TopProbabilityMass, NumCompletions=nvp.NumCompletions,...
                 StopSequences=this.StopSequences, MaxNumTokens=nvp.MaxNumTokens, ...
                 PresencePenalty=this.PresencePenalty, FrequencyPenalty=this.FrequencyPenalty, ...
-                ApiKey=this.ApiKey,TimeOut=this.TimeOut);
+                ApiKey=this.ApiKey,TimeOut=this.TimeOut, StreamFun=this.StreamFun);
         end
 
         function this = set.Temperature(this, temperature)
