@@ -5,6 +5,8 @@ classdef (Sealed) openAIMessages
     %   openAIMessages functions:
     %       addSystemMessage   - Add system message.
     %       addUserMessage     - Add user message.
+    %       addUserMessageWithImages - Add user message with images for
+    %                            GPT-4 Vision.
     %       addFunctionMessage - Add a function message.
     %       addResponseMessage - Add a response message.
     %       removeMessage      - Remove message from history.
@@ -67,6 +69,41 @@ classdef (Sealed) openAIMessages
 
             newMessage = struct("role", "user", "content", string(content));
             this.Messages{end+1} = newMessage;
+        end
+
+        function this = addUserMessageWithImages(this, prompt, images)
+            %addUserMessageWithImages   Add user message with images.
+            
+            arguments
+                this (1,1) openAIMessages
+                prompt {mustBeNonzeroLengthTextScalar}
+                images (1,:) cell {mustBeNonempty}
+            end
+
+            newMessage = struct("role", "user", "content", []);
+            newMessage.content = {struct("type","text","text",string(prompt))};
+            for ii = 1:numel(images)
+                if startsWith(images{ii},("https://"|"http://"))
+                    s = struct( ...
+                        "type","image_url", ...
+                        "image_url",struct("url",images{ii}));
+                    newMessage.content{end+1} = s;
+                else
+                    [~,~,ext] = fileparts(images{ii});
+                    MIMEType = "data:image/" + erase(ext,".") + ";base64,";
+                    % Base64 encode the image using the given MIME type
+                    fid = fopen(images{ii});
+                    V = fread(fid,'*uint8');
+                    fclose(fid);
+                    b64 = matlab.net.base64encode(V);
+                    s = struct( ...
+                        "type","image_url", ...
+                        "image_url",struct("url",MIMEType + b64));
+                    newMessage.content{end+1} = s;
+                end
+                this.Messages{end+1} = newMessage;
+            end
+
         end
 
         function this = addFunctionMessage(this, name, content)

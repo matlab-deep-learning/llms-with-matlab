@@ -8,7 +8,7 @@ function [text, message, response] = callOpenAIChatAPI(messages, functions, nvp)
 %   Ref: https://platform.openai.com/docs/guides/gpt/chat-completions-api
 %
 %   Currently, the supported NVP are, including the equivalent name in the API:
-%    - FunctionCall (function_call)
+%    - ToolChoice (tool_choice)
 %    - ModelName (model)
 %    - Temperature (temperature)
 %    - TopProbabilityMass (top_p)
@@ -17,6 +17,8 @@ function [text, message, response] = callOpenAIChatAPI(messages, functions, nvp)
 %    - MaxNumTokens (max_tokens)
 %    - PresencePenalty (presence_penalty)
 %    - FrequencyPenalty (frequence_penalty)
+%    - ResponseFormat (response_format)
+%    - Seed (seed)
 %    - ApiKey
 %    - TimeOut
 %    - StreamFun
@@ -55,7 +57,7 @@ function [text, message, response] = callOpenAIChatAPI(messages, functions, nvp)
 arguments
     messages
     functions
-    nvp.FunctionCall = []
+    nvp.ToolChoice = []
     nvp.ModelName = "gpt-3.5-turbo"
     nvp.Temperature = 1
     nvp.TopProbabilityMass = 1
@@ -64,6 +66,8 @@ arguments
     nvp.MaxNumTokens = inf
     nvp.PresencePenalty = 0
     nvp.FrequencyPenalty = 0
+    nvp.ResponseFormat = "text"
+    nvp.Seed = []
     nvp.ApiKey = ""
     nvp.TimeOut = 10
     nvp.StreamFun = []
@@ -85,7 +89,7 @@ if response.StatusCode=="OK"
         message = struct("role", "assistant", ...
             "content", streamedText);
     end
-    if isfield(message, "function_call")
+    if isfield(message, "tool_choice")
         text = "";
     else
         text = string(message.content);
@@ -105,12 +109,22 @@ parameters.messages = messages;
 
 parameters.stream = ~isempty(nvp.StreamFun);
 
-if ~isempty(functions)
-    parameters.functions = functions;
+if ~isempty(functions) && ~strcmp(nvp.ModelName,'gpt-4-vision-preview')
+    parameters.tools = functions;
 end
 
-if ~isempty(nvp.FunctionCall)
-    parameters.function_call = nvp.FunctionCall;
+if ~isempty(nvp.ToolChoice) && ~strcmp(nvp.ModelName,'gpt-4-vision-preview')
+    parameters.tool_choice = nvp.ToolChoice;
+end
+
+if ismember(nvp.ModelName,["gpt-3.5-turbo-1106","gpt-4-1106-preview"])
+    if strcmp(nvp.ResponseFormat,"json")
+        parameters.response_format = struct('type','json_object');
+    end
+end
+
+if ~isempty(nvp.Seed)
+    parameters.seed = nvp.Seed;
 end
 
 parameters.model = nvp.ModelName;
@@ -118,6 +132,10 @@ parameters.model = nvp.ModelName;
 dict = mapNVPToParameters;
 
 nvpOptions = keys(dict);
+if strcmp(nvp.ModelName,'gpt-4-vision-preview')
+    nvpOptions(ismember(nvpOptions,["MaxNumTokens","StopSequences"])) = [];
+end
+
 for i=1:length(nvpOptions)
     if isfield(nvp, nvpOptions(i))
         parameters.(dict(nvpOptions(i))) = nvp.(nvpOptions(i));
