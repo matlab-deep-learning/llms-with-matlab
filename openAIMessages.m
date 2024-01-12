@@ -71,13 +71,14 @@ classdef (Sealed) openAIMessages
             this.Messages{end+1} = newMessage;
         end
 
-        function this = addUserMessageWithImages(this, prompt, images)
+        function this = addUserMessageWithImages(this, prompt, images, nvp)
             %addUserMessageWithImages   Add user message with images.
             
             arguments
                 this (1,1) openAIMessages
                 prompt {mustBeNonzeroLengthTextScalar}
                 images (1,:) cell {mustBeNonempty}
+                nvp.Detail {mustBeMember(nvp.Detail,["low","high","auto"])} = "auto"
             end
 
             newMessage = struct("role", "user", "content", []);
@@ -87,7 +88,6 @@ classdef (Sealed) openAIMessages
                     s = struct( ...
                         "type","image_url", ...
                         "image_url",struct("url",images{ii}));
-                    newMessage.content{end+1} = s;
                 else
                     [~,~,ext] = fileparts(images{ii});
                     MIMEType = "data:image/" + erase(ext,".") + ";base64,";
@@ -99,8 +99,11 @@ classdef (Sealed) openAIMessages
                     s = struct( ...
                         "type","image_url", ...
                         "image_url",struct("url",MIMEType + b64));
-                    newMessage.content{end+1} = s;
                 end
+                if nvp.Detail ~= "auto"
+                    s.image_url.detail = nvp.Detail;
+                end
+                newMessage.content{end+1} = s;
                 this.Messages{end+1} = newMessage;
             end
 
