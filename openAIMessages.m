@@ -6,7 +6,7 @@ classdef (Sealed) openAIMessages
     %       addSystemMessage   - Add system message.
     %       addUserMessage     - Add user message.
     %       addUserMessageWithImages - Add user message with images for
-    %                            GPT-4 Vision.
+    %                            GPT-4 Turbo with Vision.
     %       addFunctionMessage - Add a function message.
     %       addResponseMessage - Add a response message.
     %       removeMessage      - Remove message from history.
