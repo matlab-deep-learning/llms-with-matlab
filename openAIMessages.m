@@ -71,18 +71,49 @@ classdef (Sealed) openAIMessages
             this.Messages{end+1} = newMessage;
         end
 
-        function this = addUserMessageWithImages(this, prompt, images, nvp)
-            %addUserMessageWithImages   Add user message with images.
+        function this = addUserMessageWithImages(this, content, images, nvp)
+            %addUserMessageWithImages   Add user message with images for
+            %use with GPT-4 Turbo with Vision.
+            %
+            %   MESSAGES = addUserMessageWithImages(MESSAGES, CONTENT, IMAGES) 
+            %   adds a user message with the specified content and images 
+            %   to MESSAGES. CONTENT must be a text scalar. IMAGES must be
+            %   a cell array of image URLs or file paths. 
+            %
+            %   messages = addUserMessageWithImages(__,Detail="low");
+            %   specify how the model should process the images using
+            %   "Detail" parameter. The default is "auto".
+            %   - When set to "low", the model scales the image to 512x512 
+            %   - When set to "high", the model scales the image to 512x512
+            %   and also creates detailed 512x512 crops of the image
+            %   - When set to "auto", the models chooses which mode to use
+            %   depending on the input image. 
+            %
+            %   Example:
+            %
+            %   % Create a chat with GPT-4 Turbo with Vision
+            %   chat = openAIChat("You are an AI assistant.", ModelName="gpt-4-vision-preview"); 
+            %
+            %   % Create messages object
+            %   messages = openAIMessages;
+            %
+            %   % Add user message with an image
+            %   content = "What are in this picture?"
+            %   images = {'peppers.png'}
+            %   messages = addUserMessageWithImages(messages, content, images);
+            %
+            %   % Generate a response
+            %   [text, response] = generate(chat, messages, MaxNumTokens=300);
             
             arguments
                 this (1,1) openAIMessages
-                prompt {mustBeNonzeroLengthTextScalar}
+                content {mustBeNonzeroLengthTextScalar}
                 images (1,:) cell {mustBeNonempty}
                 nvp.Detail {mustBeMember(nvp.Detail,["low","high","auto"])} = "auto"
             end
 
             newMessage = struct("role", "user", "content", []);
-            newMessage.content = {struct("type","text","text",string(prompt))};
+            newMessage.content = {struct("type","text","text",string(content))};
             for ii = 1:numel(images)
                 if startsWith(images{ii},("https://"|"http://"))
                     s = struct( ...
@@ -93,9 +124,9 @@ classdef (Sealed) openAIMessages
                     MIMEType = "data:image/" + erase(ext,".") + ";base64,";
                     % Base64 encode the image using the given MIME type
                     fid = fopen(images{ii});
-                    V = fread(fid,'*uint8');
+                    im = fread(fid,'*uint8');
                     fclose(fid);
-                    b64 = matlab.net.base64encode(V);
+                    b64 = matlab.net.base64encode(im);
                     s = struct( ...
                         "type","image_url", ...
                         "image_url",struct("url",MIMEType + b64));
