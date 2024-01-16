@@ -66,7 +66,7 @@ classdef(Sealed) openAIChat
 %       TimeOut              - Connection Timeout in seconds (default: 10 secs)
 %
 
-% Copyright 2023 The MathWorks, Inc.
+% Copyright 2023-2024 The MathWorks, Inc.
 
     properties        
         %TEMPERATURE   Temperature of generation.
@@ -83,10 +83,6 @@ classdef(Sealed) openAIChat
 
         %FREQUENCYPENALTY   Penalty for using a token that is frequent in the training data.
         FrequencyPenalty
-
-        %RESPONSEFORMAT     Response format, text or json     
-        ResponseFormat
-
     end
 
     properties(SetAccess=private) 
@@ -101,6 +97,9 @@ classdef(Sealed) openAIChat
 
         %SYSTEMPROMPT   System prompt.
         SystemPrompt = []
+
+        %RESPONSEFORMAT     Response format, text or json     
+        ResponseFormat 
     end
 
     properties(Access=private)
@@ -156,18 +155,19 @@ classdef(Sealed) openAIChat
             this.Temperature = nvp.Temperature;
             this.TopProbabilityMass = nvp.TopProbabilityMass;
             this.StopSequences = nvp.StopSequences;
-            % Response Format is supported in the latest models only
-            if strcmp(nvp.ResponseFormat,"json")
+
+            % ResponseFormat is only supported in the latest models only
+            if (nvp.ResponseFormat == "json")
                 if ismember(this.ModelName,["gpt-3.5-turbo-1106","gpt-4-1106-preview"])
-                    if contains(this.SystemPrompt{1}.content,"designed to output to JSON")
-                        this.ResponseFormat = nvp.ResponseFormat;
-                    else
-                        error("To get JSON output, add 'designed to output to JSON' to the system prompt.")
-                    end
+                    warning("llms:warningJsonInstruction", ...
+                        llms.utils.errorMessageCatalog.getMessage("llms:warningJsonInstruction"))
                 else
-                    mustBeMember(this.ModelName,["gpt-3.5-turbo-1106","gpt-4-1106-preview"])
+                    error("llms:invalidOptionAndValueForModel", ...
+                        llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionAndValueForModel", "ResponseFormat", "json", this.ModelName));
                 end
+
             end
+
             this.PresencePenalty = nvp.PresencePenalty;
             this.FrequencyPenalty = nvp.FrequencyPenalty;
             this.ApiKey = llms.internal.getApiKeyFromNvpOrEnv(nvp);

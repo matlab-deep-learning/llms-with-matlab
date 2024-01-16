@@ -1,6 +1,4 @@
 function [text, message, response] = callOpenAIChatAPI(messages, functions, nvp)
-% This function is undocumented and will change in a future release
-
 %callOpenAIChatAPI Calls the openAI chat completions API.
 %
 %   MESSAGES and FUNCTIONS should be structs matching the json format
@@ -52,7 +50,7 @@ function [text, message, response] = callOpenAIChatAPI(messages, functions, nvp)
 %   % Send a request
 %   [text, message] = llms.internal.callOpenAIChatAPI(messages, functions, ApiKey=apiKey)
 
-%   Copyright 2023 The MathWorks, Inc.
+%   Copyright 2023-2024 The MathWorks, Inc.
 
 arguments
     messages

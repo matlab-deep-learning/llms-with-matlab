@@ -1,9 +1,8 @@
 classdef errorMessageCatalog
-% This class is undocumented and will change in a future release
-
 %errorMessageCatalog Stores the error messages from this repository
 
-%   Copyright 2023 The MathWorks, Inc.
+%   Copyright 2023-2024 The MathWorks, Inc.
+
     properties(Constant)
         %CATALOG dictionary mapping error ids to error msgs
         Catalog = buildErrorMessageCatalog;
@@ -11,8 +10,6 @@ classdef errorMessageCatalog
 
     methods(Static)
         function msg = getMessage(messageId, slot)
-            % This function is undocumented and will change in a future release
-
             %getMessage returns error message given a messageID and a SLOT.
             %   The value in SLOT should be ordered, where the n-th element
             %   will replace the value "{n}".
@@ -47,7 +44,12 @@ catalog("llms:mustBeValidIndex") = "Value is larger than the number of elements 
 catalog("llms:stopSequencesMustHaveMax4Elements") = "Number of elements must not be larger than 4.";
 catalog("llms:keyMustBeSpecified") = "API key not found as environment variable OPENAI_API_KEY and not specified via ApiKey parameter.";
 catalog("llms:mustHaveMessages") = "Value must contain at least one message in Messages.";
-catalog("llms:mustSetFunctionsForCall") = "When no functions are defined, FunctionCall must not be specified.";
+catalog("llms:mustSetFunctionsForCall") = "When no functions are defined, ToolChoice must not be specified.";
 catalog("llms:mustBeMessagesOrTxt") = "Messages must be text with one or more characters or an openAIMessages objects.";
+catalog("llms:invalidOptionAndValueForModel") = "'{1}' with value '{2}' is not supported for ModelName '{3}'";
+catalog("llms:invalidOptionForModel") = "{1} is not supported for ModelName '{2}'";
+catalog("llms:functionNotAvailableForModel") = "This function is not supported for ModelName '{1}'";
+catalog("llms:promptLimitCharacter") = "Prompt must have a maximum length of {1} characters for ModelName '{2}'";
+catalog("llms:pngExpected") = "Argument must be a PNG image.";
+catalog("llms:warningJsonInstruction") = "When using JSON mode, you must also prompt the model to produce JSON yourself via a system or user message.";
 end
-

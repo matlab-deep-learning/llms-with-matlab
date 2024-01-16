@@ -3,18 +3,18 @@ classdef (Sealed) openAIMessages
     %   messages = openAIMessages creates an openAIMessages object.
     %
     %   openAIMessages functions:
-    %       addSystemMessage   - Add system message.
-    %       addUserMessage     - Add user message.
+    %       addSystemMessage         - Add system message.
+    %       addUserMessage           - Add user message.
     %       addUserMessageWithImages - Add user message with images for
-    %                            GPT-4 Turbo with Vision.
-    %       addFunctionMessage - Add a function message.
-    %       addResponseMessage - Add a response message.
-    %       removeMessage      - Remove message from history.
+    %                                  GPT-4 Turbo with Vision.
+    %       addFunctionMessage       - Add a function message.
+    %       addResponseMessage       - Add a response message.
+    %       removeMessage            - Remove message from history.
     %
     %   openAIMessages properties:
-    %       Messages           - Messages in the conversation history.
+    %       Messages                 - Messages in the conversation history.
 
-    % Copyright 2023 The MathWorks, Inc.
+    % Copyright 2023-2024 The MathWorks, Inc.
 
     properties(SetAccess=private)
         %MESSAGES - Messages in the conversation history.
@@ -72,13 +72,12 @@ classdef (Sealed) openAIMessages
         end
 
         function this = addUserMessageWithImages(this, content, images, nvp)
-            %addUserMessageWithImages   Add user message with images for
-            %use with GPT-4 Turbo with Vision.
+            %addUserMessageWithImages   Add user message with images
             %
             %   MESSAGES = addUserMessageWithImages(MESSAGES, CONTENT, IMAGES) 
             %   adds a user message with the specified content and images 
             %   to MESSAGES. CONTENT must be a text scalar. IMAGES must be
-            %   a cell array of image URLs or file paths. 
+            %   a string array of image URLs or file paths. 
             %
             %   messages = addUserMessageWithImages(__,Detail="low");
             %   specify how the model should process the images using
@@ -99,7 +98,7 @@ classdef (Sealed) openAIMessages
             %
             %   % Add user message with an image
             %   content = "What are in this picture?"
-            %   images = {'peppers.png'}
+            %   images = "peppers.png"
             %   messages = addUserMessageWithImages(messages, content, images);
             %
             %   % Generate a response
@@ -108,22 +107,22 @@ classdef (Sealed) openAIMessages
             arguments
                 this (1,1) openAIMessages
                 content {mustBeNonzeroLengthTextScalar}
-                images (1,:) cell {mustBeNonempty}
+                images (1,:) {mustBeNonzeroLengthText}
                 nvp.Detail {mustBeMember(nvp.Detail,["low","high","auto"])} = "auto"
             end
 
             newMessage = struct("role", "user", "content", []);
             newMessage.content = {struct("type","text","text",string(content))};
-            for ii = 1:numel(images)
-                if startsWith(images{ii},("https://"|"http://"))
+            for i = 1:numel(images)
+                if startsWith(images(i),("https://"|"http://"))
                     s = struct( ...
                         "type","image_url", ...
-                        "image_url",struct("url",images{ii}));
+                        "image_url",struct("url",images{i}));
                 else
-                    [~,~,ext] = fileparts(images{ii});
+                    [~,~,ext] = fileparts(images(i));
                     MIMEType = "data:image/" + erase(ext,".") + ";base64,";
                     % Base64 encode the image using the given MIME type
-                    fid = fopen(images{ii});
+                    fid = fopen(images(i));
                     im = fread(fid,'*uint8');
                     fclose(fid);
                     b64 = matlab.net.base64encode(im);
@@ -131,9 +130,9 @@ classdef (Sealed) openAIMessages
                         "type","image_url", ...
                         "image_url",struct("url",MIMEType + b64));
                 end
-                if nvp.Detail ~= "auto"
-                    s.image_url.detail = nvp.Detail;
-                end
+
+                s.image_url.detail = nvp.Detail;
+
                 newMessage.content{end+1} = s;
                 this.Messages{end+1} = newMessage;
             end
@@ -201,10 +200,10 @@ classdef (Sealed) openAIMessages
             end
 
             % Assistant is asking for function call
-            if isfield(messageStruct, "function_call")
-                funCall = messageStruct.function_call;
-                validateAssistantWithFunctionCall(funCall)
-                this = addAssistantMessage(this, funCall.name, funCall.arguments);
+            if isfield(messageStruct, "tool_calls")
+                toolCall = messageStruct.tool_calls{1};
+                validateAssistantWithFunctionCall(toolCall.function)
+                this = addAssistantMessage(this, messageStruct.content, toolCall);
             else
                 % Simple assistant response
                 validateRegularAssistant(messageStruct.content);
@@ -243,20 +242,22 @@ classdef (Sealed) openAIMessages
 
     methods(Access=private)
 
-        function this = addAssistantMessage(this, contentOrfunctionName, arguments)
+        function this = addAssistantMessage(this, content, toolCalls)
             arguments
                 this (1,1) openAIMessages
-                contentOrfunctionName string
-                arguments string = []
+                content string
+                toolCalls struct = []
             end
 
-            if isempty(arguments)
+            if isempty(toolCalls)
                 % Default assistant response
-                 newMessage = struct("role", "assistant", "content", contentOrfunctionName);
+                 newMessage = struct("role", "assistant", "content", content);
             else
-                % function_call message
-                functionCall = struct("name", contentOrfunctionName, "arguments", arguments);
-                newMessage = struct("role", "assistant", "content", "", "function_call", functionCall);
+                % tool_calls message
+                functionCall = struct("name", toolCalls.function.name, "arguments", toolCalls.function.arguments);
+                toolsStruct = struct("id", toolCalls.id, "type", toolCalls.type, "function", functionCall);
+                newMessage = struct("role", "assistant", "content", content, "tool_calls", toolsStruct);
+                newMessage.tool_calls = {newMessage.tool_calls};
             end
             
             if isempty(this.Messages)
