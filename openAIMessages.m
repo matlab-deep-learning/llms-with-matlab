@@ -139,12 +139,12 @@ classdef (Sealed) openAIMessages
 
         end
 
-        function this = addFunctionMessage(this, name, content)
-            %addFunctionMessage   Add function message.
+        function this = addToolMessage(this, id, name, content)
+            %addToolMessage   Add Tool message.
             %
-            %   MESSAGES = addFunctionMessage(MESSES, NAME, CONTENT) adds a function
-            %   message with the specified name and content. NAME and
-            %   CONTENT must be text scalars.
+            %   MESSAGES = addFunctionMessage(MESSAGES, ID, NAME, CONTENT)
+            %   adds a tool message with the specified id, name and content. 
+            %   ID, NAME and CONTENT must be text scalars.
             %
             %   Example:
             %   % Create messages object
@@ -152,15 +152,18 @@ classdef (Sealed) openAIMessages
             %
             %   % Add function message, containing the result of 
             %   % calling strcat("Hello", " World")
-            %   messages = addFunctionMessage(messages, "strcat", "Hello World");
+            %   messages = addToolMessage(messages, "call_123", "strcat", "Hello World");
 
             arguments
                 this (1,1) openAIMessages
+                id {mustBeNonzeroLengthTextScalar}
                 name {mustBeNonzeroLengthTextScalar}
                 content {mustBeNonzeroLengthTextScalar}
+
             end
 
-            newMessage = struct("role", "function", "name", string(name), "content", string(content));
+            newMessage = struct("tool_call_id", id, "role", "tool", ...
+                "name", string(name), "content", string(content));
             this.Messages{end+1} = newMessage;
         end
        
@@ -201,9 +204,9 @@ classdef (Sealed) openAIMessages
 
             % Assistant is asking for function call
             if isfield(messageStruct, "tool_calls")
-                toolCall = messageStruct.tool_calls{1};
-                validateAssistantWithFunctionCall(toolCall.function)
-                this = addAssistantMessage(this, messageStruct.content, toolCall);
+                toolCalls = messageStruct.tool_calls;
+                validateAssistantWithToolCalls(toolCalls)
+                this = addAssistantMessage(this, messageStruct.content, toolCalls);
             else
                 % Simple assistant response
                 validateRegularAssistant(messageStruct.content);
@@ -254,10 +257,19 @@ classdef (Sealed) openAIMessages
                  newMessage = struct("role", "assistant", "content", content);
             else
                 % tool_calls message
-                functionCall = struct("name", toolCalls.function.name, "arguments", toolCalls.function.arguments);
-                toolsStruct = struct("id", toolCalls.id, "type", toolCalls.type, "function", functionCall);
+                toolsStruct = repmat(struct("id",[],"type",[],"function",[]),size(toolCalls));
+                for i = 1:numel(toolCalls)
+                    toolsStruct(i).id = toolCalls(i).id;
+                    toolsStruct(i).type = toolCalls(i).type;
+                    toolsStruct(i).function = struct( ...
+                        "name", toolCalls(i).function.name, ...
+                        "arguments", toolCalls(i).function.arguments);
+                end
+                
                 newMessage = struct("role", "assistant", "content", content, "tool_calls", toolsStruct);
-                newMessage.tool_calls = {newMessage.tool_calls};
+                if numel(newMessage.tool_calls) == 1
+                    newMessage.tool_calls = {newMessage.tool_calls};
+                end
             end
             
             if isempty(this.Messages)
@@ -283,17 +295,26 @@ catch ME
 end
 end
 
-function validateAssistantWithFunctionCall(functionCallStruct)
-if ~isstruct(functionCallStruct)||~isfield(functionCallStruct, "name")||~isfield(functionCallStruct, "arguments")
+function validateAssistantWithToolCalls(toolCallStruct)
+if ~isstruct(toolCallStruct)||~isfield(toolCallStruct, "id")||~isfield(toolCallStruct, "function")
+    error("llms:mustBeAssistantWithIdAndFunction", ...
+        llms.utils.errorMessageCatalog.getMessage("llms:mustBeAssistantWithIdAndFunction"))
+else
+    functionCallStruct = [toolCallStruct.function];
+end
+
+if ~isfield(functionCallStruct, "name")||~isfield(functionCallStruct, "arguments")
     error("llms:mustBeAssistantWithNameAndArguments", ...
         llms.utils.errorMessageCatalog.getMessage("llms:mustBeAssistantWithNameAndArguments"))
 end
 
 try
-    mustBeNonzeroLengthText(functionCallStruct.name)
-    mustBeTextScalar(functionCallStruct.name)
-    mustBeNonzeroLengthText(functionCallStruct.arguments)
-    mustBeTextScalar(functionCallStruct.arguments)
+    for i = 1:numel(functionCallStruct)
+        mustBeNonzeroLengthText(functionCallStruct(i).name)
+        mustBeTextScalar(functionCallStruct(i).name)
+        mustBeNonzeroLengthText(functionCallStruct(i).arguments)
+        mustBeTextScalar(functionCallStruct(i).arguments)
+    end
 catch ME
     error("llms:assistantMustHaveTextNameAndArguments", ...
         llms.utils.errorMessageCatalog.getMessage("llms:assistantMustHaveTextNameAndArguments"))
