@@ -265,10 +265,11 @@ classdef (Sealed) openAIMessages
                         "name", toolCalls(i).function.name, ...
                         "arguments", toolCalls(i).function.arguments);
                 end
-                
-                newMessage = struct("role", "assistant", "content", content, "tool_calls", toolsStruct);
-                if numel(newMessage.tool_calls) == 1
-                    newMessage.tool_calls = {newMessage.tool_calls};
+                if numel(toolsStruct) > 1
+                    newMessage = struct("role", "assistant", "content", content, "tool_calls", toolsStruct);
+                else
+                    newMessage = struct("role", "assistant", "content", content, "tool_calls", []);
+                    newMessage.tool_calls = {toolsStruct};
                 end
             end
             

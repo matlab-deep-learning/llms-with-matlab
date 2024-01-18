@@ -24,7 +24,7 @@ classdef topenAIMessages < matlab.unittest.TestCase
             testCase.verifyWarningFree(@()addSystemMessage(msgs, ValidTextInput, ValidTextInput));
             testCase.verifyWarningFree(@()addSystemMessage(msgs, ValidTextInput, ValidTextInput));
             testCase.verifyWarningFree(@()addUserMessage(msgs, ValidTextInput));
-            testCase.verifyWarningFree(@()addFunctionMessage(msgs, ValidTextInput, ValidTextInput));
+            testCase.verifyWarningFree(@()addToolMessage(msgs, ValidTextInput, ValidTextInput, ValidTextInput));
         end
         
 
@@ -59,12 +59,13 @@ classdef topenAIMessages < matlab.unittest.TestCase
             testCase.verifyWarningFree(@()addUserMessageWithImages(msgs, prompt, img));
         end
 
-        function functionMessageIsAdded(testCase)
+        function toolMessageIsAdded(testCase)
             prompt = "20";
             name = "sin";
+            id = "123";
             msgs = openAIMessages;
-            systemPrompt = struct("role", "function", "name", name, "content", prompt);
-            msgs = addFunctionMessage(msgs, name, prompt);
+            systemPrompt = struct("tool_call_id", id, "role", "tool", "name", name, "content", prompt);
+            msgs = addToolMessage(msgs, id, name, prompt);
             testCase.verifyEqual(msgs.Messages{1}, systemPrompt);
         end
 
@@ -76,27 +77,39 @@ classdef topenAIMessages < matlab.unittest.TestCase
             testCase.verifyEqual(msgs.Messages{1}, assistantPrompt);
         end
 
-        function assistantFunctionCallMessageIsAdded(testCase)
+        function assistantToolCallMessageIsAdded(testCase)
             msgs = openAIMessages;
             functionName = "functionName";
             args = "{""arg1"": 1, ""arg2"": 2, ""arg3"": ""3""}";
             funCall = struct("name", functionName, "arguments", args);
             toolCall = struct("id", "123", "type", "function", "function", funCall);
-            functionCallPrompt = struct("role", "assistant", "content", "","tool_calls", toolCall);
-            functionCallPrompt.tool_calls = {functionCallPrompt.tool_calls};
-            msgs = addResponseMessage(msgs, functionCallPrompt);
-            testCase.verifyEqual(msgs.Messages{1}, functionCallPrompt);
+            toolCallPrompt = struct("role", "assistant", "content", "", "tool_calls", []);
+            toolCallPrompt.tool_calls = {toolCall};
+            msgs = addResponseMessage(msgs, toolCallPrompt);
+            testCase.verifyEqual(msgs.Messages{1}, toolCallPrompt);
         end
 
-        function assistantFunctionCallMessageWithoutArgsIsAdded(testCase)
+        function assistantToolCallMessageWithoutArgsIsAdded(testCase)
             msgs = openAIMessages;
             functionName = "functionName";
             funCall = struct("name", functionName, "arguments", "{}");
             toolCall = struct("id", "123", "type", "function", "function", funCall);
-            functionCallPrompt = struct("role", "assistant", "content", "","tool_calls", toolCall);
-            functionCallPrompt.tool_calls = {functionCallPrompt.tool_calls};
-            msgs = addResponseMessage(msgs, functionCallPrompt);
-            testCase.verifyEqual(msgs.Messages{1}, functionCallPrompt);
+            toolCallPrompt = struct("role", "assistant", "content", "","tool_calls", []);
+            toolCallPrompt.tool_calls = {toolCall};
+            msgs = addResponseMessage(msgs, toolCallPrompt);
+            testCase.verifyEqual(msgs.Messages{1}, toolCallPrompt);
+        end
+
+        function assistantParallelToolCallMessageIsAdded(testCase)
+            msgs = openAIMessages;
+            functionName = "functionName";
+            args = "{""arg1"": 1, ""arg2"": 2, ""arg3"": ""3""}";
+            funCall = struct("name", functionName, "arguments", args);
+            toolCall = struct("id", "123", "type", "function", "function", funCall);
+            toolCallPrompt = struct("role", "assistant", "content", "", "tool_calls", []);
+            toolCallPrompt.tool_calls = [toolCall,toolCall,toolCall];
+            msgs = addResponseMessage(msgs, toolCallPrompt);
+            testCase.verifyEqual(msgs.Messages{1}, toolCallPrompt);
         end
 
         function messageGetsRemoved(testCase)
@@ -105,7 +118,7 @@ classdef topenAIMessages < matlab.unittest.TestCase
             
             msgs = addSystemMessage(msgs, "name", "content");
             msgs = addUserMessage(msgs, "content"); 
-            msgs = addFunctionMessage(msgs, "name", "content");
+            msgs = addToolMessage(msgs, "123", "name", "content");
             sizeMsgs = length(msgs.Messages);
             % Message exists before removal
             msgToBeRemoved = msgs.Messages{idx};
@@ -121,7 +134,7 @@ classdef topenAIMessages < matlab.unittest.TestCase
             
             msgs = addSystemMessage(msgs, "name", "content");
             msgs = addUserMessage(msgs, "content"); 
-            msgs = addFunctionMessage(msgs, "name", "content");
+            msgs = addToolMessage(msgs, "123", "name", "content");
             sizeMsgs = length(msgs.Messages);
 
             testCase.verifyError(@()removeMessage(msgs, sizeMsgs+1), "llms:mustBeValidIndex");
@@ -144,7 +157,7 @@ classdef topenAIMessages < matlab.unittest.TestCase
 
         function invalidInputsFunctionPrompt(testCase, InvalidInputsFunctionPrompt)
             msgs = openAIMessages;
-            testCase.verifyError(@()addFunctionMessage(msgs,InvalidInputsFunctionPrompt.Input{:}), InvalidInputsFunctionPrompt.Error);
+            testCase.verifyError(@()addToolMessage(msgs,InvalidInputsFunctionPrompt.Input{:}), InvalidInputsFunctionPrompt.Error);
         end
 
         function invalidInputsRemove(testCase, InvalidRemoveMessage)
@@ -231,27 +244,27 @@ end
 function invalidFunctionPrompt = iGetInvalidFunctionPrompt
     invalidFunctionPrompt = struct( ...
         "NonStringInputName", ...
-            struct("Input", {{123, "content"}}, ...
+            struct("Input", {{"123", 123, "content"}}, ...
             "Error", "MATLAB:validators:mustBeNonzeroLengthText"), ...
         ...
         "NonStringInputContent", ...
-            struct("Input", {{"name", 123}}, ...
+            struct("Input", {{"123", "name", 123}}, ...
             "Error", "MATLAB:validators:mustBeNonzeroLengthText"), ...
         ...
         "EmptytName", ...
-            struct("Input", {{"", "content"}}, ...
+            struct("Input", {{"123", "", "content"}}, ...
             "Error", "MATLAB:validators:mustBeNonzeroLengthText"), ...
         ...
         "EmptytContent", ...
-            struct("Input", {{"name", ""}}, ...
+            struct("Input", {{"123", "name", ""}}, ...
             "Error", "MATLAB:validators:mustBeNonzeroLengthText"), ...
         ...
         "NonScalarInputName", ...
-            struct("Input", {{["name1" "name2"], "content"}}, ...
+            struct("Input", {{"123", ["name1" "name2"], "content"}}, ...
             "Error", "MATLAB:validators:mustBeTextScalar"),...
         ...
         "NonScalarInputContent", ...
-            struct("Input", {{"name", ["content1", "content2"]}}, ...
+            struct("Input", {{"123","name", ["content1", "content2"]}}, ...
             "Error", "MATLAB:validators:mustBeTextScalar"));
 end
 
