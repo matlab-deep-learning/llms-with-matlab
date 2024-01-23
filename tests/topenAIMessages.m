@@ -84,9 +84,12 @@ classdef topenAIMessages < matlab.unittest.TestCase
             funCall = struct("name", functionName, "arguments", args);
             toolCall = struct("id", "123", "type", "function", "function", funCall);
             toolCallPrompt = struct("role", "assistant", "content", "", "tool_calls", []);
-            toolCallPrompt.tool_calls = {toolCall};
+            % tool_calls is an array of struct in API response
+            toolCallPrompt.tool_calls = toolCall;
             msgs = addResponseMessage(msgs, toolCallPrompt);
-            testCase.verifyEqual(msgs.Messages{1}, toolCallPrompt);
+            % to include in msgs, tool_calls must be a cell
+            testCase.verifyEqual(fieldnames(msgs.Messages{1}), fieldnames(toolCallPrompt));
+            testCase.verifyEqual(msgs.Messages{1}.tool_calls{1}, toolCallPrompt.tool_calls);
         end
 
         function assistantToolCallMessageWithoutArgsIsAdded(testCase)
@@ -95,9 +98,12 @@ classdef topenAIMessages < matlab.unittest.TestCase
             funCall = struct("name", functionName, "arguments", "{}");
             toolCall = struct("id", "123", "type", "function", "function", funCall);
             toolCallPrompt = struct("role", "assistant", "content", "","tool_calls", []);
-            toolCallPrompt.tool_calls = {toolCall};
+            % tool_calls is an array of struct in API response
+            toolCallPrompt.tool_calls = toolCall;
             msgs = addResponseMessage(msgs, toolCallPrompt);
-            testCase.verifyEqual(msgs.Messages{1}, toolCallPrompt);
+            % to include in msgs, tool_calls must be a cell
+            testCase.verifyEqual(fieldnames(msgs.Messages{1}), fieldnames(toolCallPrompt));
+            testCase.verifyEqual(msgs.Messages{1}.tool_calls{1}, toolCallPrompt.tool_calls);
         end
 
         function assistantParallelToolCallMessageIsAdded(testCase)
@@ -107,6 +113,7 @@ classdef topenAIMessages < matlab.unittest.TestCase
             funCall = struct("name", functionName, "arguments", args);
             toolCall = struct("id", "123", "type", "function", "function", funCall);
             toolCallPrompt = struct("role", "assistant", "content", "", "tool_calls", []);
+            % tool_calls is an array of struct in API response
             toolCallPrompt.tool_calls = [toolCall,toolCall,toolCall];
             msgs = addResponseMessage(msgs, toolCallPrompt);
             testCase.verifyEqual(msgs.Messages{1}, toolCallPrompt);
