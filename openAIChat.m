@@ -131,6 +131,10 @@ classdef(Sealed) openAIChat
 
             if isfield(nvp,"StreamFun")
                 this.StreamFun = nvp.StreamFun;
+                if strcmp(nvp.ModelName,'gpt-4-vision-preview')
+                    error("llms:invalidOptionAndValueForModel", ...
+                       llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "StreamFun", nvp.ModelName));
+                end
             else
                 this.StreamFun = [];
             end
@@ -138,6 +142,10 @@ classdef(Sealed) openAIChat
             if ~isempty(nvp.Tools)
                 this.Tools = nvp.Tools;
                 [this.FunctionsStruct, this.FunctionNames] = functionAsStruct(nvp.Tools);
+                if strcmp(nvp.ModelName,'gpt-4-vision-preview')
+                   error("llms:invalidOptionAndValueForModel", ...
+                       llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "Tools", nvp.ModelName));
+                end
             else
                 this.Tools = [];
                 this.FunctionsStruct = [];
@@ -155,6 +163,11 @@ classdef(Sealed) openAIChat
             this.Temperature = nvp.Temperature;
             this.TopProbabilityMass = nvp.TopProbabilityMass;
             this.StopSequences = nvp.StopSequences;
+            if ~isempty(nvp.StopSequences) && strcmp(nvp.ModelName,'gpt-4-vision-preview')
+                error("llms:invalidOptionAndValueForModel", ...
+                       llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "StopSequences", nvp.ModelName));
+            end
+
 
             % ResponseFormat is only supported in the latest models only
             if (nvp.ResponseFormat == "json")
@@ -208,7 +221,17 @@ classdef(Sealed) openAIChat
                 nvp.Seed                {mustBeIntegerOrEmpty(nvp.Seed)} = []
             end
 
+            if nvp.MaxNumTokens ~= Inf && strcmp(this.ModelName,'gpt-4-vision-preview')
+                error("llms:invalidOptionAndValueForModel", ...
+                        llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "MaxNumTokens", this.ModelName));
+            end
+
             toolChoice = convertToolChoice(this, nvp.ToolChoice);
+            if ~isempty(nvp.ToolChoice) && strcmp(this.ModelName,'gpt-4-vision-preview')
+                error("llms:invalidOptionAndValueForModel", ...
+                       llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "ToolChoice", this.ModelName));
+            end
+
             if isstring(messages) && isscalar(messages)
                 messagesStruct = {struct("role", "user", "content", messages)};               
             else

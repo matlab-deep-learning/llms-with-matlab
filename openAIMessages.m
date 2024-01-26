@@ -297,7 +297,7 @@ end
 end
 
 function validateAssistantWithToolCalls(toolCallStruct)
-if ~isstruct(toolCallStruct)||~isfield(toolCallStruct, "id")||~isfield(toolCallStruct, "function")
+if ~(isstruct(toolCallStruct) && isfield(toolCallStruct, "id") && isfield(toolCallStruct, "function"))
     error("llms:mustBeAssistantWithIdAndFunction", ...
         llms.utils.errorMessageCatalog.getMessage("llms:mustBeAssistantWithIdAndFunction"))
 else

@@ -1,8 +1,8 @@
 # Large Language Models (LLMs) with MATLAB® [![Open in MATLAB Online](https://www.mathworks.com/images/responsive/global/open-in-matlab-online.svg)](https://matlab.mathworks.com/open/github/v1?repo=matlab-deep-learning/llms-with-matlab)
 
-This repository contains example code to demonstrate how to connect MATLAB to the OpenAI™ Chat Completions API (which powers ChatGPT™) as well as OpenAI Images API (which powers DALL-E™). This allows you to leverage the natural language processing capabilities of large language models directly within your MATLAB environment.
+This repository contains example code to demonstrate how to connect MATLAB to the OpenAI™ Chat Completions API (which powers ChatGPT™) as well as OpenAI Images API (which powers DALL·E™). This allows you to leverage the natural language processing capabilities of large language models directly within your MATLAB environment.
 
-The functionality shown here serves as an interface to the ChatGPT and DALL-E APIs. To start using the OpenAI APIs, you first need to obtain the OpenAI API keys. You are responsible for any fees OpenAI may charge for the use of their APIs. You should be familiar with the limitations and risks associated with using this technology, and you agree that you shall be solely responsible for full compliance with any terms that may apply to your use of the OpenAI APIs.
+The functionality shown here serves as an interface to the ChatGPT and DALL·E APIs. To start using the OpenAI APIs, you first need to obtain OpenAI API keys. You are responsible for any fees OpenAI may charge for the use of their APIs. You should be familiar with the limitations and risks associated with using this technology, and you agree that you shall be solely responsible for full compliance with any terms that may apply to your use of the OpenAI APIs.
 
 Some of the current LLMs supported are:
 - gpt-3.5-turbo, gpt-3.5-turbo-1106
@@ -127,6 +127,7 @@ You can specifying the streaming function when you create the chat assistant. Th
 sf = @(x)fprintf("%s",x);
 chat = openAIChat(StreamFun=sf);
 txt = generate(chat,"What is Model-Based Design and how is it related to Digital Twin?")
+% Should stream the response token by token
 ```
 
 ### Calling MATLAB functions with the API
@@ -280,6 +281,7 @@ image_path = "peppers.png";
 messages = openAIMessages;
 messages = addUserMessageWithImages(messages,"What is in the image?",image_path);
 [txt,response] = generate(chat,messages);
+% Should output the description of the image
 ```
 
 ### Obtaining embeddings
@@ -308,6 +310,7 @@ mdl = openAIImages(ModelName="dall-e-3");
 images = generate(mdl,"Create a 3D avatar of a whimsical sushi on the beach. He is decorated with various sushi elements and is playfully interacting with the beach environment.");
 figure
 imshow(images{1})
+% Should output an image based on the prompt
 ```
 
 ## Examples

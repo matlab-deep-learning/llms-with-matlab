@@ -97,9 +97,8 @@ classdef topenAIMessages < matlab.unittest.TestCase
             functionName = "functionName";
             funCall = struct("name", functionName, "arguments", "{}");
             toolCall = struct("id", "123", "type", "function", "function", funCall);
-            toolCallPrompt = struct("role", "assistant", "content", "","tool_calls", []);
             % tool_calls is an array of struct in API response
-            toolCallPrompt.tool_calls = toolCall;
+            toolCallPrompt = struct("role", "assistant", "content", "","tool_calls", toolCall);
             msgs = addResponseMessage(msgs, toolCallPrompt);
             % to include in msgs, tool_calls must be a cell
             testCase.verifyEqual(fieldnames(msgs.Messages{1}), fieldnames(toolCallPrompt));
@@ -112,8 +111,8 @@ classdef topenAIMessages < matlab.unittest.TestCase
             args = "{""arg1"": 1, ""arg2"": 2, ""arg3"": ""3""}";
             funCall = struct("name", functionName, "arguments", args);
             toolCall = struct("id", "123", "type", "function", "function", funCall);
-            toolCallPrompt = struct("role", "assistant", "content", "", "tool_calls", []);
             % tool_calls is an array of struct in API response
+            toolCallPrompt = struct("role", "assistant", "content", "", "tool_calls", toolCall);
             toolCallPrompt.tool_calls = [toolCall,toolCall,toolCall];
             msgs = addResponseMessage(msgs, toolCallPrompt);
             testCase.verifyEqual(msgs.Messages{1}, toolCallPrompt);

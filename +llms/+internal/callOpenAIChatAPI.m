@@ -134,9 +134,9 @@ if strcmp(nvp.ModelName,'gpt-4-vision-preview')
     nvpOptions(ismember(nvpOptions,["MaxNumTokens","StopSequences"])) = [];
 end
 
-for i=1:length(nvpOptions)
-    if isfield(nvp, nvpOptions(i))
-        parameters.(dict(nvpOptions(i))) = nvp.(nvpOptions(i));
+for opt = nvpOptions.'
+    if isfield(nvp, opt)
+        parameters.(dict(opt)) = nvp.(opt);
     end
 end
 end

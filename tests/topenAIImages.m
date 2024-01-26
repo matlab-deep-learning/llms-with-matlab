@@ -9,8 +9,8 @@ classdef topenAIImages < matlab.unittest.TestCase
             openAIEnvVar = "OPENAI_API_KEY";
             if isenv(openAIEnvVar)
                 key = getenv(openAIEnvVar);
+                testCase.addTeardown(@() setenv(openAIEnvVar, key));
                 unsetenv(openAIEnvVar);
-                testCase.addTeardown(@(x) setenv(openAIEnvVar, x), key);
             end
         end
     end
@@ -223,7 +223,7 @@ end
 
 function invalidEditInput = iGetInvalidEditInput
 validImage = string(which("peppers.png"));
-nonPNGImage = which("corn.tif");
+nonPNGImage = string(which("corn.tif"));
 invalidEditInput = struct( ...
         "EmptyImage",struct( ...
             "Input",{{ [], "prompt" }},...
