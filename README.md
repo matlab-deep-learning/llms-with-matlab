@@ -121,7 +121,7 @@ history = addUserMessage(history,"Generate MATLAB code that computes that");
 
 ### Streaming the response
 
-You can specifying the streaming function when you create the chat assistant. This will print the response to the command window.
+Streaming allows you to start receiving the output from the API as it is generated token by token, rather than wait for the entire completion to be generated. You can specifying the streaming function when you create the chat assistant. In this example, the streaming function will print the response to the command window.
 ```matlab
 % streaming function
 sf = @(x)fprintf("%s",x);
@@ -188,13 +188,17 @@ ans =
 You can then call the function `sind` with the specified argument and return the value to the API add a function message to the history:
 
 ```matlab
-% Arguments are returned as a json, so you need to decode it first
+% Arguments are returned as json, so you need to decode it first
 id = string(response.tool_calls.id);
 func = string(response.tool_calls.function.name);
-args = jsondecode(response.tool_calls.function.arguments);
-result = sind(args.x);
-messages = addToolMessage(messages,id,func,"x="+result);
-[txt, response] = generate(chat, messages);
+if func == "sind"
+    args = jsondecode(response.tool_calls.function.arguments);
+    result = sind(args.x);
+    messages = addToolMessage(messages,id,func,"x="+result);
+    [txt, response] = generate(chat, messages);
+else
+    % handle calls to unknown functions
+end
 ```
 
 The model then will use the function result to generate a more precise response:
@@ -202,7 +206,7 @@ The model then will use the function result to generate a more precise response:
 ```shell
 >> txt
 
-text = 
+txt = 
 
     "The sine of 30 degrees is approximately 0.5."
 ```
@@ -303,7 +307,7 @@ ans =
 ```
 ## Getting Started with Images API
 
-To get started, you can either create an `openAIImage` object and use its methods or use it in a more complex setup, as needed.
+To get started, you can either create an `openAIImages` object and use its methods or use it in a more complex setup, as needed.
 
 ```matlab
 mdl = openAIImages(ModelName="dall-e-3");

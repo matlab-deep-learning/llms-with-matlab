@@ -31,10 +31,10 @@ classdef openAIImages
 % Copyright 2024 The MathWorks, Inc.
 
     properties(SetAccess=private)  
-        %MODELNAME   Model name.
+        %ModelName   Model name.
         ModelName
 
-        %TIMEOUT    Connection timeout in seconds (default 10 secs)
+        %TimeOut    Connection timeout in seconds (default 10 secs)
         TimeOut
     end
 
@@ -77,7 +77,7 @@ classdef openAIImages
             %                          1792x1024, or 1024x1792
             %
             %       Quality          - Quality of the images to generate. 
-            %                          "standard" (default) or 'hd'. 
+            %                          "standard" (default) or "hd". 
             %                          Only "dall-e-3" supports this parameter.
             %
             %       Style            - The style of the generated images. 
@@ -89,11 +89,11 @@ classdef openAIImages
                 prompt                        {mustBeTextScalar}
                 nvp.NumImages           (1,1) {mustBePositive, mustBeInteger,...
                                                 mustBeLessThanOrEqual(nvp.NumImages,10)} = 1
-                nvp.Size                (1,1) {mustBeMember(nvp.Size, ["256x256", "512x512", ...
+                nvp.Size                (1,1) string {mustBeMember(nvp.Size, ["256x256", "512x512", ...
                                                                 "1024x1024", "1792x1024", ...
                                                                 "1024x1792"])} = "1024x1024"
-                nvp.Quality             (1,1) {mustBeMember(nvp.Quality,["standard", "hd"])} 
-                nvp.Style               (1,1) {mustBeMember(nvp.Style,["vivid", "natural"])} 
+                nvp.Quality             (1,1) string {mustBeMember(nvp.Quality,["standard", "hd"])} 
+                nvp.Style               (1,1) string {mustBeMember(nvp.Style,["vivid", "natural"])} 
             end
 
             endpoint = "https://api.openai.com/v1/images/generations";
@@ -106,7 +106,7 @@ classdef openAIImages
                 "n",nvp.NumImages,...
                 "size",nvp.Size);
 
-            if this.ModelName~="dall-e-3"
+            if this.ModelName=="dall-e-2"
                 % dall-e-3 only params
                 if isfield(nvp, "Quality") 
                     error("llms:invalidOptionForModel", ...
@@ -180,7 +180,7 @@ classdef openAIImages
                 nvp.MaskImagePath             {mustBeValidFileType(nvp.MaskImagePath)}
                 nvp.NumImages           (1,1) {mustBePositive, mustBeInteger,...
                                                 mustBeLessThanOrEqual(nvp.NumImages,10)} = 1
-                nvp.Size                (1,1) {mustBeMember(nvp.Size,["256x256", ...
+                nvp.Size                (1,1) string {mustBeMember(nvp.Size,["256x256", ...
                                                             "512x512", ...
                                                             "1024x1024"])} = "1024x1024"
             end
@@ -197,15 +197,12 @@ classdef openAIImages
             endpoint = 'https://api.openai.com/v1/images/edits';
 
             % Required params
+            numImages = num2str(nvp.NumImages);
             body = matlab.net.http.io.MultipartFormProvider( ...
                 'image',matlab.net.http.io.FileProvider(imagePath), ...
-                'prompt',matlab.net.http.io.FormProvider(prompt));
-
-            body.Names = [body.Names,"n"];
-            numImages = num2str(nvp.NumImages);
-            body.Parts = [body.Parts,{matlab.net.http.io.FormProvider(numImages)}];
-            body.Names = [body.Names,"size"];
-            body.Parts = [body.Parts,{matlab.net.http.io.FormProvider(nvp.Size)}];
+                'prompt',matlab.net.http.io.FormProvider(prompt), ...
+                'n',matlab.net.http.io.FormProvider(numImages),...
+                'size',matlab.net.http.io.FormProvider(nvp.Size));
 
             % Optional param
             if isfield(nvp,"MaskImagePath")
@@ -230,21 +227,21 @@ classdef openAIImages
             %                          and square.
             %
             %   [IMAGES, RESPONSE] = createVariation(__, Name=Value) specifies
-            %   additiona options.
+            %   additional options.
             %       
             %       NumImages        - Number of images to generate.  
             %                          Default value is 1. The max is 10. 
             %
             %       Size             - Size of the generated images. 
-            %                          Must be one of 256x256, 512x512, or 
-            %                          1024x1024 (default)
+            %                          Must be one of "256x256", "512x512", or 
+            %                          "1024x1024" (default)
 
             arguments
                 this                    (1,1) openAIImages
                 imagePath                     {mustBeValidFileType(imagePath)}
                 nvp.NumImages           (1,1) {mustBePositive, mustBeInteger,...
                                                 mustBeLessThanOrEqual(nvp.NumImages,10)} = 1
-                nvp.Size                (1,1) {mustBeMember(nvp.Size,["256x256", ...
+                nvp.Size                (1,1) string {mustBeMember(nvp.Size,["256x256", ...
                                                 "512x512","1024x1024"])} = "1024x1024"
             end
 
@@ -257,15 +254,11 @@ classdef openAIImages
 
             endpoint = 'https://api.openai.com/v1/images/variations';
 
-            body = matlab.net.http.io.MultipartFormProvider('image', ...
-                matlab.net.http.io.FileProvider(imagePath));
-
-            body.Names = [body.Names,"n"];
             numImages = num2str(nvp.NumImages);
-            body.Parts = [body.Parts,{matlab.net.http.io.FormProvider(numImages)}];
-
-            body.Names = [body.Names,"size"];
-            body.Parts = [body.Parts,{matlab.net.http.io.FormProvider(nvp.Size)}];
+            body = matlab.net.http.io.MultipartFormProvider(...
+                'image',matlab.net.http.io.FileProvider(imagePath),...
+                'n',matlab.net.http.io.FormProvider(numImages),...
+                'size',matlab.net.http.io.FormProvider(nvp.Size));
 
             % Send the HTTP Request
             response = sendRequest(this, endpoint, body);
@@ -274,16 +267,13 @@ classdef openAIImages
         end
 
         function response = sendRequest(this, endpoint, body)
-        %getResponse get the response from the given endpoint
+        %sendRequest send request to the given endpoint, return response
+            headers =  matlab.net.http.HeaderField('Authorization', "Bearer " + this.ApiKey);
             if isa(body,'struct')
-                headers =  matlab.net.http.HeaderField('Content-Type', 'application/json');
-                headers(2) =  matlab.net.http.HeaderField('Authorization', "Bearer " + this.ApiKey);
-            else
-                headers =  matlab.net.http.HeaderField('Authorization', "Bearer " + this.ApiKey);
+                headers(2) =  matlab.net.http.HeaderField('Content-Type', 'application/json');
             end
             request =  matlab.net.http.RequestMessage('post', headers, body);
 
-            % Create a HTTPOptions object;
             httpOpts = matlab.net.http.HTTPOptions;
             httpOpts.ConnectTimeout = this.TimeOut;
             response = send(request, matlab.net.URI(endpoint), httpOpts);
@@ -304,14 +294,11 @@ end
 
 function images = extractImages(response)
 
-if response.StatusCode=="OK"
+if response.StatusCode=="OK" &&  isfield(response.Body.Data.data,"url")
     % Output the images
     if isfield(response.Body.Data.data,"url")
         urls = arrayfun(@(x) string(x.url), response.Body.Data.data);
-        images = cell(1,numel(urls));
-        for ii = 1:numel(urls)
-            images{ii} = imread(urls(ii));
-        end
+        images = arrayfun(@imread,urls,UniformOutput=false);
     else
         images = [];
     end
@@ -322,13 +309,13 @@ end
 end
 
 function validateSizeNVP(model, size)
-if ismember(size,["1792x1024", "1024x1792"]) && model~="dall-e-3"
+if ismember(size,["1792x1024", "1024x1792"]) && model=="dall-e-2"
     error("llms:invalidOptionAndValueForModel", ...
         llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionAndValueForModel", ...
         "Size", size, model));
 end
 
-if ismember(size,["256x256", "512x512"]) && model~="dall-e-2"
+if ismember(size,["256x256", "512x512"]) && model=="dall-e-3"
     error("llms:invalidOptionAndValueForModel", ...
         llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionAndValueForModel", ...
         "Size", size, model));

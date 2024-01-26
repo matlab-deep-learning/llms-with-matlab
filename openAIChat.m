@@ -34,8 +34,8 @@ classdef(Sealed) openAIChat
 %   StreamFun               - Function to callback when streaming the
 %                             result
 %
-%   ResponseFormat          - The format of response the model returns. 
-%                             Default is text, or json. 
+%   ResponseFormat          - The format of response the model returns.
+%                             "text" (default) | "json"
 %
 %   openAIChat Functions:
 %       openAIChat           - Chat completion API from OpenAI.
@@ -98,7 +98,7 @@ classdef(Sealed) openAIChat
         %SYSTEMPROMPT   System prompt.
         SystemPrompt = []
 
-        %RESPONSEFORMAT     Response format, text or json     
+        %RESPONSEFORMAT     Response format, "text" or "json"       
         ResponseFormat 
     end
 
@@ -121,7 +121,7 @@ classdef(Sealed) openAIChat
                 nvp.Temperature                    {mustBeValidTemperature} = 1
                 nvp.TopProbabilityMass             {mustBeValidTopP} = 1
                 nvp.StopSequences                  {mustBeValidStop} = {}
-                nvp.ResponseFormat           (1,1) {mustBeMember(nvp.ResponseFormat,["text","json"])} = "text"
+                nvp.ResponseFormat           (1,1) string {mustBeMember(nvp.ResponseFormat,["text","json"])} = "text"
                 nvp.ApiKey                         {mustBeNonzeroLengthTextScalar} 
                 nvp.PresencePenalty                {mustBeValidPenalty} = 0
                 nvp.FrequencyPenalty               {mustBeValidPenalty} = 0
@@ -139,17 +139,17 @@ classdef(Sealed) openAIChat
                 this.StreamFun = [];
             end
 
-            if ~isempty(nvp.Tools)
+            if isempty(nvp.Tools)
+                this.Tools = [];
+                this.FunctionsStruct = [];
+                this.FunctionNames = [];
+            else
                 this.Tools = nvp.Tools;
                 [this.FunctionsStruct, this.FunctionNames] = functionAsStruct(nvp.Tools);
                 if strcmp(nvp.ModelName,'gpt-4-vision-preview')
                    error("llms:invalidOptionAndValueForModel", ...
                        llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "Tools", nvp.ModelName));
                 end
-            else
-                this.Tools = [];
-                this.FunctionsStruct = [];
-                this.FunctionNames = [];
             end
             
             if ~isempty(systemPrompt)
@@ -316,7 +316,7 @@ classdef(Sealed) openAIChat
                 if ~isempty(this.Tools) 
                     toolChoice = "auto";
                 end
-            else
+            elseif ToolChoice ~= "auto"
                 % if toolChoice is not empty, then it must be in the format
                 % {"type": "function", "function": {"name": "my_function"}}
                 toolChoice = struct("type","function","function",struct("name",toolChoice));

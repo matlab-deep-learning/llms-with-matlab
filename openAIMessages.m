@@ -7,7 +7,7 @@ classdef (Sealed) openAIMessages
     %       addUserMessage           - Add user message.
     %       addUserMessageWithImages - Add user message with images for
     %                                  GPT-4 Turbo with Vision.
-    %       addFunctionMessage       - Add a function message.
+    %       addToolMessage           - Add a tool message.
     %       addResponseMessage       - Add a response message.
     %       removeMessage            - Remove message from history.
     %
@@ -97,7 +97,7 @@ classdef (Sealed) openAIMessages
             %   messages = openAIMessages;
             %
             %   % Add user message with an image
-            %   content = "What are in this picture?"
+            %   content = "What is in this picture?"
             %   images = "peppers.png"
             %   messages = addUserMessageWithImages(messages, content, images);
             %
@@ -108,21 +108,21 @@ classdef (Sealed) openAIMessages
                 this (1,1) openAIMessages
                 content {mustBeNonzeroLengthTextScalar}
                 images (1,:) {mustBeNonzeroLengthText}
-                nvp.Detail {mustBeMember(nvp.Detail,["low","high","auto"])} = "auto"
+                nvp.Detail string {mustBeMember(nvp.Detail,["low","high","auto"])} = "auto"
             end
 
             newMessage = struct("role", "user", "content", []);
             newMessage.content = {struct("type","text","text",string(content))};
-            for i = 1:numel(images)
-                if startsWith(images(i),("https://"|"http://"))
+            for img = images(:).'
+                if startsWith(img,("https://"|"http://"))
                     s = struct( ...
                         "type","image_url", ...
-                        "image_url",struct("url",images{i}));
+                        "image_url",struct("url",img));
                 else
-                    [~,~,ext] = fileparts(images(i));
+                    [~,~,ext] = fileparts(img);
                     MIMEType = "data:image/" + erase(ext,".") + ";base64,";
                     % Base64 encode the image using the given MIME type
-                    fid = fopen(images(i));
+                    fid = fopen(img);
                     im = fread(fid,'*uint8');
                     fclose(fid);
                     b64 = matlab.net.base64encode(im);
@@ -142,7 +142,7 @@ classdef (Sealed) openAIMessages
         function this = addToolMessage(this, id, name, content)
             %addToolMessage   Add Tool message.
             %
-            %   MESSAGES = addFunctionMessage(MESSAGES, ID, NAME, CONTENT)
+            %   MESSAGES = addToolMessage(MESSAGES, ID, NAME, CONTENT)
             %   adds a tool message with the specified id, name and content. 
             %   ID, NAME and CONTENT must be text scalars.
             %
