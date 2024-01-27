@@ -132,7 +132,7 @@ txt = generate(chat,"What is Model-Based Design and how is it related to Digital
 
 ### Calling MATLAB functions with the API
 
-The optional parameter `Tools` can be used to provide function specifications to the API. The purpose of this is to enable models to generate function arguments which adhere to the provided specifications. 
+Optionally, `Tools=functions` can be used to provide function specifications to the API. The purpose of this is to enable models to generate function arguments which adhere to the provided specifications. 
 Note that the API is not able to directly call any function, so you should call the function and pass the values to the API directly. This process can be automated as shown in [ExampleFunctionCalling.mlx](/examples/ExampleFunctionCalling.mlx), but it's important to consider that ChatGPT can hallucinate function names, so avoid executing any arbitrary generated functions and only allow the execution of functions that you have defined. 
 
 For example, if you want to use the API for mathematical operations such as `sind`, instead of letting the model generate the result and risk running into hallucinations, you can give the model direct access to the function as follows:
