@@ -3,16 +3,18 @@ classdef (Sealed) openAIMessages
     %   messages = openAIMessages creates an openAIMessages object.
     %
     %   openAIMessages functions:
-    %       addSystemMessage   - Add system message.
-    %       addUserMessage     - Add user message.
-    %       addFunctionMessage - Add a function message.
-    %       addResponseMessage - Add a response message.
-    %       removeMessage      - Remove message from history.
+    %       addSystemMessage         - Add system message.
+    %       addUserMessage           - Add user message.
+    %       addUserMessageWithImages - Add user message with images for
+    %                                  GPT-4 Turbo with Vision.
+    %       addToolMessage           - Add a tool message.
+    %       addResponseMessage       - Add a response message.
+    %       removeMessage            - Remove message from history.
     %
     %   openAIMessages properties:
-    %       Messages           - Messages in the conversation history.
+    %       Messages                 - Messages in the conversation history.
 
-    % Copyright 2023 The MathWorks, Inc.
+    % Copyright 2023-2024 The MathWorks, Inc.
 
     properties(SetAccess=private)
         %MESSAGES - Messages in the conversation history.
@@ -69,12 +71,80 @@ classdef (Sealed) openAIMessages
             this.Messages{end+1} = newMessage;
         end
 
-        function this = addFunctionMessage(this, name, content)
-            %addFunctionMessage   Add function message.
+        function this = addUserMessageWithImages(this, content, images, nvp)
+            %addUserMessageWithImages   Add user message with images
             %
-            %   MESSAGES = addFunctionMessage(MESSES, NAME, CONTENT) adds a function
-            %   message with the specified name and content. NAME and
-            %   CONTENT must be text scalars.
+            %   MESSAGES = addUserMessageWithImages(MESSAGES, CONTENT, IMAGES) 
+            %   adds a user message with the specified content and images 
+            %   to MESSAGES. CONTENT must be a text scalar. IMAGES must be
+            %   a string array of image URLs or file paths. 
+            %
+            %   messages = addUserMessageWithImages(__,Detail="low");
+            %   specify how the model should process the images using
+            %   "Detail" parameter. The default is "auto".
+            %   - When set to "low", the model scales the image to 512x512 
+            %   - When set to "high", the model scales the image to 512x512
+            %   and also creates detailed 512x512 crops of the image
+            %   - When set to "auto", the models chooses which mode to use
+            %   depending on the input image. 
+            %
+            %   Example:
+            %
+            %   % Create a chat with GPT-4 Turbo with Vision
+            %   chat = openAIChat("You are an AI assistant.", ModelName="gpt-4-vision-preview"); 
+            %
+            %   % Create messages object
+            %   messages = openAIMessages;
+            %
+            %   % Add user message with an image
+            %   content = "What is in this picture?"
+            %   images = "peppers.png"
+            %   messages = addUserMessageWithImages(messages, content, images);
+            %
+            %   % Generate a response
+            %   [text, response] = generate(chat, messages, MaxNumTokens=300);
+            
+            arguments
+                this (1,1) openAIMessages
+                content {mustBeNonzeroLengthTextScalar}
+                images (1,:) {mustBeNonzeroLengthText}
+                nvp.Detail string {mustBeMember(nvp.Detail,["low","high","auto"])} = "auto"
+            end
+
+            newMessage = struct("role", "user", "content", []);
+            newMessage.content = {struct("type","text","text",string(content))};
+            for img = images(:).'
+                if startsWith(img,("https://"|"http://"))
+                    s = struct( ...
+                        "type","image_url", ...
+                        "image_url",struct("url",img));
+                else
+                    [~,~,ext] = fileparts(img);
+                    MIMEType = "data:image/" + erase(ext,".") + ";base64,";
+                    % Base64 encode the image using the given MIME type
+                    fid = fopen(img);
+                    im = fread(fid,'*uint8');
+                    fclose(fid);
+                    b64 = matlab.net.base64encode(im);
+                    s = struct( ...
+                        "type","image_url", ...
+                        "image_url",struct("url",MIMEType + b64));
+                end
+
+                s.image_url.detail = nvp.Detail;
+
+                newMessage.content{end+1} = s;
+                this.Messages{end+1} = newMessage;
+            end
+
+        end
+
+        function this = addToolMessage(this, id, name, content)
+            %addToolMessage   Add Tool message.
+            %
+            %   MESSAGES = addToolMessage(MESSAGES, ID, NAME, CONTENT)
+            %   adds a tool message with the specified id, name and content. 
+            %   ID, NAME and CONTENT must be text scalars.
             %
             %   Example:
             %   % Create messages object
@@ -82,15 +152,18 @@ classdef (Sealed) openAIMessages
             %
             %   % Add function message, containing the result of 
             %   % calling strcat("Hello", " World")
-            %   messages = addFunctionMessage(messages, "strcat", "Hello World");
+            %   messages = addToolMessage(messages, "call_123", "strcat", "Hello World");
 
             arguments
                 this (1,1) openAIMessages
+                id {mustBeNonzeroLengthTextScalar}
                 name {mustBeNonzeroLengthTextScalar}
                 content {mustBeNonzeroLengthTextScalar}
+
             end
 
-            newMessage = struct("role", "function", "name", string(name), "content", string(content));
+            newMessage = struct("tool_call_id", id, "role", "tool", ...
+                "name", string(name), "content", string(content));
             this.Messages{end+1} = newMessage;
         end
        
@@ -130,10 +203,10 @@ classdef (Sealed) openAIMessages
             end
 
             % Assistant is asking for function call
-            if isfield(messageStruct, "function_call")
-                funCall = messageStruct.function_call;
-                validateAssistantWithFunctionCall(funCall)
-                this = addAssistantMessage(this, funCall.name, funCall.arguments);
+            if isfield(messageStruct, "tool_calls")
+                toolCalls = messageStruct.tool_calls;
+                validateAssistantWithToolCalls(toolCalls)
+                this = addAssistantMessage(this, messageStruct.content, toolCalls);
             else
                 % Simple assistant response
                 validateRegularAssistant(messageStruct.content);
@@ -172,20 +245,32 @@ classdef (Sealed) openAIMessages
 
     methods(Access=private)
 
-        function this = addAssistantMessage(this, contentOrfunctionName, arguments)
+        function this = addAssistantMessage(this, content, toolCalls)
             arguments
                 this (1,1) openAIMessages
-                contentOrfunctionName string
-                arguments string = []
+                content string
+                toolCalls struct = []
             end
 
-            if isempty(arguments)
+            if isempty(toolCalls)
                 % Default assistant response
-                 newMessage = struct("role", "assistant", "content", contentOrfunctionName);
+                 newMessage = struct("role", "assistant", "content", content);
             else
-                % function_call message
-                functionCall = struct("name", contentOrfunctionName, "arguments", arguments);
-                newMessage = struct("role", "assistant", "content", "", "function_call", functionCall);
+                % tool_calls message
+                toolsStruct = repmat(struct("id",[],"type",[],"function",[]),size(toolCalls));
+                for i = 1:numel(toolCalls)
+                    toolsStruct(i).id = toolCalls(i).id;
+                    toolsStruct(i).type = toolCalls(i).type;
+                    toolsStruct(i).function = struct( ...
+                        "name", toolCalls(i).function.name, ...
+                        "arguments", toolCalls(i).function.arguments);
+                end
+                if numel(toolsStruct) > 1
+                    newMessage = struct("role", "assistant", "content", content, "tool_calls", toolsStruct);
+                else
+                    newMessage = struct("role", "assistant", "content", content, "tool_calls", []);
+                    newMessage.tool_calls = {toolsStruct};
+                end
             end
             
             if isempty(this.Messages)
@@ -211,17 +296,26 @@ catch ME
 end
 end
 
-function validateAssistantWithFunctionCall(functionCallStruct)
-if ~isstruct(functionCallStruct)||~isfield(functionCallStruct, "name")||~isfield(functionCallStruct, "arguments")
+function validateAssistantWithToolCalls(toolCallStruct)
+if ~(isstruct(toolCallStruct) && isfield(toolCallStruct, "id") && isfield(toolCallStruct, "function"))
+    error("llms:mustBeAssistantWithIdAndFunction", ...
+        llms.utils.errorMessageCatalog.getMessage("llms:mustBeAssistantWithIdAndFunction"))
+else
+    functionCallStruct = [toolCallStruct.function];
+end
+
+if ~isfield(functionCallStruct, "name")||~isfield(functionCallStruct, "arguments")
     error("llms:mustBeAssistantWithNameAndArguments", ...
         llms.utils.errorMessageCatalog.getMessage("llms:mustBeAssistantWithNameAndArguments"))
 end
 
 try
-    mustBeNonzeroLengthText(functionCallStruct.name)
-    mustBeTextScalar(functionCallStruct.name)
-    mustBeNonzeroLengthText(functionCallStruct.arguments)
-    mustBeTextScalar(functionCallStruct.arguments)
+    for i = 1:numel(functionCallStruct)
+        mustBeNonzeroLengthText(functionCallStruct(i).name)
+        mustBeTextScalar(functionCallStruct(i).name)
+        mustBeNonzeroLengthText(functionCallStruct(i).arguments)
+        mustBeTextScalar(functionCallStruct(i).arguments)
+    end
 catch ME
     error("llms:assistantMustHaveTextNameAndArguments", ...
         llms.utils.errorMessageCatalog.getMessage("llms:assistantMustHaveTextNameAndArguments"))

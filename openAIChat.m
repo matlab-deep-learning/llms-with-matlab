@@ -9,7 +9,7 @@ classdef(Sealed) openAIChat
 %   CHAT = openAIChat(systemPrompt,Name=Value) specifies additional options
 %   using one or more name-value arguments:
 %
-%   Functions               - Array of openAIFunction objects representing
+%   Tools                   - Array of openAIFunction objects representing
 %                             custom functions to be used during chat completions.
 %
 %   ModelName               - Name of the model to use for chat completions.
@@ -28,11 +28,14 @@ classdef(Sealed) openAIChat
 %   PresencePenalty         - Penalty value for using a token in the response
 %                             that has already been used. Default value is 0.
 %
-%   FrequencyPenalty         - Penalty value for using a token that is frequent
+%   FrequencyPenalty        - Penalty value for using a token that is frequent
 %                             in the training data. Default value is 0.
 %
 %   StreamFun               - Function to callback when streaming the
 %                             result
+%
+%   ResponseFormat          - The format of response the model returns.
+%                             "text" (default) | "json"
 %
 %   openAIChat Functions:
 %       openAIChat           - Chat completion API from OpenAI.
@@ -58,10 +61,12 @@ classdef(Sealed) openAIChat
 %       FunctionNames        - Names of the functions that the model can
 %                              request calls.
 %
+%       ResponseFormat       - Specifies the response format, text or json
+%
 %       TimeOut              - Connection Timeout in seconds (default: 10 secs)
 %
 
-% Copyright 2023 The MathWorks, Inc.
+% Copyright 2023-2024 The MathWorks, Inc.
 
     properties        
         %TEMPERATURE   Temperature of generation.
@@ -92,10 +97,13 @@ classdef(Sealed) openAIChat
 
         %SYSTEMPROMPT   System prompt.
         SystemPrompt = []
+
+        %RESPONSEFORMAT     Response format, "text" or "json"       
+        ResponseFormat 
     end
 
     properties(Access=private)
-        Functions
+        Tools
         FunctionsStruct
         ApiKey
         StreamFun
@@ -105,14 +113,16 @@ classdef(Sealed) openAIChat
         function this = openAIChat(systemPrompt, nvp)           
             arguments
                 systemPrompt                       {llms.utils.mustBeTextOrEmpty} = []
-                nvp.Functions                (1,:) {mustBeA(nvp.Functions, "openAIFunction")} = openAIFunction.empty
+                nvp.Tools                    (1,:) {mustBeA(nvp.Tools, "openAIFunction")} = openAIFunction.empty
                 nvp.ModelName                (1,1) {mustBeMember(nvp.ModelName,["gpt-4", "gpt-4-0613", "gpt-4-32k", ...
                                                         "gpt-3.5-turbo", "gpt-3.5-turbo-16k",... 
-                                                        "gpt-4-1106-preview","gpt-3.5-turbo-1106"])} = "gpt-3.5-turbo"
+                                                        "gpt-4-1106-preview","gpt-3.5-turbo-1106", ...
+                                                        "gpt-4-vision-preview"])} = "gpt-3.5-turbo"
                 nvp.Temperature                    {mustBeValidTemperature} = 1
                 nvp.TopProbabilityMass             {mustBeValidTopP} = 1
                 nvp.StopSequences                  {mustBeValidStop} = {}
-                nvp.ApiKey                         {llms.utils.mustBeNonzeroLengthTextScalar} 
+                nvp.ResponseFormat           (1,1) string {mustBeMember(nvp.ResponseFormat,["text","json"])} = "text"
+                nvp.ApiKey                         {mustBeNonzeroLengthTextScalar} 
                 nvp.PresencePenalty                {mustBeValidPenalty} = 0
                 nvp.FrequencyPenalty               {mustBeValidPenalty} = 0
                 nvp.TimeOut                  (1,1) {mustBeReal,mustBePositive} = 10
@@ -121,17 +131,25 @@ classdef(Sealed) openAIChat
 
             if isfield(nvp,"StreamFun")
                 this.StreamFun = nvp.StreamFun;
+                if strcmp(nvp.ModelName,'gpt-4-vision-preview')
+                    error("llms:invalidOptionAndValueForModel", ...
+                       llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "StreamFun", nvp.ModelName));
+                end
             else
                 this.StreamFun = [];
             end
 
-            if ~isempty(nvp.Functions)
-                this.Functions = nvp.Functions;
-                [this.FunctionsStruct, this.FunctionNames] = functionAsStruct(nvp.Functions);
-            else
-                this.Functions = [];
+            if isempty(nvp.Tools)
+                this.Tools = [];
                 this.FunctionsStruct = [];
                 this.FunctionNames = [];
+            else
+                this.Tools = nvp.Tools;
+                [this.FunctionsStruct, this.FunctionNames] = functionAsStruct(nvp.Tools);
+                if strcmp(nvp.ModelName,'gpt-4-vision-preview')
+                   error("llms:invalidOptionAndValueForModel", ...
+                       llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "Tools", nvp.ModelName));
+                end
             end
             
             if ~isempty(systemPrompt)
@@ -145,6 +163,24 @@ classdef(Sealed) openAIChat
             this.Temperature = nvp.Temperature;
             this.TopProbabilityMass = nvp.TopProbabilityMass;
             this.StopSequences = nvp.StopSequences;
+            if ~isempty(nvp.StopSequences) && strcmp(nvp.ModelName,'gpt-4-vision-preview')
+                error("llms:invalidOptionAndValueForModel", ...
+                       llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "StopSequences", nvp.ModelName));
+            end
+
+
+            % ResponseFormat is only supported in the latest models only
+            if (nvp.ResponseFormat == "json")
+                if ismember(this.ModelName,["gpt-3.5-turbo-1106","gpt-4-1106-preview"])
+                    warning("llms:warningJsonInstruction", ...
+                        llms.utils.errorMessageCatalog.getMessage("llms:warningJsonInstruction"))
+                else
+                    error("llms:invalidOptionAndValueForModel", ...
+                        llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionAndValueForModel", "ResponseFormat", "json", this.ModelName));
+                end
+
+            end
+
             this.PresencePenalty = nvp.PresencePenalty;
             this.FrequencyPenalty = nvp.FrequencyPenalty;
             this.ApiKey = llms.internal.getApiKeyFromNvpOrEnv(nvp);
@@ -166,18 +202,36 @@ classdef(Sealed) openAIChat
             %       MaxNumTokens     - Maximum number of tokens in the generated response.
             %                          Default value is inf.
             %
-            %       FunctionCall     - Function call to execute before generating the
-            %                          response, specified as a string array. Default value is empty.
-            
+            %       ToolChoice       - Function to execute. 'none', 'auto', 
+            %                          or specify the function to call.
+            %
+            %       Seed             - An integer value to use to obtain
+            %                          reproducible responses
+            %                           
+            % Currently, GPT-4 Turbo with vision does not support the message.name 
+            % parameter, functions/tools, response_format parameter, stop
+            % sequences, and max_tokens
+
             arguments
                 this                    (1,1) openAIChat
                 messages                (1,1) {mustBeValidMsgs}
                 nvp.NumCompletions      (1,1) {mustBePositive, mustBeInteger} = 1
                 nvp.MaxNumTokens        (1,1) {mustBePositive} = inf
-                nvp.FunctionCall        {mustBeValidFunctionCall(this, nvp.FunctionCall)} = []
+                nvp.ToolChoice          {mustBeValidFunctionCall(this, nvp.ToolChoice)} = []
+                nvp.Seed                {mustBeIntegerOrEmpty(nvp.Seed)} = []
             end
 
-            functionCall = convertFunctionCall(this, nvp.FunctionCall);
+            if nvp.MaxNumTokens ~= Inf && strcmp(this.ModelName,'gpt-4-vision-preview')
+                error("llms:invalidOptionAndValueForModel", ...
+                        llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "MaxNumTokens", this.ModelName));
+            end
+
+            toolChoice = convertToolChoice(this, nvp.ToolChoice);
+            if ~isempty(nvp.ToolChoice) && strcmp(this.ModelName,'gpt-4-vision-preview')
+                error("llms:invalidOptionAndValueForModel", ...
+                       llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "ToolChoice", this.ModelName));
+            end
+
             if isstring(messages) && isscalar(messages)
                 messagesStruct = {struct("role", "user", "content", messages)};               
             else
@@ -189,10 +243,11 @@ classdef(Sealed) openAIChat
             end
             
             [text, message, response] = llms.internal.callOpenAIChatAPI(messagesStruct, this.FunctionsStruct,...
-                ModelName=this.ModelName, FunctionCall=functionCall, Temperature=this.Temperature, ...
+                ModelName=this.ModelName, ToolChoice=toolChoice, Temperature=this.Temperature, ...
                 TopProbabilityMass=this.TopProbabilityMass, NumCompletions=nvp.NumCompletions,...
                 StopSequences=this.StopSequences, MaxNumTokens=nvp.MaxNumTokens, ...
                 PresencePenalty=this.PresencePenalty, FrequencyPenalty=this.FrequencyPenalty, ...
+                ResponseFormat=this.ResponseFormat,Seed=nvp.Seed, ...
                 ApiKey=this.ApiKey,TimeOut=this.TimeOut, StreamFun=this.StreamFun);
         end
 
@@ -254,15 +309,26 @@ classdef(Sealed) openAIChat
             end
         end
 
-        function functionCall = convertFunctionCall(this, functionCall)
-            % If functionCall is not empty, then it must be in
-            % the format {"name", functionCall}
-            if ~isempty(functionCall)&&ismember(functionCall, this.FunctionNames)
-                functionCall = struct("name", functionCall);
+        function toolChoice = convertToolChoice(this, toolChoice)
+            % if toolChoice is empty
+            if isempty(toolChoice)
+                % if Tools is not empty, the default is 'auto'.
+                if ~isempty(this.Tools) 
+                    toolChoice = "auto";
+                end
+            elseif ToolChoice ~= "auto"
+                % if toolChoice is not empty, then it must be in the format
+                % {"type": "function", "function": {"name": "my_function"}}
+                toolChoice = struct("type","function","function",struct("name",toolChoice));
             end
 
         end
     end
+end
+
+function mustBeNonzeroLengthTextScalar(content)
+mustBeNonzeroLengthText(content)
+mustBeTextScalar(content)
 end
 
 function [functionsStruct, functionNames] = functionAsStruct(functions)
@@ -271,7 +337,8 @@ functionsStruct = cell(1, numFunctions);
 functionNames = strings(1, numFunctions);
 
 for i = 1:numFunctions
-    functionsStruct{i} = encodeStruct(functions(i));
+    functionsStruct{i} = struct('type','function', ...
+        'function',encodeStruct(functions(i))) ;
     functionNames(i) = functions(i).FunctionName;
 end
 end
@@ -311,4 +378,10 @@ if ~isempty(value)
         error("llms:stopSequencesMustHaveMax4Elements", llms.utils.errorMessageCatalog.getMessage("llms:stopSequencesMustHaveMax4Elements"));
     end
 end
+end
+
+function mustBeIntegerOrEmpty(value)
+    if ~isempty(value)
+        mustBeInteger(value)
+    end
 end
