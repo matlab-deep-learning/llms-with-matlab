@@ -117,7 +117,7 @@ classdef(Sealed) openAIChat
                 nvp.ModelName                (1,1) {mustBeMember(nvp.ModelName,["gpt-4", "gpt-4-0613", "gpt-4-32k", ...
                                                         "gpt-3.5-turbo", "gpt-3.5-turbo-16k",... 
                                                         "gpt-4-1106-preview","gpt-3.5-turbo-1106", ...
-                                                        "gpt-4-vision-preview"])} = "gpt-3.5-turbo"
+                                                        "gpt-4-vision-preview", "gpt-4-turbo-preview"])} = "gpt-3.5-turbo"
                 nvp.Temperature                    {mustBeValidTemperature} = 1
                 nvp.TopProbabilityMass             {mustBeValidTopP} = 1
                 nvp.StopSequences                  {mustBeValidStop} = {}
@@ -132,7 +132,7 @@ classdef(Sealed) openAIChat
             if isfield(nvp,"StreamFun")
                 this.StreamFun = nvp.StreamFun;
                 if strcmp(nvp.ModelName,'gpt-4-vision-preview')
-                    error("llms:invalidOptionAndValueForModel", ...
+                    error("llms:invalidOptionForModel", ...
                        llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "StreamFun", nvp.ModelName));
                 end
             else
@@ -147,7 +147,7 @@ classdef(Sealed) openAIChat
                 this.Tools = nvp.Tools;
                 [this.FunctionsStruct, this.FunctionNames] = functionAsStruct(nvp.Tools);
                 if strcmp(nvp.ModelName,'gpt-4-vision-preview')
-                   error("llms:invalidOptionAndValueForModel", ...
+                   error("llms:invalidOptionForModel", ...
                        llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "Tools", nvp.ModelName));
                 end
             end
@@ -164,7 +164,7 @@ classdef(Sealed) openAIChat
             this.TopProbabilityMass = nvp.TopProbabilityMass;
             this.StopSequences = nvp.StopSequences;
             if ~isempty(nvp.StopSequences) && strcmp(nvp.ModelName,'gpt-4-vision-preview')
-                error("llms:invalidOptionAndValueForModel", ...
+                error("llms:invalidOptionForModel", ...
                        llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "StopSequences", nvp.ModelName));
             end
 
@@ -222,13 +222,13 @@ classdef(Sealed) openAIChat
             end
 
             if nvp.MaxNumTokens ~= Inf && strcmp(this.ModelName,'gpt-4-vision-preview')
-                error("llms:invalidOptionAndValueForModel", ...
+                error("llms:invalidOptionForModel", ...
                         llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "MaxNumTokens", this.ModelName));
             end
 
             toolChoice = convertToolChoice(this, nvp.ToolChoice);
             if ~isempty(nvp.ToolChoice) && strcmp(this.ModelName,'gpt-4-vision-preview')
-                error("llms:invalidOptionAndValueForModel", ...
+                error("llms:invalidOptionForModel", ...
                        llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "ToolChoice", this.ModelName));
             end
 
