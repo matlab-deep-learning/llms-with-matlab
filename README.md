@@ -288,6 +288,35 @@ messages = addUserMessageWithImages(messages,"What is in the image?",image_path)
 % Should output the description of the image
 ```
 
+## Establishing a connection to Chat Completions API using Azure®
+
+If you would like to connect MATLAB to Chat Completions API via Azure® instead of directly with OpenAI, you will have to create an `azureChat` object.
+However, you first need to obtain, in addition to the Azure API keys, your Azure OpenAI Resource.
+
+In order to create the chat assistant, you must specify your Azure OpenAI Resource and the LLM you want to use:
+```matlab
+chat = azureChat(YOUR_RESOURCE_NAME, YOUR_DEPLOYMENT_NAME, "You are a helpful AI assistant");
+```
+
+The `azureChat` object also allows to specify additional options in the same way as the `openAIChat` object.
+However, the `ModelName` option is not available due to the fact that the name of the LLM is already specified when creating the chat assistant.
+
+On the other hand, the `azureChat` object offers an additional option that allows you to set the API version that you want to use for the operation.
+
+After establishing your connection with Azure, you can continue using the `generate` function and other objects in the same way as if you had established a connection directly with OpenAI:
+```matlab
+% Initialize the Azure Chat object, passing a system prompt and specifying the API version
+chat = azureChat(YOUR_RESOURCE_NAME, YOUR_DEPLOYMENT_NAME, "You are a helpful AI assistant", APIVersion="2023-12-01-preview");
+
+% Create an openAIMessages object to start the conversation history
+history = openAIMessages;
+
+% Ask your question and store it in the history, create the response using the generate method, and store the response in the history 
+history = addUserMessage(history,"What is an eigenvalue?");
+[txt, response] = generate(chat, history)
+history = addResponseMessage(history, response);
+```
+
 ### Obtaining embeddings
 
 You can extract embeddings from your text with OpenAI using the function `extractOpenAIEmbeddings` as follows:

@@ -1,19 +1,20 @@
-classdef(Sealed) openAIChat < llms.internal.textGenerator
-%openAIChat Chat completion API from OpenAI.
+classdef(Sealed) azureChat < llms.internal.textGenerator
+%azureChat Chat completion API from Azure.
 %
-%   CHAT = openAIChat(systemPrompt) creates an openAIChat object with the
+%   CHAT = azureChat(resourceName, deploymentID) creates an azureChat object with the
+%   resource name and deployment ID path parameters required by Azure to establish the connection.
+%
+%   CHAT = azureChat(systemPrompt) creates an azureChatobject with the
 %   specified system prompt.
 %
-%   CHAT = openAIChat(systemPrompt,ApiKey=key) uses the specified API key
-%
-%   CHAT = openAIChat(systemPrompt,Name=Value) specifies additional options
+%   CHAT = azureChat(systemPrompt,Name=Value) specifies additional options
 %   using one or more name-value arguments:
 %
-%   Tools                   - Array of openAIFunction objects representing
-%                             custom functions to be used during chat completions.
+%   Tools                   - A list of tools the model can call.
+%                             This parameter requires API version 2023-12-01-preview.
 %
-%   ModelName               - Name of the model to use for chat completions.
-%                             The default value is "gpt-3.5-turbo".
+%   API Version             - A list of API versions to use for this operation.
+%                             Default value is 2023-05-15.
 %
 %   Temperature             - Temperature value for controlling the randomness
 %                             of the output. Default value is 1.
@@ -25,6 +26,11 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator
 %                             stop the generation of tokens. Default
 %                             value is empty.
 %
+%   ResponseFormat          - The format of response the model returns.
+%                             "text" (default) | "json"
+%
+%   ApiKey                  - The API key for accessing the OpenAI Chat API.
+%
 %   PresencePenalty         - Penalty value for using a token in the response
 %                             that has already been used. Default value is 0.
 %
@@ -34,16 +40,15 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator
 %   StreamFun               - Function to callback when streaming the
 %                             result
 %
-%   ResponseFormat          - The format of response the model returns.
-%                             "text" (default) | "json"
+%   TimeOut                 - Connection Timeout in seconds (default: 10 secs)
 %
-%   openAIChat Functions:
-%       openAIChat           - Chat completion API from OpenAI.
-%       generate             - Generate a response using the openAIChat instance.
 %
-%   openAIChat Properties:
-%       ModelName            - Model name.
 %
+%   azureChat Functions:
+%       azureChat            - Chat completion API from OpenAI.
+%       generate             - Generate a response using the azureChat instance.
+%
+%   azureChat Properties:
 %       Temperature          - Temperature of generation.
 %
 %       TopProbabilityMass   - Top probability mass to consider for generation.
@@ -68,22 +73,23 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator
 
 % Copyright 2023-2024 The MathWorks, Inc.
 
-
     properties(SetAccess=private) 
-        %MODELNAME   Model name.
-        ModelName
+        ResourceName
+        DeploymentID
+        APIVersion
     end
 
 
     methods
-        function this = openAIChat(systemPrompt, nvp)           
+        function this = azureChat(resourceName, deploymentID, systemPrompt, nvp)           
             arguments
+                resourceName                       {mustBeTextScalar}
+                deploymentID                       {mustBeTextScalar}
                 systemPrompt                       {llms.utils.mustBeTextOrEmpty} = []
                 nvp.Tools                    (1,:) {mustBeA(nvp.Tools, "openAIFunction")} = openAIFunction.empty
-                nvp.ModelName                (1,1) {mustBeMember(nvp.ModelName,["gpt-4", "gpt-4-0613", "gpt-4-32k", ...
-                                                        "gpt-3.5-turbo", "gpt-3.5-turbo-16k",... 
-                                                        "gpt-4-1106-preview","gpt-3.5-turbo-1106", ...
-                                                        "gpt-4-vision-preview", "gpt-4-turbo-preview"])} = "gpt-3.5-turbo"  
+                nvp.APIVersion               (1,1) {mustBeMember(nvp.APIVersion,["2023-03-15-preview", "2023-05-15", "2023-06-01-preview", ...
+                                                        "2023-07-01-preview", "2023-08-01-preview",... 
+                                                        "2023-12-01-preview"])} = "2023-05-15"             
                 nvp.Temperature                    {llms.utils.mustBeValidTemperature} = 1
                 nvp.TopProbabilityMass             {llms.utils.mustBeValidTopP} = 1
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}
@@ -97,10 +103,6 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator
 
             if isfield(nvp,"StreamFun")
                 this.StreamFun = nvp.StreamFun;
-                if strcmp(nvp.ModelName,'gpt-4-vision-preview')
-                    error("llms:invalidOptionForModel", ...
-                       llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "StreamFun", nvp.ModelName));
-                end
             else
                 this.StreamFun = [];
             end
@@ -112,10 +114,6 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator
             else
                 this.Tools = nvp.Tools;
                 [this.FunctionsStruct, this.FunctionNames] = functionAsStruct(nvp.Tools);
-                if strcmp(nvp.ModelName,'gpt-4-vision-preview')
-                   error("llms:invalidOptionForModel", ...
-                       llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "Tools", nvp.ModelName));
-                end
             end
             
             if ~isempty(systemPrompt)
@@ -125,28 +123,13 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator
                 end
             end
 
-            this.ModelName = nvp.ModelName;
+            this.ResourceName = resourceName;
+            this.DeploymentID = deploymentID;
+            this.APIVersion = nvp.APIVersion;
+            this.ResponseFormat = nvp.ResponseFormat;
             this.Temperature = nvp.Temperature;
             this.TopProbabilityMass = nvp.TopProbabilityMass;
             this.StopSequences = nvp.StopSequences;
-            if ~isempty(nvp.StopSequences) && strcmp(nvp.ModelName,'gpt-4-vision-preview')
-                error("llms:invalidOptionForModel", ...
-                       llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "StopSequences", nvp.ModelName));
-            end
-
-
-            % ResponseFormat is only supported in the latest models only
-            if (nvp.ResponseFormat == "json")
-                if ismember(this.ModelName,["gpt-3.5-turbo-1106","gpt-4-1106-preview"])
-                    warning("llms:warningJsonInstruction", ...
-                        llms.utils.errorMessageCatalog.getMessage("llms:warningJsonInstruction"))
-                else
-                    error("llms:invalidOptionAndValueForModel", ...
-                        llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionAndValueForModel", "ResponseFormat", "json", this.ModelName));
-                end
-
-            end
-
             this.PresencePenalty = nvp.PresencePenalty;
             this.FrequencyPenalty = nvp.FrequencyPenalty;
             this.ApiKey = llms.internal.getApiKeyFromNvpOrEnv(nvp);
@@ -154,7 +137,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator
         end
 
         function [text, message, response] = generate(this, messages, nvp)
-            %generate   Generate a response using the openAIChat instance.
+            %generate   Generate a response using the azureChat instance.
             %
             %   [TEXT, MESSAGE, RESPONSE] = generate(CHAT, MESSAGES) generates a response
             %   with the specified MESSAGES.
@@ -179,23 +162,12 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator
             % sequences, and max_tokens
 
             arguments
-                this                    (1,1) openAIChat
+                this                    (1,1) azureChat
                 messages                (1,1) {mustBeValidMsgs}
                 nvp.NumCompletions      (1,1) {mustBePositive, mustBeInteger} = 1
                 nvp.MaxNumTokens        (1,1) {mustBePositive} = inf
                 nvp.ToolChoice          {mustBeValidFunctionCall(this, nvp.ToolChoice)} = []
                 nvp.Seed                {mustBeIntegerOrEmpty(nvp.Seed)} = []
-            end
-
-            if nvp.MaxNumTokens ~= Inf && strcmp(this.ModelName,'gpt-4-vision-preview')
-                error("llms:invalidOptionForModel", ...
-                        llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "MaxNumTokens", this.ModelName));
-            end
-
-            toolChoice = convertToolChoice(this, nvp.ToolChoice);
-            if ~isempty(nvp.ToolChoice) && strcmp(this.ModelName,'gpt-4-vision-preview')
-                error("llms:invalidOptionForModel", ...
-                       llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "ToolChoice", this.ModelName));
             end
 
             if isstring(messages) && isscalar(messages)
@@ -208,15 +180,16 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator
                 messagesStruct = horzcat(this.SystemPrompt, messagesStruct);
             end
             
-            [text, message, response] = llms.internal.callOpenAIChatAPI(messagesStruct, this.FunctionsStruct,...
-                ModelName=this.ModelName, ToolChoice=toolChoice, Temperature=this.Temperature, ...
+            toolChoice = convertToolChoice(this, nvp.ToolChoice);
+            [text, message, response] = llms.internal.callAzureChatAPI(this.ResourceName, ...
+                this.DeploymentID, messagesStruct, this.FunctionsStruct, ...
+                ToolChoice=toolChoice, APIVersion = this.APIVersion, Temperature=this.Temperature, ...
                 TopProbabilityMass=this.TopProbabilityMass, NumCompletions=nvp.NumCompletions,...
                 StopSequences=this.StopSequences, MaxNumTokens=nvp.MaxNumTokens, ...
                 PresencePenalty=this.PresencePenalty, FrequencyPenalty=this.FrequencyPenalty, ...
                 ResponseFormat=this.ResponseFormat,Seed=nvp.Seed, ...
                 ApiKey=this.ApiKey,TimeOut=this.TimeOut, StreamFun=this.StreamFun);
         end
-
     end
 
     methods(Hidden)
