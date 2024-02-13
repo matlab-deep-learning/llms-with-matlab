@@ -1,3 +1,4 @@
 *.env
 *.asv
+*.mat
 startup.m
