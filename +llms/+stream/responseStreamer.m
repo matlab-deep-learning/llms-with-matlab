@@ -43,7 +43,7 @@ classdef responseStreamer < matlab.net.http.io.StringConsumer
                     try
                         json = jsondecode(str{i});
                     catch ME
-                        error("API returned il-formed json:" + str{i})
+                        error("API returned il-formed json: " + str{i})
                     end
                     if ischar(json.choices.finish_reason) && ismember(json.choices.finish_reason,["stop","tool_calls"])
                         stop = true;

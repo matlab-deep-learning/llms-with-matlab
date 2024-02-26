@@ -85,7 +85,7 @@ if response.StatusCode=="OK"
         message = response.Body.Data.choices(1).message;
     else
         pat = '{"' + wildcardPattern + '":';
-        if contains(streamedText,'{"id":"call_')
+        if contains(streamedText,pat)
             s = jsondecode(streamedText);
             if contains(s.function.arguments,pat)
                 prompt = jsondecode(s.function.arguments);
