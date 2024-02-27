@@ -43,7 +43,11 @@ classdef responseStreamer < matlab.net.http.io.StringConsumer
                     try
                         json = jsondecode(str{i});
                     catch ME
-                        error("API returned il-formed json: " + str{i})
+                        errID = 'llms:stream:responseStreamer:InvalidInput';
+                        msg = "Input does not have the expected json format. " + str{i};
+                        causeException = MException(errID,msg);
+                        ME = addCause(ME,causeException);
+                        rethrow(ME)
                     end
                     if ischar(json.choices.finish_reason) && ismember(json.choices.finish_reason,["stop","tool_calls"])
                         stop = true;
