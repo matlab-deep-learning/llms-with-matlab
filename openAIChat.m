@@ -311,7 +311,7 @@ classdef(Sealed) openAIChat
                 if ~isempty(this.Tools) 
                     toolChoice = "auto";
                 end
-            elseif ~ismember(ToolChoice,["auto","none"])
+            elseif ~ismember(toolChoice,["auto","none"])
                 % if toolChoice is not empty, then it must be "auto", "none" or in the format
                 % {"type": "function", "function": {"name": "my_function"}}
                 toolChoice = struct("type","function","function",struct("name",toolChoice));
