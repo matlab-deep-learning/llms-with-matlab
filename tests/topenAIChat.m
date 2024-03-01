@@ -77,7 +77,7 @@ classdef topenAIChat < matlab.unittest.TestCase
             testCase.verifyError(@()generate(chat,"input", ToolChoice="bla"), "llms:mustSetFunctionsForCall");
         end
 
-        function errorsWhenPassingToolChoiceWithNone(testCase)
+        function settingToolChoiceWithNone(testCase)
             functions = openAIFunction("funName");
             chat = openAIChat(ApiKey="this-is-not-a-real-key",Tools=functions);
             testCase.verifyWarningFree(@()generate(chat,"This is okay","ToolChoice","none"));
