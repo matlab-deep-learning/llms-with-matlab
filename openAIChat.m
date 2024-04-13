@@ -131,10 +131,6 @@ classdef(Sealed) openAIChat
 
             if isfield(nvp,"StreamFun")
                 this.StreamFun = nvp.StreamFun;
-                if strcmp(nvp.ModelName,'gpt-4-vision-preview')
-                    error("llms:invalidOptionForModel", ...
-                       llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "StreamFun", nvp.ModelName));
-                end
             else
                 this.StreamFun = [];
             end
@@ -146,10 +142,6 @@ classdef(Sealed) openAIChat
             else
                 this.Tools = nvp.Tools;
                 [this.FunctionsStruct, this.FunctionNames] = functionAsStruct(nvp.Tools);
-                if strcmp(nvp.ModelName,'gpt-4-vision-preview')
-                   error("llms:invalidOptionForModel", ...
-                       llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "Tools", nvp.ModelName));
-                end
             end
             
             if ~isempty(systemPrompt)
@@ -163,20 +155,15 @@ classdef(Sealed) openAIChat
             this.Temperature = nvp.Temperature;
             this.TopProbabilityMass = nvp.TopProbabilityMass;
             this.StopSequences = nvp.StopSequences;
-            if ~isempty(nvp.StopSequences) && strcmp(nvp.ModelName,'gpt-4-vision-preview')
-                error("llms:invalidOptionForModel", ...
-                       llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "StopSequences", nvp.ModelName));
-            end
-
 
             % ResponseFormat is only supported in the latest models only
             if (nvp.ResponseFormat == "json")
-                if ismember(this.ModelName,["gpt-3.5-turbo-1106","gpt-4-1106-preview"])
-                    warning("llms:warningJsonInstruction", ...
-                        llms.utils.errorMessageCatalog.getMessage("llms:warningJsonInstruction"))
-                else
+                if ismember(this.ModelName,["gpt-4","gpt-4-0613"])
                     error("llms:invalidOptionAndValueForModel", ...
                         llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionAndValueForModel", "ResponseFormat", "json", this.ModelName));
+                else
+                    warning("llms:warningJsonInstruction", ...
+                        llms.utils.errorMessageCatalog.getMessage("llms:warningJsonInstruction"))
                 end
 
             end
@@ -222,10 +209,6 @@ classdef(Sealed) openAIChat
             end
 
             toolChoice = convertToolChoice(this, nvp.ToolChoice);
-            if ~isempty(nvp.ToolChoice) && strcmp(this.ModelName,'gpt-4-vision-preview')
-                error("llms:invalidOptionForModel", ...
-                       llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "ToolChoice", this.ModelName));
-            end
 
             if isstring(messages) && isscalar(messages)
                 messagesStruct = {struct("role", "user", "content", messages)};               
