@@ -52,15 +52,15 @@ To use this repository with a local installation of MATLAB, first clone the repo
 
 Set up your OpenAI API key. Create a `.env` file in the project root directory with the following content.
 
-    ```
-    OPENAI_API_KEY=<your key>
-    ```
+```
+OPENAI_API_KEY=<your key>
+```
     
 Then load your `.env` file as follows:
 
-    ```matlab
-    loadenv(".env")
-    ```
+```matlab
+loadenv(".env")
+```
 
 ## Getting Started with Chat Completion API
 
