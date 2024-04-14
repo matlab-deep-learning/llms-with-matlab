@@ -56,7 +56,7 @@ Set up your OpenAI API key. Create a `.env` file in the project root directory w
     OPENAI_API_KEY=<your key>
     ```
     
-    Then load your `.env` file as follows:
+Then load your `.env` file as follows:
 
     ```matlab
     loadenv(".env")
@@ -287,9 +287,9 @@ You can extract the arguments and write the data to a table, for example.
 
 ### Understand the content of an image
 
-You can use gpt-4-vision-preview to experiment with image understanding. 
+You can use gpt-4-turbo to experiment with image understanding. 
 ```matlab
-chat = openAIChat("You are an AI assistant.", ModelName="gpt-4-turbo",StopSequences="stop");
+chat = openAIChat("You are an AI assistant.", ModelName="gpt-4-turbo");
 image_path = "peppers.png";
 messages = openAIMessages;
 messages = addUserMessageWithImages(messages,"What is in the image?",image_path);

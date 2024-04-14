@@ -146,6 +146,15 @@ for opt = nvpOptions.'
         parameters.(dict(opt)) = nvp.(opt);
     end
 end
+
+if isempty(nvp.StopSequences)
+    parameters = rmfield(parameters,"stop");
+end
+
+if nvp.MaxNumTokens == Inf
+    parameters = rmfield(parameters,"max_tokens");
+end
+
 end
 
 function dict = mapNVPToParameters()

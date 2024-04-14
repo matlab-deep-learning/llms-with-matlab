@@ -38,7 +38,7 @@ classdef topenAIChat < matlab.unittest.TestCase
         end
 
         function constructMdlWithInvalidParameters(testCase)
-            testCase.verifyError(@()openAIChat(ApiKey="this-is-not-a-real-key", ResponseFormat="json"), "llms:invalidOptionAndValueForModel");
+            testCase.verifyError(@()openAIChat(ApiKey="this-is-not-a-real-key", ModelName="gpt-4", ResponseFormat="json"), "llms:invalidOptionAndValueForModel");
         end
 
         function keyNotFound(testCase)
