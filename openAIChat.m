@@ -216,6 +216,13 @@ classdef(Sealed) openAIChat
                 messagesStruct = messages.Messages;
             end
 
+            if iscell(messagesStruct{end}.content) && any(cellfun(@(x) isfield(x,"image_url"), messagesStruct{end}.content))
+                if ~ismember(this.ModelName,["gpt-4-turbo","gpt-4-turbo-2024-04-09"]) 
+                 error("llms:invalidContentTypeForModel", ...
+                       llms.utils.errorMessageCatalog.getMessage("llms:invalidContentTypeForModel", "Image content", this.ModelName));
+                end
+            end
+
             if ~isempty(this.SystemPrompt)
                 messagesStruct = horzcat(this.SystemPrompt, messagesStruct);
             end
@@ -227,6 +234,13 @@ classdef(Sealed) openAIChat
                 PresencePenalty=this.PresencePenalty, FrequencyPenalty=this.FrequencyPenalty, ...
                 ResponseFormat=this.ResponseFormat,Seed=nvp.Seed, ...
                 ApiKey=this.ApiKey,TimeOut=this.TimeOut, StreamFun=this.StreamFun);
+
+            if isfield(response.Body.Data,"error")
+                err = response.Body.Data.error.message;
+                text = llms.utils.errorMessageCatalog.getMessage("llms:apiReturnedError",err);
+                message = struct("role","assistant","content",text);
+            end
+
         end
 
         function this = set.Temperature(this, temperature)
