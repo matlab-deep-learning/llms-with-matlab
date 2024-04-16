@@ -38,7 +38,7 @@ classdef topenAIChat < matlab.unittest.TestCase
         end
 
         function constructMdlWithInvalidParameters(testCase)
-            testCase.verifyError(@()openAIChat(ApiKey="this-is-not-a-real-key", ResponseFormat="json"), "llms:invalidOptionAndValueForModel");
+            testCase.verifyError(@()openAIChat(ApiKey="this-is-not-a-real-key", ModelName="gpt-4", ResponseFormat="json"), "llms:invalidOptionAndValueForModel");
         end
 
         function keyNotFound(testCase)
@@ -100,7 +100,21 @@ classdef topenAIChat < matlab.unittest.TestCase
             end
             
             testCase.verifyError(@()assignValueToProperty(InvalidValuesSetters.Property,InvalidValuesSetters.Value), InvalidValuesSetters.Error);
-        end      
+        end
+
+        function invalidGenerateInputforModel(testCase)
+            chat = openAIChat(ApiKey="this-is-not-a-real-key");
+            image_path = "peppers.png";
+            emptyMessages = openAIMessages;
+            inValidMessages = addUserMessageWithImages(emptyMessages,"What is in the image?",image_path);
+            testCase.verifyError(@()generate(chat,inValidMessages), "llms:invalidContentTypeForModel")
+        end
+
+        function noStopSequencesNoMaxNumTokens(testCase)
+            chat = openAIChat(ApiKey="this-is-not-a-real-key");
+            testCase.verifyWarningFree(@()generate(chat,"This is okay"));
+        end
+
     end    
 end
 

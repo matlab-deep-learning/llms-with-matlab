@@ -5,11 +5,11 @@ This repository contains example code to demonstrate how to connect MATLAB to th
 The functionality shown here serves as an interface to the ChatGPT and DALL·E APIs. To start using the OpenAI APIs, you first need to obtain OpenAI API keys. You are responsible for any fees OpenAI may charge for the use of their APIs. You should be familiar with the limitations and risks associated with using this technology, and you agree that you shall be solely responsible for full compliance with any terms that may apply to your use of the OpenAI APIs.
 
 Some of the current LLMs supported are:
-- gpt-3.5-turbo, gpt-3.5-turbo-1106
-- gpt-4, gpt-4-1106-preview
-- gpt-4-vision-preview (a.k.a. GPT-4 Turbo with Vision)
+- gpt-3.5-turbo, gpt-3.5-turbo-1106, gpt-3.5-turbo-0125
+- gpt-4-turbo, gpt-4-turbo-2024-04-09 (GPT-4 Turbo with Vision)
+- gpt-4, gpt-4-0613
 - dall-e-2, dall-e-3
-
+                                                        
 For details on the specification of each model, check the official [OpenAI documentation](https://platform.openai.com/docs/models).
 
 ## Requirements
@@ -52,15 +52,15 @@ To use this repository with a local installation of MATLAB, first clone the repo
 
 Set up your OpenAI API key. Create a `.env` file in the project root directory with the following content.
 
-    ```
-    OPENAI_API_KEY=<your key>
-    ```
+```
+OPENAI_API_KEY=<your key>
+```
     
-    Then load your `.env` file as follows:
+Then load your `.env` file as follows:
 
-    ```matlab
-    loadenv(".env")
-    ```
+```matlab
+loadenv(".env")
+```
 
 ## Getting Started with Chat Completion API
 
@@ -287,13 +287,13 @@ You can extract the arguments and write the data to a table, for example.
 
 ### Understand the content of an image
 
-You can use gpt-4-vision-preview to experiment with image understanding. 
+You can use gpt-4-turbo to experiment with image understanding. 
 ```matlab
-chat = openAIChat("You are an AI assistant.", ModelName="gpt-4-vision-preview"); 
+chat = openAIChat("You are an AI assistant.", ModelName="gpt-4-turbo");
 image_path = "peppers.png";
 messages = openAIMessages;
 messages = addUserMessageWithImages(messages,"What is in the image?",image_path);
-[txt,response] = generate(chat,messages);
+[txt,response] = generate(chat,messages,MaxNumTokens=4096);
 % Should output the description of the image
 ```
 
