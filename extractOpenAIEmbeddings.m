@@ -20,14 +20,14 @@ function [emb, response] = extractOpenAIEmbeddings(text, nvp)
 %   [emb, response] = EXTRACTOPENAIEMBEDDINGS(...) also returns the full
 %   response from the OpenAI API call.
 %
-%   Copyright 2023 The MathWorks, Inc.
+%   Copyright 2023-2024 The MathWorks, Inc.
 
 arguments
-    text           (1,:) {mustBeText}
+    text           (1,:) {mustBeNonzeroLengthText}
     nvp.ModelName  (1,1) {mustBeMember(nvp.ModelName,["text-embedding-ada-002", ...
                         "text-embedding-3-large", "text-embedding-3-small"])} = "text-embedding-ada-002"
     nvp.TimeOut    (1,1) {mustBeReal,mustBePositive} = 10
-    nvp.Dimensions (1,1) {mustBeInteger}
+    nvp.Dimensions (1,1) {mustBeInteger,mustBePositive, mustBeLessThanOrEqual(nvp.Dimensions, 1536)}
     nvp.ApiKey           {llms.utils.mustBeNonzeroLengthTextScalar}
 end
 
