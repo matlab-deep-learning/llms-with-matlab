@@ -15,3 +15,6 @@ jobs:
           test-results-junit: test-results/results.xml
           code-coverage-cobertura: code-coverage/coverage.xml
           source-folder: .
+      - uses: codecov/codecov-action@v4
+        with:
+          file: coverage.xml
