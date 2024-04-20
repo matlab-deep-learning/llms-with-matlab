@@ -333,7 +333,7 @@ To learn how to use this in your workflows, see [Examples](/examples/).
 - [SummarizeLargeDocumentsUsingChatGPTandMATLAB.mlx](/examples/SummarizeLargeDocumentsUsingChatGPTandMATLAB.mlx): Learn to create concise summaries of long texts with ChatGPT. (Requires Text Analytics Toolbox™)
 - [CreateSimpleChatBot.mlx](/examples/CreateSimpleChatBot.mlx): Build a conversational chatbot capable of handling various dialogue scenarios using ChatGPT. (Requires Text Analytics Toolbox)
 - [AnalyzeScientificPapersUsingFunctionCalls.mlx](/examples/AnalyzeScientificPapersUsingFunctionCalls.mlx): Learn how to create agents capable of executing MATLAB functions. 
-- [ExampleParallelFunctionCalls.mlx](/examples/ExampleParallelFunctionCalls.mlx): Learn how to take advantage of parallel function calling. 
+- [AnalyzeTextDataUsingParallelFunctionCallwithChatGPT.mlx](/examples/AnalyzeTextDataUsingParallelFunctionCallwithChatGPT.mlx): Learn how to take advantage of parallel function calling. 
 - [RetrievalAugmentedGenerationUsingChatGPTandMATLAB.mlx](/examples/RetrievalAugmentedGenerationUsingChatGPTandMATLAB.mlx): Learn about retrieval augmented generation with a simple use case. (Requires Text Analytics Toolbox™)
 - [DescribeImagesUsingChatGPT.mlx](/examples/DescribeImagesUsingChatGPT.mlx): Learn how to use GPT-4 Turbo with Vision to understand the content of an image. 
 - [AnalyzeSentimentinTextUsingChatGPTinJSONMode.mlx](/examples/AnalyzeSentimentinTextUsingChatGPTinJSONMode.mlx): Learn how to use JSON mode in chat completions
