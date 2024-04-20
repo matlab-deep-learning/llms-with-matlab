@@ -1,7 +1,7 @@
 classdef textractOpenAIEmbeddings < matlab.unittest.TestCase
 % Tests for extractOpenAIEmbeddings
 
-%   Copyright 2023 The MathWorks, Inc.
+%   Copyright 2023-2024 The MathWorks, Inc.
 
     methods (TestClassSetup)
         function saveEnvVar(testCase)
