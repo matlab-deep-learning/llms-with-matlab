@@ -55,8 +55,6 @@ if isfield(response.Body.Data, "data")
 else
     emb = [];
 end
-
-
 end
 
 function mustBeCorrectDimensions(dimensions,modelName)
