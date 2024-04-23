@@ -85,7 +85,7 @@ classdef openAIImages
             %                          Only "dall-e-3" supports this parameter.
 
             arguments
-                this                    (1,1)  openAIImages
+                this                    (1,1) openAIImages
                 prompt                        {mustBeNonzeroLengthTextScalar}
                 nvp.NumImages           (1,1) {mustBePositive, mustBeInteger,...
                                                 mustBeLessThanOrEqual(nvp.NumImages,10)} = 1
