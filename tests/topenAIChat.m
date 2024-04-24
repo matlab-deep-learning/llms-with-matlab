@@ -34,6 +34,7 @@ classdef topenAIChat < matlab.unittest.TestCase
             chat = openAIChat(ApiKey="this-is-not-a-real-key");
             messages = openAIMessages;
             messages = addUserMessage(messages, "This should be okay.");
+
             testCase.verifyWarningFree(@()generate(chat,messages));
         end
 
@@ -55,6 +56,7 @@ classdef topenAIChat < matlab.unittest.TestCase
             chat = openAIChat(systemPrompt, Tools=functions, ModelName=modelName, ...
                 Temperature=temperature, TopProbabilityMass=topP, StopSequences=stop, ApiKey=apiKey,...
                 FrequencyPenalty=frequenceP, PresencePenalty=presenceP, TimeOut=timeout);
+
             testCase.verifyEqual(chat.ModelName, modelName);
             testCase.verifyEqual(chat.Temperature, temperature);
             testCase.verifyEqual(chat.TopProbabilityMass, topP);
@@ -65,18 +67,27 @@ classdef topenAIChat < matlab.unittest.TestCase
 
         function verySmallTimeOutErrors(testCase)
             chat = openAIChat(TimeOut=0.0001, ApiKey="false-key");
+
             testCase.verifyError(@()generate(chat, "hi"), "MATLAB:webservices:Timeout")
         end
 
         function errorsWhenPassingToolChoiceWithEmptyTools(testCase)
             chat = openAIChat(ApiKey="this-is-not-a-real-key");
+
             testCase.verifyError(@()generate(chat,"input", ToolChoice="bla"), "llms:mustSetFunctionsForCall");
         end
 
         function settingToolChoiceWithNone(testCase)
             functions = openAIFunction("funName");
             chat = openAIChat(ApiKey="this-is-not-a-real-key",Tools=functions);
+
             testCase.verifyWarningFree(@()generate(chat,"This is okay","ToolChoice","none"));
+        end
+
+        function settingSeedToInteger(testCase)
+            chat = openAIChat(ApiKey="this-is-not-a-real-key");
+
+            testCase.verifyWarningFree(@()generate(chat,"This is okay", "Seed", 2));
         end
 
         function invalidInputsConstructor(testCase, InvalidConstructorInput)
@@ -86,6 +97,7 @@ classdef topenAIChat < matlab.unittest.TestCase
         function invalidInputsGenerate(testCase, InvalidGenerateInput)
             f = openAIFunction("validfunction");
             chat = openAIChat(Tools=f, ApiKey="this-is-not-a-real-key");
+
             testCase.verifyError(@()generate(chat,InvalidGenerateInput.Input{:}), InvalidGenerateInput.Error);
         end
 
@@ -103,22 +115,36 @@ classdef topenAIChat < matlab.unittest.TestCase
             image_path = "peppers.png";
             emptyMessages = openAIMessages;
             inValidMessages = addUserMessageWithImages(emptyMessages,"What is in the image?",image_path);
+
             testCase.verifyError(@()generate(chat,inValidMessages), "llms:invalidContentTypeForModel")
         end
 
         function noStopSequencesNoMaxNumTokens(testCase)
             chat = openAIChat(ApiKey="this-is-not-a-real-key");
+
             testCase.verifyWarningFree(@()generate(chat,"This is okay"));
         end
 
         function createOpenAIChatWithStreamFunc(testCase)
             sf = @(x)fprintf("%s", x);
             chat = openAIChat(ApiKey="this-is-not-a-real-key", StreamFun=sf);
+
             testCase.verifyWarningFree(@()generate(chat, "Hello world."));
         end
 
+        function warningJSONResponseFormatGPT35(testCase)
+            chat = @() openAIChat("You are a useful assistant", ...
+                ApiKey="this-is-not-a-real-key", ...
+                ResponseFormat="json", ...
+                ModelName="gpt-3.5-turbo");
+
+            testCase.verifyWarning(@()chat(), "llms:warningJsonInstruction");
+        end
+
         function createOpenAIChatWithOpenAIKey(testCase)
-            chat = openAIChat(ApiKey=getenv("OPENAI_KEY"));
+            chat = openAIChat("You are a useful assistant", ...
+                ApiKey=getenv("OPENAI_KEY"));
+
             testCase.verifyWarningFree(@()generate(chat, "Hello world."));
         end
 
@@ -420,5 +446,9 @@ invalidGenerateInput = struct( ...
         ...
         "InvalidToolChoiceSize",struct( ...
             "Input",{{ validMessages  "ToolChoice" ["validfunction", "validfunction"] }},...
-            "Error","MATLAB:validators:mustBeTextScalar"));
+            "Error","MATLAB:validators:mustBeTextScalar"),...
+        ...
+        "InvalidSeed",struct( ...
+            "Input",{{ validMessages  "Seed" "2" }},...
+            "Error","MATLAB:validators:mustBeNumericOrLogical"));   
 end
