@@ -16,9 +16,9 @@ classdef topenAIChat < matlab.unittest.TestCase
     end
 
     properties(TestParameter)
-        InvalidConstructorInput = iGetInvalidConstructorInput;
-        InvalidGenerateInput = iGetInvalidGenerateInput;  
-        InvalidValuesSetters = iGetInvalidValuesSetters;  
+        InvalidConstructorInput = iGetInvalidConstructorInput();
+        InvalidGenerateInput = iGetInvalidGenerateInput();  
+        InvalidValuesSetters = iGetInvalidValuesSetters();  
     end
     
     methods(Test)
@@ -35,10 +35,6 @@ classdef topenAIChat < matlab.unittest.TestCase
             messages = openAIMessages;
             messages = addUserMessage(messages, "This should be okay.");
             testCase.verifyWarningFree(@()generate(chat,messages));
-        end
-
-        function constructMdlWithInvalidParameters(testCase)
-            testCase.verifyError(@()openAIChat(ApiKey="this-is-not-a-real-key", ModelName="gpt-4", ResponseFormat="json"), "llms:invalidOptionAndValueForModel");
         end
 
         function keyNotFound(testCase)
@@ -115,15 +111,21 @@ classdef topenAIChat < matlab.unittest.TestCase
             testCase.verifyWarningFree(@()generate(chat,"This is okay"));
         end
 
+        function createOpenAIChatWithStreamFunc(testCase)
+            sf = @(x)fprintf("%s", x);
+            chat = openAIChat(ApiKey="this-is-not-a-real-key", StreamFun=sf);
+            testCase.verifyWarningFree(@()generate(chat, "Hello world."));
+        end
+
         function createOpenAIChatWithOpenAIKey(testCase)
             chat = openAIChat(ApiKey=getenv("OPENAI_KEY"));
-            testCase.verifyWarningFree(@()generate(chat,"Hello world."));
+            testCase.verifyWarningFree(@()generate(chat, "Hello world."));
         end
 
     end    
 end
 
-function invalidValuesSetters = iGetInvalidValuesSetters
+function invalidValuesSetters = iGetInvalidValuesSetters()
 
 invalidValuesSetters = struct( ...
     "InvalidTemperatureType", struct( ...
@@ -227,7 +229,7 @@ invalidValuesSetters = struct( ...
         "Error", "MATLAB:notGreaterEqual"));
 end
 
-function invalidConstructorInput = iGetInvalidConstructorInput
+function invalidConstructorInput = iGetInvalidConstructorInput()
 validFunction = openAIFunction("funName");
 invalidConstructorInput = struct( ...
     "InvalidResponseFormatValue", struct( ...
@@ -237,6 +239,10 @@ invalidConstructorInput = struct( ...
     "InvalidResponseFormatSize", struct( ...
         "Input",{{"ResponseFormat", ["text" "text"] }},...
         "Error", "MATLAB:validation:IncompatibleSize"), ...
+    ...
+    "InvalidResponseFormatModelCombination", struct( ...
+        "Input", {{"ApiKey", "this-is-not-a-real-key", "ModelName", "gpt-4", "ResponseFormat", "json"}}, ...
+        "Error", "llms:invalidOptionAndValueForModel"), ...
     ...
     "InvalidStreamFunType", struct( ...
         "Input",{{"StreamFun", "2" }},...
@@ -371,7 +377,7 @@ invalidConstructorInput = struct( ...
         "Error","MATLAB:validators:mustBeTextScalar"));
 end
 
-function invalidGenerateInput = iGetInvalidGenerateInput
+function invalidGenerateInput = iGetInvalidGenerateInput()
 emptyMessages = openAIMessages;
 validMessages = addUserMessage(emptyMessages,"Who invented the telephone?");
 
