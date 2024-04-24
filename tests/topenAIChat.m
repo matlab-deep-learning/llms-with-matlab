@@ -116,7 +116,7 @@ classdef topenAIChat < matlab.unittest.TestCase
         end
 
         function createOpenAIChatWithOpenAIKey(testCase)
-            chat = openAIChat(ApiKey=getenv(OPENAI_KEY));
+            chat = openAIChat(ApiKey=getenv("OPENAI_KEY"));
             testCase.verifyWarningFree(@()generate(chat,"Hello world."));
         end
 
