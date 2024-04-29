@@ -16,9 +16,9 @@ classdef topenAIChat < matlab.unittest.TestCase
     end
 
     properties(TestParameter)
-        InvalidConstructorInput = iGetInvalidConstructorInput;
-        InvalidGenerateInput = iGetInvalidGenerateInput;  
-        InvalidValuesSetters = iGetInvalidValuesSetters;  
+        InvalidConstructorInput = iGetInvalidConstructorInput();
+        InvalidGenerateInput = iGetInvalidGenerateInput();  
+        InvalidValuesSetters = iGetInvalidValuesSetters();  
     end
     
     methods(Test)
@@ -34,11 +34,8 @@ classdef topenAIChat < matlab.unittest.TestCase
             chat = openAIChat(ApiKey="this-is-not-a-real-key");
             messages = openAIMessages;
             messages = addUserMessage(messages, "This should be okay.");
-            testCase.verifyWarningFree(@()generate(chat,messages));
-        end
 
-        function constructMdlWithInvalidParameters(testCase)
-            testCase.verifyError(@()openAIChat(ApiKey="this-is-not-a-real-key", ModelName="gpt-4", ResponseFormat="json"), "llms:invalidOptionAndValueForModel");
+            testCase.verifyWarningFree(@()generate(chat,messages));
         end
 
         function keyNotFound(testCase)
@@ -59,6 +56,7 @@ classdef topenAIChat < matlab.unittest.TestCase
             chat = openAIChat(systemPrompt, Tools=functions, ModelName=modelName, ...
                 Temperature=temperature, TopProbabilityMass=topP, StopSequences=stop, ApiKey=apiKey,...
                 FrequencyPenalty=frequenceP, PresencePenalty=presenceP, TimeOut=timeout);
+
             testCase.verifyEqual(chat.ModelName, modelName);
             testCase.verifyEqual(chat.Temperature, temperature);
             testCase.verifyEqual(chat.TopProbabilityMass, topP);
@@ -69,18 +67,27 @@ classdef topenAIChat < matlab.unittest.TestCase
 
         function verySmallTimeOutErrors(testCase)
             chat = openAIChat(TimeOut=0.0001, ApiKey="false-key");
+
             testCase.verifyError(@()generate(chat, "hi"), "MATLAB:webservices:Timeout")
         end
 
         function errorsWhenPassingToolChoiceWithEmptyTools(testCase)
             chat = openAIChat(ApiKey="this-is-not-a-real-key");
+
             testCase.verifyError(@()generate(chat,"input", ToolChoice="bla"), "llms:mustSetFunctionsForCall");
         end
 
         function settingToolChoiceWithNone(testCase)
             functions = openAIFunction("funName");
             chat = openAIChat(ApiKey="this-is-not-a-real-key",Tools=functions);
+
             testCase.verifyWarningFree(@()generate(chat,"This is okay","ToolChoice","none"));
+        end
+
+        function settingSeedToInteger(testCase)
+            chat = openAIChat(ApiKey="this-is-not-a-real-key");
+
+            testCase.verifyWarningFree(@()generate(chat,"This is okay", "Seed", 2));
         end
 
         function invalidInputsConstructor(testCase, InvalidConstructorInput)
@@ -90,6 +97,7 @@ classdef topenAIChat < matlab.unittest.TestCase
         function invalidInputsGenerate(testCase, InvalidGenerateInput)
             f = openAIFunction("validfunction");
             chat = openAIChat(Tools=f, ApiKey="this-is-not-a-real-key");
+
             testCase.verifyError(@()generate(chat,InvalidGenerateInput.Input{:}), InvalidGenerateInput.Error);
         end
 
@@ -107,18 +115,56 @@ classdef topenAIChat < matlab.unittest.TestCase
             image_path = "peppers.png";
             emptyMessages = openAIMessages;
             inValidMessages = addUserMessageWithImages(emptyMessages,"What is in the image?",image_path);
+
             testCase.verifyError(@()generate(chat,inValidMessages), "llms:invalidContentTypeForModel")
         end
 
         function noStopSequencesNoMaxNumTokens(testCase)
             chat = openAIChat(ApiKey="this-is-not-a-real-key");
+
             testCase.verifyWarningFree(@()generate(chat,"This is okay"));
+        end
+
+        function createOpenAIChatWithStreamFunc(testCase)
+
+            function seen = sf(str)
+                persistent data;
+                if isempty(data)
+                    data = strings(1, 0);
+                end
+                % Append streamed text to an empty string array of length 1
+                data = [data, str];
+                seen = data;
+            end
+            chat = openAIChat(ApiKey=getenv("OPENAI_KEY"), StreamFun=@sf);
+
+            testCase.verifyWarningFree(@()generate(chat, "Hello world."));
+            % Checking that persistent data, which is still stored in
+            % memory, is greater than 1. This would mean that the stream
+            % function has been called and streamed some text.
+            testCase.verifyGreaterThan(numel(sf("")), 1);
+        end
+
+        function warningJSONResponseFormatGPT35(testCase)
+            chat = @() openAIChat("You are a useful assistant", ...
+                ApiKey="this-is-not-a-real-key", ...
+                ResponseFormat="json", ...
+                ModelName="gpt-3.5-turbo");
+
+            testCase.verifyWarning(@()chat(), "llms:warningJsonInstruction");
+        end
+
+        function createOpenAIChatWithOpenAIKey(testCase)
+            chat = openAIChat("You are a useful assistant", ...
+                ApiKey=getenv("OPENAI_KEY"));
+
+            testCase.verifyWarningFree(@()generate(chat, "Hello world."));
         end
 
     end    
 end
 
-function invalidValuesSetters = iGetInvalidValuesSetters
+function invalidValuesSetters = iGetInvalidValuesSetters()
 
 invalidValuesSetters = struct( ...
     "InvalidTemperatureType", struct( ...
@@ -222,7 +268,7 @@ invalidValuesSetters = struct( ...
         "Error", "MATLAB:notGreaterEqual"));
 end
 
-function invalidConstructorInput = iGetInvalidConstructorInput
+function invalidConstructorInput = iGetInvalidConstructorInput()
 validFunction = openAIFunction("funName");
 invalidConstructorInput = struct( ...
     "InvalidResponseFormatValue", struct( ...
@@ -232,6 +278,10 @@ invalidConstructorInput = struct( ...
     "InvalidResponseFormatSize", struct( ...
         "Input",{{"ResponseFormat", ["text" "text"] }},...
         "Error", "MATLAB:validation:IncompatibleSize"), ...
+    ...
+    "InvalidResponseFormatModelCombination", struct( ...
+        "Input", {{"ApiKey", "this-is-not-a-real-key", "ModelName", "gpt-4", "ResponseFormat", "json"}}, ...
+        "Error", "llms:invalidOptionAndValueForModel"), ...
     ...
     "InvalidStreamFunType", struct( ...
         "Input",{{"StreamFun", "2" }},...
@@ -366,7 +416,7 @@ invalidConstructorInput = struct( ...
         "Error","MATLAB:validators:mustBeTextScalar"));
 end
 
-function invalidGenerateInput = iGetInvalidGenerateInput
+function invalidGenerateInput = iGetInvalidGenerateInput()
 emptyMessages = openAIMessages;
 validMessages = addUserMessage(emptyMessages,"Who invented the telephone?");
 
@@ -409,5 +459,9 @@ invalidGenerateInput = struct( ...
         ...
         "InvalidToolChoiceSize",struct( ...
             "Input",{{ validMessages  "ToolChoice" ["validfunction", "validfunction"] }},...
-            "Error","MATLAB:validators:mustBeTextScalar"));
+            "Error","MATLAB:validators:mustBeTextScalar"),...
+        ...
+        "InvalidSeed",struct( ...
+            "Input",{{ validMessages  "Seed" "2" }},...
+            "Error","MATLAB:validators:mustBeNumericOrLogical"));   
 end

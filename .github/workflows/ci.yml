@@ -13,6 +13,8 @@ jobs:
           products: Text_Analytics_Toolbox
           cache: true
       - name: Run tests and generate artifacts
+        env:
+            OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
         uses: matlab-actions/run-tests@v2
         with:
           test-results-junit: test-results/results.xml

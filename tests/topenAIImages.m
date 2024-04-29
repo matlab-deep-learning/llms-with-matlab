@@ -129,6 +129,18 @@ classdef topenAIImages < matlab.unittest.TestCase
             mdl = openAIImages(ApiKey="this-is-not-a-real-key");
             testCase.verifyError(@()createVariation(mdl,InvalidVariationInput.Input{:}), InvalidVariationInput.Error);
         end
+
+        function testThatImageIsReturned(testCase)
+            mdl = openAIImages(ApiKey=getenv("OPENAI_KEY"));
+
+            [images, response] = generate(mdl, ...
+                "Create a 3D avatar of a whimsical sushi on the beach. " + ...
+                "He is decorated with various sushi elements and is " + ...
+                "playfully interacting with the beach environment.");
+
+            testCase.verifySize(images{:}, [1024, 1024, 3]);
+            testCase.verifyEqual(response.StatusLine.ReasonPhrase, "OK");
+        end
     end    
 end
 
