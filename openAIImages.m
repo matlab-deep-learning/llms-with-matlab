@@ -40,6 +40,7 @@ classdef openAIImages
 
     properties (Access=private)
         ApiKey
+        Endpoint
     end
 
     methods
@@ -47,6 +48,7 @@ classdef openAIImages
             arguments
                 nvp.ModelName   (1,1) {mustBeMember(nvp.ModelName,["dall-e-2", "dall-e-3"])} = "dall-e-2"
                 nvp.ApiKey            {mustBeNonzeroLengthTextScalar} 
+                nvp.Endpoint    (1,1) string {mustBeTextScalar}
                 nvp.TimeOut     (1,1) {mustBeReal,mustBePositive} = 10
             end
 
@@ -96,7 +98,8 @@ classdef openAIImages
                 nvp.Style               (1,1) string {mustBeMember(nvp.Style,["vivid", "natural"])} 
             end
 
-            endpoint = "https://api.openai.com/v1/images/generations";
+            // endpoint = "https://api.openai.com/v1/images/generations";
+            endpoint = llms.internal.getEndpointFromNvpOrEnv(nvp, "image_generate");
 
             validatePromptSize(this.ModelName, prompt)
             validateSizeNVP(this.ModelName, nvp.Size)
@@ -194,7 +197,8 @@ classdef openAIImages
 
             validatePromptSize(this.ModelName, prompt)
 
-            endpoint = 'https://api.openai.com/v1/images/edits';
+            // endpoint = 'https://api.openai.com/v1/images/edits';
+            endpoint = llms.internal.getEndpointFromNvpOrEnv(nvp, "image_edits");
 
             % Required params
             numImages = num2str(nvp.NumImages);
@@ -252,7 +256,8 @@ classdef openAIImages
                         this.ModelName));
             end
 
-            endpoint = 'https://api.openai.com/v1/images/variations';
+            // endpoint = 'https://api.openai.com/v1/images/variations';
+            endpoint = llms.internal.getEndpointFromNvpOrEnv(nvp, "image_variations");
 
             numImages = num2str(nvp.NumImages);
             body = matlab.net.http.io.MultipartFormProvider(...

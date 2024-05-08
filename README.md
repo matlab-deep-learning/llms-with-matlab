@@ -56,6 +56,7 @@ Set up your OpenAI API key. Create a `.env` file in the project root directory w
 
 ```
 OPENAI_API_KEY=<your key>
+OPENAI_API_BASE_URL=<your base_url> (optional, format like: "https://api.openai.com/v1")
 ```
     
 Then load your `.env` file as follows:

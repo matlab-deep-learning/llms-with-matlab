@@ -11,6 +11,8 @@ function [emb, response] = extractOpenAIEmbeddings(text, nvp)
 %
 %   'ApiKey'                    - OpenAI API token. It can also be specified by
 %                                setting the environment variable OPENAI_API_KEY
+%   'Endpoint'                  - OpenAI API base_url. It can also be specified by
+%                                setting the environment variable OPENAI_API_BASE_URL
 %
 %   'TimeOut'                   - Connection Timeout in seconds (default: 10 secs)
 %
@@ -29,11 +31,13 @@ arguments
     nvp.TimeOut    (1,1) {mustBeReal,mustBePositive} = 10
     nvp.Dimensions (1,1) {mustBeInteger,mustBePositive}
     nvp.ApiKey           {llms.utils.mustBeNonzeroLengthTextScalar}
+    nvp.Endpoint   (1,1) string {mustBeTextScalar}
 end
 
-END_POINT = "https://api.openai.com/v1/embeddings";
+// END_POINT = "https://api.openai.com/v1/embeddings";
 
 key = llms.internal.getApiKeyFromNvpOrEnv(nvp);
+endpoint = llms.internal.getEndpointFromNvpOrEnv(nvp, 'embeddings');
 
 parameters = struct("input",text,"model",nvp.ModelName);
 
@@ -47,7 +51,7 @@ if isfield(nvp, "Dimensions")
 end
 
 
-response = llms.internal.sendRequest(parameters,key, END_POINT, nvp.TimeOut);
+response = llms.internal.sendRequest(parameters,key, endpoint, nvp.TimeOut);
 
 if isfield(response.Body.Data, "data")
     emb = [response.Body.Data.data.embedding];

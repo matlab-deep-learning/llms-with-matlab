@@ -106,6 +106,7 @@ classdef(Sealed) openAIChat
         Tools
         FunctionsStruct
         ApiKey
+        Endpoint
         StreamFun
     end
 
@@ -123,6 +124,7 @@ classdef(Sealed) openAIChat
                 nvp.StopSequences                  {mustBeValidStop} = {}
                 nvp.ResponseFormat           (1,1) string {mustBeMember(nvp.ResponseFormat,["text","json"])} = "text"
                 nvp.ApiKey                         {mustBeNonzeroLengthTextScalar} 
+                nvp.Endpoint                 (1,1) string {mustBeTextScalar}
                 nvp.PresencePenalty                {mustBeValidPenalty} = 0
                 nvp.FrequencyPenalty               {mustBeValidPenalty} = 0
                 nvp.TimeOut                  (1,1) {mustBeReal,mustBePositive} = 10
@@ -171,6 +173,7 @@ classdef(Sealed) openAIChat
             this.PresencePenalty = nvp.PresencePenalty;
             this.FrequencyPenalty = nvp.FrequencyPenalty;
             this.ApiKey = llms.internal.getApiKeyFromNvpOrEnv(nvp);
+            this.Endpoint = llms.internal.getEndpointFromNvpOrEnv(nvp, "chat");
             this.TimeOut = nvp.TimeOut;
         end
 
@@ -233,7 +236,7 @@ classdef(Sealed) openAIChat
                 StopSequences=this.StopSequences, MaxNumTokens=nvp.MaxNumTokens, ...
                 PresencePenalty=this.PresencePenalty, FrequencyPenalty=this.FrequencyPenalty, ...
                 ResponseFormat=this.ResponseFormat,Seed=nvp.Seed, ...
-                ApiKey=this.ApiKey,TimeOut=this.TimeOut, StreamFun=this.StreamFun);
+                ApiKey=this.ApiKey,Endpoint=this.Endpoint,TimeOut=this.TimeOut, StreamFun=this.StreamFun);
 
             if isfield(response.Body.Data,"error")
                 err = response.Body.Data.error.message;
