@@ -5,17 +5,16 @@ classdef texampleTests < matlab.unittest.TestCase
 
     methods (TestClassSetup)
         function saveEnvVar(testCase)
-            % Ensures key is not in environment variable for tests
             openAIEnvVar = "OPENAI_KEY";
             key = getenv(openAIEnvVar);
-            unsetenv(openAIEnvVar);
-            testCase.addTeardown(@(x) setenv(openAIEnvVar, x), key);
+            writelines("OPENAI_API_KEY="+key,".env");
+            
+            testCase.addTeardown(@() delete(".env"));
+            testCase.addTeardown(@() unsetenv("OPENAI_API_KEY"));
         end
     end
     
     methods(Test)
-        % Test methods
-
         function testAnalyzeScientificPapersUsingFunctionCalls(~)
             AnalyzeScientificPapersUsingFunctionCalls;
         end
