@@ -4,13 +4,14 @@ classdef texampleTests < matlab.unittest.TestCase
 %   Copyright 2024 The MathWorks, Inc.
 
     methods (TestClassSetup)
-        function saveEnvVar(testCase)
+        function setUpAndTearDowns(testCase)
             openAIEnvVar = "OPENAI_KEY";
             key = getenv(openAIEnvVar);
             writelines("OPENAI_API_KEY="+key,".env");
-            
+
             testCase.addTeardown(@() delete(".env"));
             testCase.addTeardown(@() unsetenv("OPENAI_API_KEY"));
+            testCase.addTeardown(@() iCloseAll());
         end
     end
     
@@ -18,6 +19,36 @@ classdef texampleTests < matlab.unittest.TestCase
         function testAnalyzeScientificPapersUsingFunctionCalls(~)
             AnalyzeScientificPapersUsingFunctionCalls;
         end
+
+        function testProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode(~)
+            ProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode;
+        end
+
+        function testUsingDALLEToGenerateImages(~)
+            UsingDALLEToGenerateImages;
+        end
+
+        function testInformationRetrievalUsingOpenAIDocumentEmbedding(~)
+            InformationRetrievalUsingOpenAIDocumentEmbedding;
+        end
+
+        function testDescribeImagesUsingChatGPT(~)
+            DescribeImagesUsingChatGPT;
+        end
+
+        function testSummarizeLargeDocumentsUsingChatGPTandMATLAB(~)
+            SummarizeLargeDocumentsUsingChatGPTandMATLAB;
+        end
+
+        function testAnalyzeTextDataUsingParallelFunctionCallwithChatGPT(~)
+            AnalyzeTextDataUsingParallelFunctionCallwithChatGPT;
+        end
     end
     
+end
+
+function iCloseAll()
+% Close all opened figures
+allFig = findall(0, 'type', 'figure');
+close(allFig)
 end
