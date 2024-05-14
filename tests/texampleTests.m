@@ -43,6 +43,10 @@ classdef texampleTests < matlab.unittest.TestCase
         function testAnalyzeTextDataUsingParallelFunctionCallwithChatGPT(~)
             AnalyzeTextDataUsingParallelFunctionCallwithChatGPT;
         end
+
+        function testRetrievalAugmentedGenerationUsingChatGPTandMATLAB(~)
+            RetrievalAugmentedGenerationUsingChatGPTandMATLAB;
+        end
     end
     
 end
