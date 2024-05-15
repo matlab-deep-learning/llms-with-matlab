@@ -159,6 +159,11 @@ classdef topenAIChat < matlab.unittest.TestCase
                 ApiKey=getenv("OPENAI_KEY"));
 
             testCase.verifyWarningFree(@()generate(chat, "Hello world."));
+
+            chat = openAIChat("You are a useful assistant", ...
+                ApiKey=getenv("OPENAI_KEY"), ModelName="gpt-4o");
+
+            testCase.verifyWarningFree(@()generate(chat, "Hello world."));
         end
 
     end    
