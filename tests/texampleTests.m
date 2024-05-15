@@ -6,11 +6,17 @@ classdef texampleTests < matlab.unittest.TestCase
     methods (TestClassSetup)
         function setUpAndTearDowns(testCase)
             openAIEnvVar = "OPENAI_KEY";
-            key = getenv(openAIEnvVar);
-            writelines("OPENAI_API_KEY="+key,".env");
+            secretKey = getenv(openAIEnvVar);
+            % Create an empty .env file because it is expected by our .mlx
+            % example files
+            writelines("",".env");
+            
+            % Assign the value of the secret key to OPENAI_API_KEY using
+            % the test fixture
+            import matlab.unittest.fixtures.EnvironmentVariableFixture
+            fixture = EnvironmentVariableFixture("OPENAI_API_KEY", secretKey);
+            testCase.applyFixture(fixture);
 
-            testCase.addTeardown(@() delete(".env"));
-            testCase.addTeardown(@() unsetenv("OPENAI_API_KEY"));
             testCase.addTeardown(@() iCloseAll());
         end
     end
