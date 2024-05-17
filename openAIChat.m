@@ -205,7 +205,7 @@ classdef(Sealed) openAIChat
                 messagesStruct = messages.Messages;
             end
 
-            llms.openai.validateMessageSupported(messagesStruct{end}, model);
+            llms.openai.validateMessageSupported(messagesStruct{end}, this.ModelName);
 
             if ~isempty(this.SystemPrompt)
                 messagesStruct = horzcat(this.SystemPrompt, messagesStruct);
