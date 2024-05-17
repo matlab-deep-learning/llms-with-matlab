@@ -114,13 +114,7 @@ classdef(Sealed) openAIChat
             arguments
                 systemPrompt                       {llms.utils.mustBeTextOrEmpty} = []
                 nvp.Tools                    (1,:) {mustBeA(nvp.Tools, "openAIFunction")} = openAIFunction.empty
-                nvp.ModelName                (1,1) string {mustBeMember(nvp.ModelName,[...
-                                                            "gpt-4o","gpt-4o-2024-05-13",...
-                                                            "gpt-4-turbo","gpt-4-turbo-2024-04-09",...
-                                                            "gpt-4","gpt-4-0613", ...
-                                                            "gpt-3.5-turbo","gpt-3.5-turbo-0125", ...
-                                                            "gpt-3.5-turbo-1106",...
-                                                        ])} = "gpt-3.5-turbo"
+                nvp.ModelName                (1,1) string {mustBeModel} = "gpt-3.5-turbo"
                 nvp.Temperature                    {mustBeValidTemperature} = 1
                 nvp.TopProbabilityMass             {mustBeValidTopP} = 1
                 nvp.StopSequences                  {mustBeValidStop} = {}
@@ -160,16 +154,8 @@ classdef(Sealed) openAIChat
             this.StopSequences = nvp.StopSequences;
 
             % ResponseFormat is only supported in the latest models only
-            if nvp.ResponseFormat == "json"
-                if ismember(this.ModelName,["gpt-4","gpt-4-0613"])
-                    error("llms:invalidOptionAndValueForModel", ...
-                        llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionAndValueForModel", "ResponseFormat", "json", this.ModelName));
-                else
-                    warning("llms:warningJsonInstruction", ...
-                        llms.utils.errorMessageCatalog.getMessage("llms:warningJsonInstruction"))
-                end
-
-            end
+            llms.openai.validateResponseFormat(nvp.ResponseFormat, this.ModelName);
+            this.ResponseFormat = nvp.ResponseFormat;
 
             this.PresencePenalty = nvp.PresencePenalty;
             this.FrequencyPenalty = nvp.FrequencyPenalty;
@@ -219,12 +205,7 @@ classdef(Sealed) openAIChat
                 messagesStruct = messages.Messages;
             end
 
-            if iscell(messagesStruct{end}.content) && any(cellfun(@(x) isfield(x,"image_url"), messagesStruct{end}.content))
-                if ~ismember(this.ModelName,["gpt-4-turbo","gpt-4-turbo-2024-04-09","gpt-4o","gpt-4o-2024-05-13"]) 
-                 error("llms:invalidContentTypeForModel", ...
-                       llms.utils.errorMessageCatalog.getMessage("llms:invalidContentTypeForModel", "Image content", this.ModelName));
-                end
-            end
+            llms.openai.validateMessageSupported(messagesStruct{end}, model);
 
             if ~isempty(this.SystemPrompt)
                 messagesStruct = horzcat(this.SystemPrompt, messagesStruct);
@@ -333,4 +314,8 @@ function mustBeIntegerOrEmpty(value)
     if ~isempty(value)
         mustBeInteger(value)
     end
+end
+
+function mustBeModel(model)
+    mustBeMember(model,llms.openai.models);
 end
