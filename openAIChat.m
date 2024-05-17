@@ -70,19 +70,19 @@ classdef(Sealed) openAIChat
 
     properties        
         %TEMPERATURE   Temperature of generation.
-        Temperature
+        Temperature {mustBeValidTemperature} = 1
 
         %TOPPROBABILITYMASS   Top probability mass to consider for generation.
-        TopProbabilityMass
+        TopProbabilityMass {mustBeValidTopP} = 1
 
         %STOPSEQUENCES   Sequences to stop the generation of tokens.
-        StopSequences
+        StopSequences {mustBeValidStop} = {}
 
         %PRESENCEPENALTY   Penalty for using a token in the response that has already been used.
-        PresencePenalty
+        PresencePenalty {mustBeValidPenalty} = 0
 
         %FREQUENCYPENALTY   Penalty for using a token that is frequent in the training data.
-        FrequencyPenalty
+        FrequencyPenalty {mustBeValidPenalty} = 0
     end
 
     properties(SetAccess=private) 
@@ -114,11 +114,13 @@ classdef(Sealed) openAIChat
             arguments
                 systemPrompt                       {llms.utils.mustBeTextOrEmpty} = []
                 nvp.Tools                    (1,:) {mustBeA(nvp.Tools, "openAIFunction")} = openAIFunction.empty
-                nvp.ModelName                (1,1) {mustBeMember(nvp.ModelName,["gpt-4o", ...
-                                                        "gpt-4o-2024-05-13","gpt-4-turbo", ...
-                                                        "gpt-4-turbo-2024-04-09","gpt-4","gpt-4-0613", ...
-                                                        "gpt-3.5-turbo","gpt-3.5-turbo-0125", ...
-                                                        "gpt-3.5-turbo-1106"])} = "gpt-3.5-turbo"
+                nvp.ModelName                (1,1) string {mustBeMember(nvp.ModelName,[...
+                                                            "gpt-4o","gpt-4o-2024-05-13",...
+                                                            "gpt-4-turbo","gpt-4-turbo-2024-04-09",...
+                                                            "gpt-4","gpt-4-0613", ...
+                                                            "gpt-3.5-turbo","gpt-3.5-turbo-0125", ...
+                                                            "gpt-3.5-turbo-1106",...
+                                                        ])} = "gpt-3.5-turbo"
                 nvp.Temperature                    {mustBeValidTemperature} = 1
                 nvp.TopProbabilityMass             {mustBeValidTopP} = 1
                 nvp.StopSequences                  {mustBeValidStop} = {}
@@ -147,7 +149,7 @@ classdef(Sealed) openAIChat
             
             if ~isempty(systemPrompt)
                 systemPrompt = string(systemPrompt);
-                if ~(strlength(systemPrompt)==0)
+                if systemPrompt ~= ""
                    this.SystemPrompt = {struct("role", "system", "content", systemPrompt)};
                 end
             end
@@ -158,7 +160,7 @@ classdef(Sealed) openAIChat
             this.StopSequences = nvp.StopSequences;
 
             % ResponseFormat is only supported in the latest models only
-            if (nvp.ResponseFormat == "json")
+            if nvp.ResponseFormat == "json"
                 if ismember(this.ModelName,["gpt-4","gpt-4-0613"])
                     error("llms:invalidOptionAndValueForModel", ...
                         llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionAndValueForModel", "ResponseFormat", "json", this.ModelName));
@@ -243,52 +245,6 @@ classdef(Sealed) openAIChat
             end
 
         end
-
-        function this = set.Temperature(this, temperature)
-            arguments
-                this openAIChat
-                temperature 
-            end
-            mustBeValidTemperature(temperature);
-            
-            this.Temperature = temperature;
-        end
-
-        function this = set.TopProbabilityMass(this,topP)
-            arguments
-                this openAIChat
-                topP
-            end
-            mustBeValidTopP(topP);
-            this.TopProbabilityMass = topP;
-        end
-
-        function this = set.StopSequences(this,stop)
-            arguments
-                this openAIChat
-                stop 
-            end
-            mustBeValidStop(stop);
-            this.StopSequences = stop;
-        end
-
-        function this = set.PresencePenalty(this,penalty)
-            arguments
-                this openAIChat
-                penalty 
-            end
-            mustBeValidPenalty(penalty)
-            this.PresencePenalty = penalty;
-        end
-
-        function this = set.FrequencyPenalty(this,penalty)
-            arguments
-                this openAIChat
-                penalty
-            end
-            mustBeValidPenalty(penalty)
-            this.FrequencyPenalty = penalty;
-        end
     end
 
     methods(Hidden)
@@ -331,7 +287,7 @@ functionNames = strings(1, numFunctions);
 
 for i = 1:numFunctions
     functionsStruct{i} = struct('type','function', ...
-        'function',encodeStruct(functions(i))) ;
+        'function',encodeStruct(functions(i)));
     functionNames(i) = functions(i).FunctionName;
 end
 end
