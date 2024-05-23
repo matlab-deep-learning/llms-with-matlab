@@ -84,8 +84,20 @@ if response.StatusCode=="OK"
     if isempty(nvp.StreamFun)
         message = response.Body.Data.choices(1).message;
     else
-        message = struct("role", "assistant", ...
-            "content", streamedText);
+        pat = '{"' + wildcardPattern + '":';
+        if contains(streamedText,pat)
+            s = jsondecode(streamedText);
+            if contains(s.function.arguments,pat)
+                prompt = jsondecode(s.function.arguments);
+                s.function.arguments = prompt;
+            end
+            message = struct("role", "assistant", ...
+                 "content",[], ...
+                 "tool_calls",jsondecode(streamedText));
+        else
+            message = struct("role", "assistant", ...
+                "content", streamedText);
+        end
     end
     if isfield(message, "tool_choice")
         text = "";
@@ -107,18 +119,16 @@ parameters.messages = messages;
 
 parameters.stream = ~isempty(nvp.StreamFun);
 
-if ~isempty(functions) && ~strcmp(nvp.ModelName,'gpt-4-vision-preview')
+if ~isempty(functions)
     parameters.tools = functions;
 end
 
-if ~isempty(nvp.ToolChoice) && ~strcmp(nvp.ModelName,'gpt-4-vision-preview')
+if ~isempty(nvp.ToolChoice)
     parameters.tool_choice = nvp.ToolChoice;
 end
 
-if ismember(nvp.ModelName,["gpt-3.5-turbo-1106","gpt-4-1106-preview"])
-    if strcmp(nvp.ResponseFormat,"json")
-        parameters.response_format = struct('type','json_object');
-    end
+if strcmp(nvp.ResponseFormat,"json")
+    parameters.response_format = struct('type','json_object');
 end
 
 if ~isempty(nvp.Seed)
@@ -130,15 +140,21 @@ parameters.model = nvp.ModelName;
 dict = mapNVPToParameters;
 
 nvpOptions = keys(dict);
-if strcmp(nvp.ModelName,'gpt-4-vision-preview')
-    nvpOptions(ismember(nvpOptions,["MaxNumTokens","StopSequences"])) = [];
-end
 
 for opt = nvpOptions.'
     if isfield(nvp, opt)
         parameters.(dict(opt)) = nvp.(opt);
     end
 end
+
+if isempty(nvp.StopSequences)
+    parameters = rmfield(parameters,"stop");
+end
+
+if nvp.MaxNumTokens == Inf
+    parameters = rmfield(parameters,"max_tokens");
+end
+
 end
 
 function dict = mapNVPToParameters()

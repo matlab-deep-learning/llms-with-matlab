@@ -49,11 +49,13 @@ catalog("llms:mustSetFunctionsForCall") = "When no functions are defined, ToolCh
 catalog("llms:mustBeMessagesOrTxt") = "Messages must be text with one or more characters or an openAIMessages objects.";
 catalog("llms:invalidOptionAndValueForModel") = "'{1}' with value '{2}' is not supported for ModelName '{3}'";
 catalog("llms:invalidOptionForModel") = "{1} is not supported for ModelName '{2}'";
+catalog("llms:invalidContentTypeForModel") = "{1} is not supported for ModelName '{2}'";
 catalog("llms:functionNotAvailableForModel") = "This function is not supported for ModelName '{1}'";
 catalog("llms:promptLimitCharacter") = "Prompt must have a maximum length of {1} characters for ModelName '{2}'";
 catalog("llms:pngExpected") = "Argument must be a PNG image.";
 catalog("llms:warningJsonInstruction") = "When using JSON mode, you must also prompt the model to produce JSON yourself via a system or user message.";
 catalog("llms:invalidOptionsForOpenAIBackEnd") = "The parameters Resource Name, Deployment ID and API Version are not compatible with OpenAI.";
 catalog("llms:invalidOptionsForAzureBackEnd") = "The parameter Model Name is not compatible with Azure.";
-
+catalog("llms:apiReturnedError") = "OpenAI API Error: {1}";
+catalog("llms:dimensionsMustBeSmallerThan") = "Dimensions must be less than or equal to {1}.";
 end

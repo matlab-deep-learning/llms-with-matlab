@@ -68,7 +68,6 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator
 
 % Copyright 2023-2024 The MathWorks, Inc.
 
-
     properties(SetAccess=private) 
         %MODELNAME   Model name.
         ModelName
@@ -80,10 +79,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator
             arguments
                 systemPrompt                       {llms.utils.mustBeTextOrEmpty} = []
                 nvp.Tools                    (1,:) {mustBeA(nvp.Tools, "openAIFunction")} = openAIFunction.empty
-                nvp.ModelName                (1,1) {mustBeMember(nvp.ModelName,["gpt-4", "gpt-4-0613", "gpt-4-32k", ...
-                                                        "gpt-3.5-turbo", "gpt-3.5-turbo-16k",... 
-                                                        "gpt-4-1106-preview","gpt-3.5-turbo-1106", ...
-                                                        "gpt-4-vision-preview", "gpt-4-turbo-preview"])} = "gpt-3.5-turbo"  
+                nvp.ModelName                (1,1) string {mustBeModel} = "gpt-3.5-turbo"
                 nvp.Temperature                    {llms.utils.mustBeValidTemperature} = 1
                 nvp.TopProbabilityMass             {llms.utils.mustBeValidTopP} = 1
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}
@@ -97,10 +93,6 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator
 
             if isfield(nvp,"StreamFun")
                 this.StreamFun = nvp.StreamFun;
-                if strcmp(nvp.ModelName,'gpt-4-vision-preview')
-                    error("llms:invalidOptionForModel", ...
-                       llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "StreamFun", nvp.ModelName));
-                end
             else
                 this.StreamFun = [];
             end
@@ -112,15 +104,11 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator
             else
                 this.Tools = nvp.Tools;
                 [this.FunctionsStruct, this.FunctionNames] = functionAsStruct(nvp.Tools);
-                if strcmp(nvp.ModelName,'gpt-4-vision-preview')
-                   error("llms:invalidOptionForModel", ...
-                       llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "Tools", nvp.ModelName));
-                end
             end
             
             if ~isempty(systemPrompt)
                 systemPrompt = string(systemPrompt);
-                if ~(strlength(systemPrompt)==0)
+                if systemPrompt ~= ""
                    this.SystemPrompt = {struct("role", "system", "content", systemPrompt)};
                 end
             end
@@ -129,23 +117,10 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator
             this.Temperature = nvp.Temperature;
             this.TopProbabilityMass = nvp.TopProbabilityMass;
             this.StopSequences = nvp.StopSequences;
-            if ~isempty(nvp.StopSequences) && strcmp(nvp.ModelName,'gpt-4-vision-preview')
-                error("llms:invalidOptionForModel", ...
-                       llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "StopSequences", nvp.ModelName));
-            end
-
 
             % ResponseFormat is only supported in the latest models only
-            if (nvp.ResponseFormat == "json")
-                if ismember(this.ModelName,["gpt-3.5-turbo-1106","gpt-4-1106-preview"])
-                    warning("llms:warningJsonInstruction", ...
-                        llms.utils.errorMessageCatalog.getMessage("llms:warningJsonInstruction"))
-                else
-                    error("llms:invalidOptionAndValueForModel", ...
-                        llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionAndValueForModel", "ResponseFormat", "json", this.ModelName));
-                end
-
-            end
+            llms.openai.validateResponseFormat(nvp.ResponseFormat, this.ModelName);
+            this.ResponseFormat = nvp.ResponseFormat;
 
             this.PresencePenalty = nvp.PresencePenalty;
             this.FrequencyPenalty = nvp.FrequencyPenalty;
@@ -175,8 +150,8 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator
             %                          reproducible responses
             %                           
             % Currently, GPT-4 Turbo with vision does not support the message.name 
-            % parameter, functions/tools, response_format parameter, stop
-            % sequences, and max_tokens
+            % parameter, functions/tools, response_format parameter, and stop
+            % sequences. It also has a low MaxNumTokens default, which can be overridden.
 
             arguments
                 this                    (1,1) openAIChat
@@ -187,22 +162,15 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator
                 nvp.Seed                {mustBeIntegerOrEmpty(nvp.Seed)} = []
             end
 
-            if nvp.MaxNumTokens ~= Inf && strcmp(this.ModelName,'gpt-4-vision-preview')
-                error("llms:invalidOptionForModel", ...
-                        llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "MaxNumTokens", this.ModelName));
-            end
-
             toolChoice = convertToolChoice(this, nvp.ToolChoice);
-            if ~isempty(nvp.ToolChoice) && strcmp(this.ModelName,'gpt-4-vision-preview')
-                error("llms:invalidOptionForModel", ...
-                       llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", "ToolChoice", this.ModelName));
-            end
 
             if isstring(messages) && isscalar(messages)
                 messagesStruct = {struct("role", "user", "content", messages)};               
             else
                 messagesStruct = messages.Messages;
             end
+
+            llms.openai.validateMessageSupported(messagesStruct{end}, this.ModelName);
 
             if ~isempty(this.SystemPrompt)
                 messagesStruct = horzcat(this.SystemPrompt, messagesStruct);
@@ -215,8 +183,14 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator
                 PresencePenalty=this.PresencePenalty, FrequencyPenalty=this.FrequencyPenalty, ...
                 ResponseFormat=this.ResponseFormat,Seed=nvp.Seed, ...
                 ApiKey=this.ApiKey,TimeOut=this.TimeOut, StreamFun=this.StreamFun);
-        end
 
+            if isfield(response.Body.Data,"error")
+                err = response.Body.Data.error.message;
+                text = llms.utils.errorMessageCatalog.getMessage("llms:apiReturnedError",err);
+                message = struct("role","assistant","content",text);
+            end
+
+        end
     end
 
     methods(Hidden)
@@ -237,8 +211,8 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator
                 if ~isempty(this.Tools) 
                     toolChoice = "auto";
                 end
-            elseif ToolChoice ~= "auto"
-                % if toolChoice is not empty, then it must be in the format
+            elseif ~ismember(toolChoice,["auto","none"])
+                % if toolChoice is not empty, then it must be "auto", "none" or in the format
                 % {"type": "function", "function": {"name": "my_function"}}
                 toolChoice = struct("type","function","function",struct("name",toolChoice));
             end
@@ -259,7 +233,7 @@ functionNames = strings(1, numFunctions);
 
 for i = 1:numFunctions
     functionsStruct{i} = struct('type','function', ...
-        'function',encodeStruct(functions(i))) ;
+        'function',encodeStruct(functions(i)));
     functionNames(i) = functions(i).FunctionName;
 end
 end
@@ -282,4 +256,8 @@ function mustBeIntegerOrEmpty(value)
     if ~isempty(value)
         mustBeInteger(value)
     end
+end
+
+function mustBeModel(model)
+    mustBeMember(model,llms.openai.models);
 end

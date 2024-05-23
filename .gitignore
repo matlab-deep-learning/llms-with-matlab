@@ -1,3 +1,6 @@
 *.env
 *.asv
+*.mat
 startup.m
+papers_to_read.csv
+data/*

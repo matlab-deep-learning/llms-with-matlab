@@ -1,0 +1,27 @@
+name: Run MATLAB Tests on GitHub-Hosted Runner
+on: [push]
+jobs:
+  test:
+    name: Run MATLAB Tests and Generate Artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Set up MATLAB
+        uses: matlab-actions/setup-matlab@v2
+        with:
+          products: Text_Analytics_Toolbox
+          cache: true
+      - name: Run tests and generate artifacts
+        env:
+            OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+        uses: matlab-actions/run-tests@v2
+        with:
+          test-results-junit: test-results/results.xml
+          code-coverage-cobertura: code-coverage/coverage.xml
+          source-folder: .
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: matlab-deep-learning/llms-with-matlab

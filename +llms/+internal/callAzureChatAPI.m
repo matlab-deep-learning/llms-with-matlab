@@ -22,7 +22,7 @@ function [text, message, response] = callAzureChatAPI(resourceName, deploymentID
 %   More details on the parameters: https://platform.openai.com/docs/api-reference/chat/create
 %
 %   Example
-%   
+%
 %   % Create messages struct
 %   messages = {struct("role", "system",...
 %       "content", "You are a helpful assistant");

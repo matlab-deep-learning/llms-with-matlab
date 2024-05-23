@@ -17,10 +17,10 @@ classdef tazureChat < matlab.unittest.TestCase
 
     properties(TestParameter)
         InvalidConstructorInput = iGetInvalidConstructorInput;
-        InvalidGenerateInput = iGetInvalidGenerateInput;  
-        InvalidValuesSetters = iGetInvalidValuesSetters;  
+        InvalidGenerateInput = iGetInvalidGenerateInput;
+        InvalidValuesSetters = iGetInvalidValuesSetters;
     end
-    
+
     methods(Test)
         % Test methods
         function keyNotFound(testCase)
@@ -74,10 +74,10 @@ classdef tazureChat < matlab.unittest.TestCase
             function assignValueToProperty(property, value)
                 chat.(property) = value;
             end
-            
+
             testCase.verifyError(@()assignValueToProperty(InvalidValuesSetters.Property,InvalidValuesSetters.Value), InvalidValuesSetters.Error);
-        end      
-    end    
+        end
+    end
 end
 
 function invalidValuesSetters = iGetInvalidValuesSetters

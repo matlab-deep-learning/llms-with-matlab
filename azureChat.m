@@ -73,7 +73,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator
 
 % Copyright 2023-2024 The MathWorks, Inc.
 
-    properties(SetAccess=private) 
+    properties(SetAccess=private)
         ResourceName
         DeploymentID
         APIVersion
@@ -81,20 +81,20 @@ classdef(Sealed) azureChat < llms.internal.textGenerator
 
 
     methods
-        function this = azureChat(resourceName, deploymentID, systemPrompt, nvp)           
+        function this = azureChat(resourceName, deploymentID, systemPrompt, nvp)
             arguments
                 resourceName                       {mustBeTextScalar}
                 deploymentID                       {mustBeTextScalar}
                 systemPrompt                       {llms.utils.mustBeTextOrEmpty} = []
                 nvp.Tools                    (1,:) {mustBeA(nvp.Tools, "openAIFunction")} = openAIFunction.empty
                 nvp.APIVersion               (1,1) {mustBeMember(nvp.APIVersion,["2023-03-15-preview", "2023-05-15", "2023-06-01-preview", ...
-                                                        "2023-07-01-preview", "2023-08-01-preview",... 
-                                                        "2023-12-01-preview"])} = "2023-05-15"             
+                                                        "2023-07-01-preview", "2023-08-01-preview",...
+                                                        "2023-12-01-preview"])} = "2023-05-15"
                 nvp.Temperature                    {llms.utils.mustBeValidTemperature} = 1
                 nvp.TopProbabilityMass             {llms.utils.mustBeValidTopP} = 1
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}
                 nvp.ResponseFormat           (1,1) string {mustBeMember(nvp.ResponseFormat,["text","json"])} = "text"
-                nvp.ApiKey                         {mustBeNonzeroLengthTextScalar} 
+                nvp.ApiKey                         {mustBeNonzeroLengthTextScalar}
                 nvp.PresencePenalty                {llms.utils.mustBeValidPenalty} = 0
                 nvp.FrequencyPenalty               {llms.utils.mustBeValidPenalty} = 0
                 nvp.TimeOut                  (1,1) {mustBeReal,mustBePositive} = 10
@@ -115,7 +115,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator
                 this.Tools = nvp.Tools;
                 [this.FunctionsStruct, this.FunctionNames] = functionAsStruct(nvp.Tools);
             end
-            
+
             if ~isempty(systemPrompt)
                 systemPrompt = string(systemPrompt);
                 if ~(strlength(systemPrompt)==0)
@@ -151,13 +151,13 @@ classdef(Sealed) azureChat < llms.internal.textGenerator
             %       MaxNumTokens     - Maximum number of tokens in the generated response.
             %                          Default value is inf.
             %
-            %       ToolChoice       - Function to execute. 'none', 'auto', 
+            %       ToolChoice       - Function to execute. 'none', 'auto',
             %                          or specify the function to call.
             %
             %       Seed             - An integer value to use to obtain
             %                          reproducible responses
-            %                           
-            % Currently, GPT-4 Turbo with vision does not support the message.name 
+            %
+            % Currently, GPT-4 Turbo with vision does not support the message.name
             % parameter, functions/tools, response_format parameter, stop
             % sequences, and max_tokens
 
@@ -171,7 +171,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator
             end
 
             if isstring(messages) && isscalar(messages)
-                messagesStruct = {struct("role", "user", "content", messages)};               
+                messagesStruct = {struct("role", "user", "content", messages)};
             else
                 messagesStruct = messages.Messages;
             end
@@ -179,7 +179,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator
             if ~isempty(this.SystemPrompt)
                 messagesStruct = horzcat(this.SystemPrompt, messagesStruct);
             end
-            
+
             toolChoice = convertToolChoice(this, nvp.ToolChoice);
             [text, message, response] = llms.internal.callAzureChatAPI(this.ResourceName, ...
                 this.DeploymentID, messagesStruct, this.FunctionsStruct, ...
@@ -207,7 +207,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator
             % if toolChoice is empty
             if isempty(toolChoice)
                 % if Tools is not empty, the default is 'auto'.
-                if ~isempty(this.Tools) 
+                if ~isempty(this.Tools)
                     toolChoice = "auto";
                 end
             elseif ToolChoice ~= "auto"
@@ -239,11 +239,11 @@ end
 
 function mustBeValidMsgs(value)
 if isa(value, "openAIMessages")
-    if numel(value.Messages) == 0 
+    if numel(value.Messages) == 0
         error("llms:mustHaveMessages", llms.utils.errorMessageCatalog.getMessage("llms:mustHaveMessages"));
     end
 else
-    try 
+    try
         llms.utils.mustBeNonzeroLengthTextScalar(value);
     catch ME
         error("llms:mustBeMessagesOrTxt", llms.utils.errorMessageCatalog.getMessage("llms:mustBeMessagesOrTxt"));
