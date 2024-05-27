@@ -7,6 +7,23 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+      - name: Install Ollama
+        run: |
+          curl -fsSL https://ollama.com/install.sh | sudo -E sh
+      - name: Start serving
+        run: |
+            # Run the background, there is no way to daemonise at the moment
+            ollama serve &
+
+            # A short pause is required before the HTTP port is opened
+            sleep 5
+
+            # This endpoint blocks until ready
+            time curl -i http://localhost:11434
+
+      - name: Pull mistral model
+        run: |
+            ollama pull mistral
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v2
         with:
