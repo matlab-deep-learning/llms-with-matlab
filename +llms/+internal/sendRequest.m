@@ -15,18 +15,20 @@ end
 
 % Define the headers for the API request
 
-headers = [matlab.net.http.HeaderField('Content-Type', 'application/json')...
-    matlab.net.http.HeaderField('Authorization', "Bearer " + token)...
-    matlab.net.http.HeaderField('api-key',token)];
+headers = matlab.net.http.HeaderField('Content-Type', 'application/json');
+if ~isempty(token)
+    headers = [headers ...
+        matlab.net.http.HeaderField('Authorization', "Bearer " + token)...
+        matlab.net.http.HeaderField('api-key',token)];
+end
 
 % Define the request message
 request = matlab.net.http.RequestMessage('post',headers,parameters);
 
-% Create a HTTPOptions object;
+% set the timeout
 httpOpts = matlab.net.http.HTTPOptions;
-
-% Set the ConnectTimeout option
 httpOpts.ConnectTimeout = timeout;
+httpOpts.ResponseTimeout = timeout;
 
 % Send the request and store the response
 if isempty(streamFun)
