@@ -4,10 +4,10 @@ classdef(Sealed) azureChat < llms.internal.textGenerator
 %   CHAT = azureChat(endpoint, deploymentID) creates an azureChat object with the
 %   endpoint and deployment ID path parameters required by Azure to establish the connection.
 %
-%   CHAT = azureChat(systemPrompt) creates an azureChatobject with the
+%   CHAT = azureChat(__,systemPrompt) creates an azureChatobject with the
 %   specified system prompt.
 %
-%   CHAT = azureChat(systemPrompt,Name=Value) specifies additional options
+%   CHAT = azureChat(__,Name=Value) specifies additional options
 %   using one or more name-value arguments:
 %
 %   Tools                   - A list of tools the model can call.
