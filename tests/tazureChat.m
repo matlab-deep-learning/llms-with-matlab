@@ -49,7 +49,7 @@ classdef tazureChat < matlab.unittest.TestCase
         end
 
         function verySmallTimeOutErrors(testCase)
-            chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"), TimeOut=0.0001, ApiKey="false-key");
+            chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"), TimeOut=1e-10, ApiKey="false-key");
             testCase.verifyError(@()generate(chat, "hi"), "MATLAB:webservices:Timeout")
         end
 
