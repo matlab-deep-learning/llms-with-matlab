@@ -1,4 +1,4 @@
-function [text, message, response] = callAzureChatAPI(resourceName, deploymentID, messages, functions, nvp)
+function [text, message, response] = callAzureChatAPI(endpoint, deploymentID, messages, functions, nvp)
 %callOpenAIChatAPI Calls the openAI chat completions API.
 %
 %   MESSAGES and FUNCTIONS should be structs matching the json format
@@ -52,7 +52,7 @@ function [text, message, response] = callAzureChatAPI(resourceName, deploymentID
 %   Copyright 2023-2024 The MathWorks, Inc.
 
 arguments
-    resourceName
+    endpoint
     deploymentID
     messages
     functions
@@ -72,11 +72,11 @@ arguments
     nvp.StreamFun = []
 end
 
-END_POINT = "https://" + resourceName + ".openai.azure.com/openai/deployments/" + deploymentID + "/chat/completions?api-version=" + nvp.APIVersion;
+URL = endpoint + "openai/deployments/" + deploymentID + "/chat/completions?api-version=" + nvp.APIVersion;
 
 parameters = buildParametersCall(messages, functions, nvp);
 
-[response, streamedText] = llms.internal.sendRequest(parameters,nvp.ApiKey, END_POINT, nvp.TimeOut, nvp.StreamFun);
+[response, streamedText] = llms.internal.sendRequest(parameters,nvp.ApiKey, URL, nvp.TimeOut, nvp.StreamFun);
 
 % If call errors, "choices" will not be part of response.Body.Data, instead
 % we get response.Body.Data.error
@@ -108,9 +108,13 @@ parameters.messages = messages;
 
 parameters.stream = ~isempty(nvp.StreamFun);
 
-parameters.tools = functions;
+if ~isempty(functions)
+    parameters.tools = functions;
+end
 
-parameters.tool_choice = nvp.ToolChoice;
+if ~isempty(nvp.ToolChoice)
+    parameters.tool_choice = nvp.ToolChoice;
+end
 
 if ~isempty(nvp.Seed)
     parameters.seed = nvp.Seed;

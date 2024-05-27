@@ -1,6 +1,6 @@
 function [response, streamedText] = sendRequest(parameters, token, endpoint, timeout, streamFun)
 %sendRequest Sends a request to an ENDPOINT using PARAMETERS and
-%   api key TOKEN. TIMEOUT is the nubmer of seconds to wait for initial
+%   api key TOKEN. TIMEOUT is the number of seconds to wait for initial
 %   server connection. STREAMFUN is an optional callback function.
 
 %   Copyright 2023 The MathWorks, Inc.
@@ -16,7 +16,8 @@ end
 % Define the headers for the API request
 
 headers = [matlab.net.http.HeaderField('Content-Type', 'application/json')...
-    matlab.net.http.HeaderField('Authorization', "Bearer " + token)];
+    matlab.net.http.HeaderField('Authorization', "Bearer " + token)...
+    matlab.net.http.HeaderField('api-key',token)];
 
 % Define the request message
 request = matlab.net.http.RequestMessage('post',headers,parameters);

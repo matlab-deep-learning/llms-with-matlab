@@ -3,18 +3,6 @@ classdef tazureChat < matlab.unittest.TestCase
 
 %   Copyright 2024 The MathWorks, Inc.
 
-    methods (TestClassSetup)
-        function saveEnvVar(testCase)
-            % Ensures key is not in environment variable for tests
-            azureKeyVar = "AZURE_OPENAI_API_KEY";
-            if isenv(azureKeyVar)
-                key = getenv(azureKeyVar);
-                unsetenv(azureKeyVar);
-                testCase.addTeardown(@(x) setenv(azureKeyVar, x), key);
-            end
-        end
-    end
-
     properties(TestParameter)
         InvalidConstructorInput = iGetInvalidConstructorInput;
         InvalidGenerateInput = iGetInvalidGenerateInput;
@@ -24,11 +12,14 @@ classdef tazureChat < matlab.unittest.TestCase
     methods(Test)
         % Test methods
         function keyNotFound(testCase)
-            testCase.verifyError(@()azureChat("My_resource", "Deployment"), "llms:keyMustBeSpecified");
+            import matlab.unittest.fixtures.EnvironmentVariableFixture
+            testCase.applyFixture(EnvironmentVariableFixture("AZURE_OPENAI_API_KEY","dummy"));
+            unsetenv("AZURE_OPENAI_API_KEY");
+            testCase.verifyError(@()azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT")), "llms:keyMustBeSpecified");
         end
 
         function constructChatWithAllNVP(testCase)
-            resourceName = "resource";
+            endpoint = getenv("AZURE_OPENAI_ENDPOINT");
             deploymentID = "hello";
             functions = openAIFunction("funName");
             temperature = 0;
@@ -39,7 +30,7 @@ classdef tazureChat < matlab.unittest.TestCase
             frequenceP = 2;
             systemPrompt = "This is a system prompt";
             timeout = 3;
-            chat = azureChat(resourceName, deploymentID, systemPrompt, Tools=functions, ...
+            chat = azureChat(endpoint, deploymentID, systemPrompt, Tools=functions, ...
                 Temperature=temperature, TopProbabilityMass=topP, StopSequences=stop, ApiKey=apiKey,...
                 FrequencyPenalty=frequenceP, PresencePenalty=presenceP, TimeOut=timeout);
             testCase.verifyEqual(chat.Temperature, temperature);
@@ -49,28 +40,36 @@ classdef tazureChat < matlab.unittest.TestCase
             testCase.verifyEqual(chat.PresencePenalty, presenceP);
         end
 
+        function doGenerate(testCase)
+            testCase.assumeTrue(isenv("AZURE_OPENAI_API_KEY"),"end-to-end test requires environment variables AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT.");
+            chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"));
+            response = testCase.verifyWarningFree(@() generate(chat,"hi"));
+            testCase.verifyClass(response,'string');
+            testCase.verifyGreaterThan(strlength(response),0);
+        end
+
         function verySmallTimeOutErrors(testCase)
-            chat = azureChat("My_resource", "Deployment", TimeOut=0.0001, ApiKey="false-key");
+            chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"), TimeOut=0.0001, ApiKey="false-key");
             testCase.verifyError(@()generate(chat, "hi"), "MATLAB:webservices:Timeout")
         end
 
         function errorsWhenPassingToolChoiceWithEmptyTools(testCase)
-            chat = azureChat("My_resource", "Deployment", ApiKey="this-is-not-a-real-key");
+            chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"), ApiKey="this-is-not-a-real-key");
             testCase.verifyError(@()generate(chat,"input", ToolChoice="bla"), "llms:mustSetFunctionsForCall");
         end
 
         function invalidInputsConstructor(testCase, InvalidConstructorInput)
-            testCase.verifyError(@()azureChat("My_resource", "Deployment", InvalidConstructorInput.Input{:}), InvalidConstructorInput.Error);
+            testCase.verifyError(@()azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"), InvalidConstructorInput.Input{:}), InvalidConstructorInput.Error);
         end
 
         function invalidInputsGenerate(testCase, InvalidGenerateInput)
             f = openAIFunction("validfunction");
-            chat = azureChat("My_resource", "Deployment", Tools=f, ApiKey="this-is-not-a-real-key");
+            chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"), Tools=f, ApiKey="this-is-not-a-real-key");
             testCase.verifyError(@()generate(chat,InvalidGenerateInput.Input{:}), InvalidGenerateInput.Error);
         end
 
         function invalidSetters(testCase, InvalidValuesSetters)
-            chat = azureChat("My_resource", "Deployment", ApiKey="this-is-not-a-real-key");
+            chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"), ApiKey="this-is-not-a-real-key");
             function assignValueToProperty(property, value)
                 chat.(property) = value;
             end

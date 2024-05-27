@@ -1,8 +1,8 @@
 classdef(Sealed) azureChat < llms.internal.textGenerator
 %azureChat Chat completion API from Azure.
 %
-%   CHAT = azureChat(resourceName, deploymentID) creates an azureChat object with the
-%   resource name and deployment ID path parameters required by Azure to establish the connection.
+%   CHAT = azureChat(endpoint, deploymentID) creates an azureChat object with the
+%   endpoint and deployment ID path parameters required by Azure to establish the connection.
 %
 %   CHAT = azureChat(systemPrompt) creates an azureChatobject with the
 %   specified system prompt.
@@ -74,16 +74,15 @@ classdef(Sealed) azureChat < llms.internal.textGenerator
 % Copyright 2023-2024 The MathWorks, Inc.
 
     properties(SetAccess=private)
-        ResourceName
-        DeploymentID
-        APIVersion
+        Endpoint     (1,1) string
+        DeploymentID (1,1) string
+        APIVersion   (1,1) string
     end
 
-
     methods
-        function this = azureChat(resourceName, deploymentID, systemPrompt, nvp)
+        function this = azureChat(endpoint, deploymentID, systemPrompt, nvp)
             arguments
-                resourceName                       {mustBeTextScalar}
+                endpoint                           {mustBeTextScalar}
                 deploymentID                       {mustBeTextScalar}
                 systemPrompt                       {llms.utils.mustBeTextOrEmpty} = []
                 nvp.Tools                    (1,:) {mustBeA(nvp.Tools, "openAIFunction")} = openAIFunction.empty
@@ -123,7 +122,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator
                 end
             end
 
-            this.ResourceName = resourceName;
+            this.Endpoint = endpoint;
             this.DeploymentID = deploymentID;
             this.APIVersion = nvp.APIVersion;
             this.ResponseFormat = nvp.ResponseFormat;
@@ -181,7 +180,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator
             end
 
             toolChoice = convertToolChoice(this, nvp.ToolChoice);
-            [text, message, response] = llms.internal.callAzureChatAPI(this.ResourceName, ...
+            [text, message, response] = llms.internal.callAzureChatAPI(this.Endpoint, ...
                 this.DeploymentID, messagesStruct, this.FunctionsStruct, ...
                 ToolChoice=toolChoice, APIVersion = this.APIVersion, Temperature=this.Temperature, ...
                 TopProbabilityMass=this.TopProbabilityMass, NumCompletions=nvp.NumCompletions,...
