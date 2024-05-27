@@ -6,11 +6,11 @@ classdef tazureChat < matlab.unittest.TestCase
     methods (TestClassSetup)
         function saveEnvVar(testCase)
             % Ensures key is not in environment variable for tests
-            openAIEnvVar = "OPENAI_API_KEY";
-            if isenv(openAIEnvVar)
-                key = getenv(openAIEnvVar);
-                unsetenv(openAIEnvVar);
-                testCase.addTeardown(@(x) setenv(openAIEnvVar, x), key);
+            azureKeyVar = "AZURE_OPENAI_API_KEY";
+            if isenv(azureKeyVar)
+                key = getenv(azureKeyVar);
+                unsetenv(azureKeyVar);
+                testCase.addTeardown(@(x) setenv(azureKeyVar, x), key);
             end
         end
     end

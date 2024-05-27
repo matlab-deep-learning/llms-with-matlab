@@ -15,6 +15,9 @@ jobs:
       - name: Run tests and generate artifacts
         env:
             OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+            AZURE_OPENAI_DEPLOYMENT: ${{ secrets.AZURE_DEPLOYMENT }}
+            AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_ENDPOINT }}
+            AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_KEY }}
         uses: matlab-actions/run-tests@v2
         with:
           test-results-junit: test-results/results.xml

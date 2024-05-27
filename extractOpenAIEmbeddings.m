@@ -33,7 +33,7 @@ end
 
 END_POINT = "https://api.openai.com/v1/embeddings";
 
-key = llms.internal.getApiKeyFromNvpOrEnv(nvp);
+key = llms.internal.getApiKeyFromNvpOrEnv(nvp,"OPENAI_API_KEY");
 
 parameters = struct("input",text,"model",nvp.ModelName);
 

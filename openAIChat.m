@@ -124,7 +124,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator
 
             this.PresencePenalty = nvp.PresencePenalty;
             this.FrequencyPenalty = nvp.FrequencyPenalty;
-            this.ApiKey = llms.internal.getApiKeyFromNvpOrEnv(nvp);
+            this.ApiKey = llms.internal.getApiKeyFromNvpOrEnv(nvp,"OPENAI_API_KEY");
             this.TimeOut = nvp.TimeOut;
         end
 

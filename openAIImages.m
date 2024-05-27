@@ -51,7 +51,7 @@ classdef openAIImages
             end
 
             this.ModelName = nvp.ModelName;
-            this.ApiKey = llms.internal.getApiKeyFromNvpOrEnv(nvp);
+            this.ApiKey = llms.internal.getApiKeyFromNvpOrEnv(nvp,"OPENAI_API_KEY");
             this.TimeOut = nvp.TimeOut;
         end
 
