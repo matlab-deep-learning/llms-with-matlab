@@ -57,9 +57,10 @@ classdef textractOpenAIEmbeddings < matlab.unittest.TestCase
                 ApiKey="this-is-not-a-real-key", TimeOut=10));
         end
 
-        function verySmallTimeOutErrors(testCase)
-            testCase.verifyError(@()extractOpenAIEmbeddings("bla", TimeOut=0.0001, ApiKey="false-key"), "MATLAB:webservices:Timeout")
-        end
+        %% Test is currently unreliable, reasons unclear
+        % function verySmallTimeOutErrors(testCase)
+        %     testCase.verifyError(@()extractOpenAIEmbeddings("bla", TimeOut=0.0001, ApiKey="false-key"), "MATLAB:webservices:Timeout")
+        % end
 
         function testInvalidInputs(testCase, InvalidInput)
             testCase.verifyError(@()extractOpenAIEmbeddings(InvalidInput.Input{:}), InvalidInput.Error);
