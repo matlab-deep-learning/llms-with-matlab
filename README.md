@@ -2,11 +2,13 @@
 
 [![Open in MATLAB Online](https://www.mathworks.com/images/responsive/global/open-in-matlab-online.svg)](https://matlab.mathworks.com/open/github/v1?repo=matlab-deep-learning/llms-with-matlab) [![View Large Language Models (LLMs) with MATLAB on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/163796-large-language-models-llms-with-matlab) 
 
-This repository contains example code to demonstrate how to connect MATLAB to the OpenAI™ Chat Completions API (which powers ChatGPT™) as well as OpenAI Images API (which powers DALL·E™). This allows you to leverage the natural language processing capabilities of large language models directly within your MATLAB environment.
+This repository contains example code to demonstrate how to connect MATLAB to the OpenAI™ Chat Completions API (which powers ChatGPT™), OpenAI Images API (which powers DALL·E™), [Azure® OpenAI Service](https://learn.microsoft.com/en-us/azure/ai-services/openai/), and local [Ollama](https://ollama.com/) models. This allows you to leverage the natural language processing capabilities of large language models directly within your MATLAB environment.
 
-The functionality shown here serves as an interface to the ChatGPT and DALL·E APIs. To start using the OpenAI APIs, you first need to obtain OpenAI API keys. You are responsible for any fees OpenAI may charge for the use of their APIs. You should be familiar with the limitations and risks associated with using this technology, and you agree that you shall be solely responsible for full compliance with any terms that may apply to your use of the OpenAI APIs.
+## OpenAI and Azure
 
-Some of the current LLMs supported are:
+The functionality shown here serves as an interface to the APIs listed above. To start using the OpenAI APIs, you first need to obtain OpenAI API keys; to use Azure OpenAI Services, you need to create a model deployment on your Azure account and obtain one of the keys for it. You are responsible for any fees OpenAI or Azure may charge for the use of their APIs. You should be familiar with the limitations and risks associated with using this technology, and you agree that you shall be solely responsible for full compliance with any terms that may apply to your use of the OpenAI or Azure APIs.
+
+Some of the current LLMs supported on Azure and OpenAI are:
 - gpt-3.5-turbo, gpt-3.5-turbo-1106, gpt-3.5-turbo-0125
 - gpt-4o, gpt-4o-2024-05-13 (GPT-4 Omni)
 - gpt-4-turbo, gpt-4-turbo-2024-04-09 (GPT-4 Turbo with Vision)
@@ -14,6 +16,19 @@ Some of the current LLMs supported are:
 - dall-e-2, dall-e-3
                                                         
 For details on the specification of each model, check the official [OpenAI documentation](https://platform.openai.com/docs/models).
+
+## Ollama
+
+To use local models with [Ollama](https://ollama.com/), you will need to install and start an Ollama server, and “pull” models into it. Please follow the Ollama documentation for details. You should be familiar with the limitations and risks associated with using this technology, and you agree that you shall be solely responsible for full compliance with any terms that may apply to your use of any specific model.
+
+Some of the [LLMs currently supported out of the box on Ollama](https://ollama.com/library) are:
+- llama2, llama2-uncensored, llama3, codellama
+- phi3
+- aya
+- mistral (v0.1, v0.2, v0.3)
+- mixtral
+- gemma, codegemma
+- command-r
 
 ## Requirements
 
@@ -24,7 +39,9 @@ For details on the specification of each model, check the official [OpenAI docum
 
 ### 3rd Party Products:
 
-- An active OpenAI API subscription and API key.
+- For OpenAI connections: An active OpenAI API subscription and API key.
+- For Azure OpenAI Services: An active Azure subscription with OpenAI access, deployment, and API key.
+- For Ollama: A local ollama installation. Currently, only connections on `localhost` are supported, i.e., Ollama and MATLAB must run on the same machine.
 
 ## Setup
 
@@ -51,14 +68,30 @@ To use this repository with a local installation of MATLAB, first clone the repo
     addpath('path/to/llms-with-matlab');
     ```
 
-### Setting up your API key
+### Setting up your OpenAI API key
 
 Set up your OpenAI API key. Create a `.env` file in the project root directory with the following content.
 
 ```
 OPENAI_API_KEY=<your key>
 ```
-    
+
+Then load your `.env` file as follows:
+
+```matlab
+loadenv(".env")
+```
+
+### Setting up your Azure OpenAI Services API key
+
+Set up your OpenAI API key. Create a `.env` file in the project root directory with the following content.
+
+```
+AZURE_OPENAI_API_KEY=<your key>
+```
+
+You can use either `KEY1` or `KEY2` from the Azure configuration website.
+
 Then load your `.env` file as follows:
 
 ```matlab
@@ -67,7 +100,7 @@ loadenv(".env")
 
 ## Getting Started with Chat Completion API
 
-To get started, you can either create an `openAIChat` object and use its methods or use it in a more complex setup, as needed.
+To get started, you can either create an `openAIChat`, `azureChat`, or `ollamaChat` object and use its methods or use it in a more complex setup, as needed.
 
 ### Simple call without preserving chat history
 
@@ -81,13 +114,14 @@ Here's a simple example of how to use the `openAIChat` for sentiment analysis:
 % The system prompt tells the assistant how to behave, in this case, as a sentiment analyzer
 systemPrompt = "You are a sentiment analyser. You will look at a sentence and output"+...
     " a single word that classifies that sentence as either 'positive' or 'negative'."+....
-    "Examples: \n"+...
-    "The project was a complete failure. \n"+...
-    "negative \n\n"+...  
-    "The team successfully completed the project ahead of schedule."+...
-    "positive \n\n"+...
-    "His attitude was terribly discouraging to the team. \n"+...
-    "negative \n\n";
+    newline + ...
+    "Examples:" + newline +...
+    "The project was a complete failure." + newline +...
+    "negative" + newline + newline +...  
+    "The team successfully completed the project ahead of schedule." + newline +...
+    "positive" + newline + newline +...
+    "His attitude was terribly discouraging to the team." + newline +...
+    "negative" + newline + newline;
 
 chat = openAIChat(systemPrompt);
 
@@ -112,14 +146,16 @@ Then create the chat assistant:
 chat = openAIChat("You are a helpful AI assistant.");
 ```
 
-Add a user message to the history and pass it to `generate`
+(Side note: `azureChat` and `ollamaChat` work with `openAIMessages`, too.)
+
+Add a user message to the history and pass it to `generate`:
 
 ```matlab
 history = addUserMessage(history,"What is an eigenvalue?");
 [txt, response] = generate(chat, history)
 ```
 
-The output `txt` will contain the answer and `response` will contain the full response, which you need to include in the history as follows
+The output `txt` will contain the answer and `response` will contain the full response, which you need to include in the history as follows:
 ```matlab
 history = addResponseMessage(history, response);
 ```
@@ -143,6 +179,8 @@ txt = generate(chat,"What is Model-Based Design and how is it related to Digital
 ```
 
 ### Calling MATLAB functions with the API
+
+(This is currently not supported for `ollamaChat`.)
 
 Optionally, `Tools=functions` can be used to provide function specifications to the API. The purpose of this is to enable models to generate function arguments which adhere to the provided specifications. 
 Note that the API is not able to directly call any function, so you should call the function and pass the values to the API directly. This process can be automated as shown in [AnalyzeScientificPapersUsingFunctionCalls.mlx](/examples/AnalyzeScientificPapersUsingFunctionCalls.mlx), but it's important to consider that ChatGPT can hallucinate function names, so avoid executing any arbitrary generated functions and only allow the execution of functions that you have defined. 
@@ -300,14 +338,13 @@ messages = addUserMessageWithImages(messages,"What is in the image?",image_path)
 % Should output the description of the image
 ```
 
-## Establishing a connection to Chat Completions API using Azure®
+## Establishing a connection to Chat Completions API using Azure
 
-If you would like to connect MATLAB to Chat Completions API via Azure® instead of directly with OpenAI, you will have to create an `azureChat` object.
-However, you first need to obtain, in addition to the Azure API keys, your Azure OpenAI Resource.
+If you would like to connect MATLAB to Chat Completions API via Azure instead of directly with OpenAI, you will have to create an `azureChat` object. See [the Azure documentation](https://learn.microsoft.com/en-us/azure/ai-services/openai/chatgpt-quickstart) for details on the setup required and where to find your key, endpoint, and deployment name. As explained above, the key should be in the environment variable `AZURE_OPENAI_API_KEY`, or provided as `ApiKey=…` in the `azureChat` call below.
 
 In order to create the chat assistant, you must specify your Azure OpenAI Resource and the LLM you want to use:
 ```matlab
-chat = azureChat(YOUR_RESOURCE_NAME, YOUR_DEPLOYMENT_NAME, "You are a helpful AI assistant");
+chat = azureChat(YOUR_ENDPOINT_NAME, YOUR_DEPLOYMENT_NAME, "You are a helpful AI assistant");
 ```
 
 The `azureChat` object also allows to specify additional options in the same way as the `openAIChat` object.
@@ -329,7 +366,32 @@ history = addUserMessage(history,"What is an eigenvalue?");
 history = addResponseMessage(history, response);
 ```
 
-### Obtaining embeddings
+## Establishing a connection to local LLMs using Ollama
+
+In case you want to use a local LLM (e.g., to avoid sending sensitive data to a cloud provider, or to use other models), you will need to install Ollama and pull a model, following the instructions on [ollama.com](https://ollama.com). Ollama needs to run on the same machine as your MATLAB instance.
+
+In order to create the chat assistant, you must specify the LLM you want to use:
+```matlab
+chat = ollamaChat("mistral");
+```
+
+The additional options of `ollamaChat` are similar to those of `openAIChat` and `azureChat`.
+
+In many workflows, `ollamaChat` is drop-in compatible with `openAIChat`:
+```matlab
+% Initialize the chat object
+chat = ollamaChat("phi3");
+
+% Create an openAIMessages object to start the conversation history
+history = openAIMessages;
+
+% Ask your question and store it in the history, create the response using the generate method, and store the response in the history 
+history = addUserMessage(history,"What is an eigenvalue?");
+[txt, response] = generate(chat, history)
+history = addResponseMessage(history, response);
+```
+
+## Obtaining embeddings
 
 You can extract embeddings from your text with OpenAI using the function `extractOpenAIEmbeddings` as follows:
 ```matlab
