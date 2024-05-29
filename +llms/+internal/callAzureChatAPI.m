@@ -1,4 +1,6 @@
 function [text, message, response] = callAzureChatAPI(endpoint, deploymentID, messages, functions, nvp)
+% This function is undocumented and will change in a future release
+
 %callAzureChatAPI Calls the openAI chat completions API on Azure.
 %
 %   MESSAGES and FUNCTIONS should be structs matching the json format

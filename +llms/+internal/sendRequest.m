@@ -1,9 +1,11 @@
 function [response, streamedText] = sendRequest(parameters, token, endpoint, timeout, streamFun)
+% This function is undocumented and will change in a future release
+
 %sendRequest Sends a request to an ENDPOINT using PARAMETERS and
 %   api key TOKEN. TIMEOUT is the number of seconds to wait for initial
 %   server connection. STREAMFUN is an optional callback function.
 
-%   Copyright 2023 The MathWorks, Inc.
+%   Copyright 2023-2024 The MathWorks, Inc.
 
 arguments
     parameters

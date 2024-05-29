@@ -13,9 +13,16 @@ classdef(Sealed) ollamaChat < llms.internal.textGenerator
 %                             of the output. Default value depends on the model;
 %                             if not specified in the model, defaults to 0.8.
 %
-%   TODO: TopK and TopP, how do they relate to this?
 %   TopProbabilityMass      - Top probability mass value for controlling the
-%                             diversity of the output. Default value is 1.
+%                             diversity of the output. Default value is 1; with
+%                             smaller value TopProbabilityMass=p, only the most
+%                             probable tokens up to a cumulative probability p
+%                             are used.
+%
+%   TopProbabilityNum       - Maximum number of most likely tokens that are
+%                             considered for output. Default is Inf, allowing
+%                             all tokens. Smaller values reduce diversity in
+%                             the output.
 %
 %   StopSequences           - Vector of strings that when encountered, will
 %                             stop the generation of tokens. Default
@@ -24,8 +31,6 @@ classdef(Sealed) ollamaChat < llms.internal.textGenerator
 %   ResponseFormat          - The format of response the model returns.
 %                             "text" (default) | "json"
 %
-%   Seed - TODO: Seems to have no effect whatsoever (tested via curl) - cf. https://github.com/ollama/ollama/issues/4660
-%
 %   Mirostat - 0/1/2, eta, tau
 %
 %   RepeatLastN - find a better name! “Sets how far back for the model to look back to prevent repetition. (Default: 64, 0 = disabled, -1 = num_ctx)”
@@ -33,8 +38,6 @@ classdef(Sealed) ollamaChat < llms.internal.textGenerator
 %   RepeatPenalty
 %
 %   TailFreeSamplingZ
-%
-%   MaxNumTokens
 %
 %   StreamFun               - Function to callback when streaming the
 %                             result
@@ -48,17 +51,13 @@ classdef(Sealed) ollamaChat < llms.internal.textGenerator
 %       generate             - Generate a response using the ollamaChat instance.
 %
 %   ollamaChat Properties: TODO TODO
+%       Model                - Model name (as expected by ollama server)
+%
 %       Temperature          - Temperature of generation.
 %
 %       TopProbabilityMass   - Top probability mass to consider for generation.
 %
 %       StopSequences        - Sequences to stop the generation of tokens.
-%
-%       PresencePenalty      - Penalty for using a token in the
-%                              response that has already been used.
-%
-%       FrequencyPenalty     - Penalty for using a token that is
-%                              frequent in the training data.
 %
 %       SystemPrompt         - System prompt.
 %
@@ -159,50 +158,11 @@ classdef(Sealed) ollamaChat < llms.internal.textGenerator
                 TimeOut=this.TimeOut, StreamFun=this.StreamFun);
         end
     end
-
-    methods(Hidden)
-        function mustBeValidFunctionCall(this, functionCall)
-            if ~isempty(functionCall)
-                mustBeTextScalar(functionCall);
-                if isempty(this.FunctionNames)
-                    error("llms:mustSetFunctionsForCall", llms.utils.errorMessageCatalog.getMessage("llms:mustSetFunctionsForCall"));
-                end
-                mustBeMember(functionCall, ["none","auto", this.FunctionNames]);
-            end
-        end
-
-        function toolChoice = convertToolChoice(this, toolChoice)
-            % if toolChoice is empty
-            if isempty(toolChoice)
-                % if Tools is not empty, the default is 'auto'.
-                if ~isempty(this.Tools)
-                    toolChoice = "auto";
-                end
-            elseif ToolChoice ~= "auto"
-                % if toolChoice is not empty, then it must be in the format
-                % {"type": "function", "function": {"name": "my_function"}}
-                toolChoice = struct("type","function","function",struct("name",toolChoice));
-            end
-
-        end
-    end
 end
 
 function mustBeNonzeroLengthTextScalar(content)
 mustBeNonzeroLengthText(content)
 mustBeTextScalar(content)
-end
-
-function [functionsStruct, functionNames] = functionAsStruct(functions)
-numFunctions = numel(functions);
-functionsStruct = cell(1, numFunctions);
-functionNames = strings(1, numFunctions);
-
-for i = 1:numFunctions
-    functionsStruct{i} = struct('type','function', ...
-        'function',encodeStruct(functions(i))) ;
-    functionNames(i) = functions(i).FunctionName;
-end
 end
 
 function mustBeValidMsgs(value)

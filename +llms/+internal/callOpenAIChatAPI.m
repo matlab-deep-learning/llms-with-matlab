@@ -1,4 +1,6 @@
 function [text, message, response] = callOpenAIChatAPI(messages, functions, nvp)
+% This function is undocumented and will change in a future release
+
 %callOpenAIChatAPI Calls the openAI chat completions API.
 %
 %   MESSAGES and FUNCTIONS should be structs matching the json format

@@ -1,4 +1,6 @@
 function [text, message, response] = callOllamaChatAPI(model, messages, nvp)
+% This function is undocumented and will change in a future release
+
 %callOllamaChatAPI Calls the ollama chat completions API.
 %
 %   MESSAGES and FUNCTIONS should be structs matching the json format
