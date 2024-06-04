@@ -42,7 +42,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
 %   StreamFun               - Function to callback when streaming the
 %                             result
 %
-%   TimeOut                 - Connection Timeout in seconds (default: 10 secs)
+%   TimeOut                 - Connection Timeout in seconds (default: 120 secs)
 %
 %
 %
@@ -50,12 +50,14 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
 %       ollamaChat            - Chat completion API from OpenAI.
 %       generate             - Generate a response using the ollamaChat instance.
 %
-%   ollamaChat Properties: TODO TODO
+%   ollamaChat Properties:
 %       Model                - Model name (as expected by ollama server)
 %
 %       Temperature          - Temperature of generation.
 %
-%       TopProbabilityMass   - Top probability mass to consider for generation.
+%       TopProbabilityMass   - Top probability mass to consider for generation (top-p sampling).
+%
+%       TopProbabilityNum    - Only consider the k most likely tokens for generation (top-k sampling).
 %
 %       StopSequences        - Sequences to stop the generation of tokens.
 %
@@ -63,7 +65,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
 %
 %       ResponseFormat       - Specifies the response format, text or json
 %
-%       TimeOut              - Connection Timeout in seconds (default: 10 secs)
+%       TimeOut              - Connection Timeout in seconds (default: 120 secs)
 %
 
 % Copyright 2024 The MathWorks, Inc.
@@ -83,7 +85,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
                 nvp.TopProbabilityNum        (1,1) {mustBeReal,mustBePositive} = Inf
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}
                 nvp.ResponseFormat           (1,1) string {mustBeMember(nvp.ResponseFormat,["text","json"])} = "text"
-                nvp.TimeOut                  (1,1) {mustBeReal,mustBePositive} = 10
+                nvp.TimeOut                  (1,1) {mustBeReal,mustBePositive} = 120
                 nvp.StreamFun                (1,1) {mustBeA(nvp.StreamFun,'function_handle')}
             end
 
