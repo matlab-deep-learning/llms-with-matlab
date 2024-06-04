@@ -1,4 +1,4 @@
-classdef(Sealed) ollamaChat < llms.internal.textGenerator
+classdef (Sealed) ollamaChat < llms.internal.textGenerator
 %ollamaChat Chat completion API from Azure.
 %
 %   CHAT = ollamaChat(modelName) creates an ollamaChat object for the given model.
@@ -68,8 +68,9 @@ classdef(Sealed) ollamaChat < llms.internal.textGenerator
 
 % Copyright 2024 The MathWorks, Inc.
 
-    properties(SetAccess=private)
+    properties
         Model     (1,1) string
+        TopProbabilityNum (1,1) {mustBeReal,mustBePositive} = Inf
     end
 
     methods
@@ -79,6 +80,7 @@ classdef(Sealed) ollamaChat < llms.internal.textGenerator
                 systemPrompt                       {llms.utils.mustBeTextOrEmpty} = []
                 nvp.Temperature                    {llms.utils.mustBeValidTemperature} = 1
                 nvp.TopProbabilityMass             {llms.utils.mustBeValidTopP} = 1
+                nvp.TopProbabilityNum        (1,1) {mustBeReal,mustBePositive} = Inf
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}
                 nvp.ResponseFormat           (1,1) string {mustBeMember(nvp.ResponseFormat,["text","json"])} = "text"
                 nvp.TimeOut                  (1,1) {mustBeReal,mustBePositive} = 10
@@ -102,6 +104,7 @@ classdef(Sealed) ollamaChat < llms.internal.textGenerator
             this.ResponseFormat = nvp.ResponseFormat;
             this.Temperature = nvp.Temperature;
             this.TopProbabilityMass = nvp.TopProbabilityMass;
+            this.TopProbabilityNum = nvp.TopProbabilityNum;
             this.StopSequences = nvp.StopSequences;
             this.TimeOut = nvp.TimeOut;
         end
@@ -152,6 +155,7 @@ classdef(Sealed) ollamaChat < llms.internal.textGenerator
             [text, message, response] = llms.internal.callOllamaChatAPI(...
                 this.Model, messagesStruct, ...
                 Temperature=this.Temperature, ...
+                TopProbabilityMass=this.TopProbabilityMass, TopProbabilityNum=this.TopProbabilityNum,...
                 NumCompletions=nvp.NumCompletions,...
                 StopSequences=this.StopSequences, MaxNumTokens=nvp.MaxNumTokens, ...
                 ResponseFormat=this.ResponseFormat,Seed=nvp.Seed, ...

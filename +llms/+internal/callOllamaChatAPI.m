@@ -25,31 +25,16 @@ function [text, message, response] = callOllamaChatAPI(model, messages, nvp)
 %
 %   Example
 %
+%   model = "mistral";
+%
 %   % Create messages struct
 %   messages = {struct("role", "system",...
 %       "content", "You are a helpful assistant");
 %       struct("role", "user", ...
 %       "content", "What is the edit distance between hi and hello?")};
 %
-%   % Create functions struct
-%   functions = {struct("name", "editDistance", ...
-%       "description", "Find edit distance between two strings or documents.", ...
-%       "parameters", struct( ...
-%       "type", "object", ...
-%       "properties", struct(...
-%           "str1", struct(...
-%               "description", "Source string.", ...
-%               "type", "string"),...
-%           "str2", struct(...
-%               "description", "Target string.", ...
-%               "type", "string")),...
-%       "required", ["str1", "str2"]))};
-%
-%   % Define your API key
-%   apiKey = "your-api-key-here"
-%
 %   % Send a request
-%   [text, message] = llms.internal.callOpenAIChatAPI(messages, functions, ApiKey=apiKey)
+%   [text, message] = llms.internal.callOllamaChatAPI(model, messages)
 
 %   Copyright 2023-2024 The MathWorks, Inc.
 
@@ -58,6 +43,7 @@ arguments
     messages
     nvp.Temperature = 1
     nvp.TopProbabilityMass = 1
+    nvp.TopProbabilityNum = Inf
     nvp.NumCompletions = 1
     nvp.StopSequences = []
     nvp.MaxNumTokens = inf
@@ -70,6 +56,12 @@ arguments
 end
 
 URL = "http://localhost:11434/api/chat"; % TODO: model parameter
+
+% The JSON for StopSequences must have an array, and cannot say "stop": "foo".
+% The easiest way to ensure that is to never pass in a scalar …
+if isscalar(nvp.StopSequences)
+    nvp.StopSequences = [nvp.StopSequences, nvp.StopSequences];
+end
 
 parameters = buildParametersCall(model, messages, nvp);
 
@@ -123,6 +115,7 @@ function dict = mapNVPToParameters()
 dict = dictionary();
 dict("Temperature") = "temperature";
 dict("TopProbabilityMass") = "top_p";
+dict("TopProbabilityNum") = "top_k";
 dict("NumCompletions") = "n";
 dict("StopSequences") = "stop";
 dict("MaxNumTokens") = "num_predict";
