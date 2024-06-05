@@ -102,7 +102,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
         end
 
         function [text, message, response] = generate(this, messages, nvp)
-            %generate   Generate a response using the azureChat instance.
+            %generate   Generate a response using the ollamaChat instance.
             %
             %   [TEXT, MESSAGE, RESPONSE] = generate(CHAT, MESSAGES) generates a response
             %   with the specified MESSAGES.
