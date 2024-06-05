@@ -5,7 +5,7 @@ classdef errorMessageCatalog
 
     properties(Constant)
         %CATALOG dictionary mapping error ids to error msgs
-        Catalog = buildErrorMessageCatalog;
+        Catalog = buildErrorMessageCatalog();
     end
 
     methods(Static)
@@ -31,7 +31,7 @@ classdef errorMessageCatalog
     end
 end
 
-function catalog = buildErrorMessageCatalog
+function catalog = buildErrorMessageCatalog()
 catalog = dictionary("string", "string");
 catalog("llms:mustBeUnique") = "Values must be unique.";
 catalog("llms:mustBeVarName") = "Parameter name must begin with a letter and contain not more than 'namelengthmax' characters.";
