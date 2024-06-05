@@ -53,6 +53,10 @@ classdef texampleTests < matlab.unittest.TestCase
         function testRetrievalAugmentedGenerationUsingChatGPTandMATLAB(~)
             RetrievalAugmentedGenerationUsingChatGPTandMATLAB;
         end
+
+        function testAnalyzeSentimentinTextUsingChatGPTinJSONMode(~)
+            AnalyzeSentimentinTextUsingChatGPTinJSONMode;
+        end
     end
     
 end
