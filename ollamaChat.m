@@ -31,13 +31,8 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
 %   ResponseFormat          - The format of response the model returns.
 %                             "text" (default) | "json"
 %
-%   Mirostat - 0/1/2, eta, tau
-%
-%   RepeatLastN - find a better name! “Sets how far back for the model to look back to prevent repetition. (Default: 64, 0 = disabled, -1 = num_ctx)”
-%
-%   RepeatPenalty
-%
-%   TailFreeSamplingZ
+%   TailFreeSamplingZ       - Reduce the use of less probable tokens, based on
+%                             the second-order differences of ordered probabilities.
 %
 %   StreamFun               - Function to callback when streaming the
 %                             result
@@ -50,29 +45,22 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
 %       ollamaChat            - Chat completion API from OpenAI.
 %       generate             - Generate a response using the ollamaChat instance.
 %
-%   ollamaChat Properties:
+%   ollamaChat Properties, in addition to the name-value pairs above:
 %       Model                - Model name (as expected by ollama server)
 %
-%       Temperature          - Temperature of generation.
-%
-%       TopProbabilityMass   - Top probability mass to consider for generation (top-p sampling).
-%
-%       TopProbabilityNum    - Only consider the k most likely tokens for generation (top-k sampling).
-%
-%       StopSequences        - Sequences to stop the generation of tokens.
-%
 %       SystemPrompt         - System prompt.
-%
-%       ResponseFormat       - Specifies the response format, text or json
-%
-%       TimeOut              - Connection Timeout in seconds (default: 120 secs)
-%
+
+% Ollama model properties not exposed:
+%  repeat_last_n, repeat_penalty           - could not find an example where they made a difference
+%  mirostat, mirostat_eta, mirostat_tau    - looking for the best API design
+
 
 % Copyright 2024 The MathWorks, Inc.
 
     properties
         Model     (1,1) string
         TopProbabilityNum (1,1) {mustBeReal,mustBePositive} = Inf
+        TailFreeSamplingZ (1,1) {mustBeReal} = 1
     end
 
     methods
@@ -86,6 +74,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}
                 nvp.ResponseFormat           (1,1) string {mustBeMember(nvp.ResponseFormat,["text","json"])} = "text"
                 nvp.TimeOut                  (1,1) {mustBeReal,mustBePositive} = 120
+                nvp.TailFreeSamplingZ        (1,1) {mustBeReal} = 1
                 nvp.StreamFun                (1,1) {mustBeA(nvp.StreamFun,'function_handle')}
             end
 
@@ -107,6 +96,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
             this.Temperature = nvp.Temperature;
             this.TopProbabilityMass = nvp.TopProbabilityMass;
             this.TopProbabilityNum = nvp.TopProbabilityNum;
+            this.TailFreeSamplingZ = nvp.TailFreeSamplingZ;
             this.StopSequences = nvp.StopSequences;
             this.TimeOut = nvp.TimeOut;
         end
@@ -131,10 +121,6 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
             %
             %       Seed             - An integer value to use to obtain
             %                          reproducible responses
-            %
-            % Currently, GPT-4 Turbo with vision does not support the message.name
-            % parameter, functions/tools, response_format parameter, stop
-            % sequences, and max_tokens
 
             arguments
                 this                    (1,1) ollamaChat
@@ -158,6 +144,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
                 this.Model, messagesStruct, ...
                 Temperature=this.Temperature, ...
                 TopProbabilityMass=this.TopProbabilityMass, TopProbabilityNum=this.TopProbabilityNum,...
+                TailFreeSamplingZ=this.TailFreeSamplingZ,...
                 NumCompletions=nvp.NumCompletions,...
                 StopSequences=this.StopSequences, MaxNumTokens=nvp.MaxNumTokens, ...
                 ResponseFormat=this.ResponseFormat,Seed=nvp.Seed, ...

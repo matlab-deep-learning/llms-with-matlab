@@ -44,6 +44,7 @@ arguments
     nvp.Temperature = 1
     nvp.TopProbabilityMass = 1
     nvp.TopProbabilityNum = Inf
+    nvp.TailFreeSamplingZ = 1
     nvp.NumCompletions = 1
     nvp.StopSequences = []
     nvp.MaxNumTokens = inf
@@ -116,6 +117,7 @@ dict = dictionary();
 dict("Temperature") = "temperature";
 dict("TopProbabilityMass") = "top_p";
 dict("TopProbabilityNum") = "top_k";
+dict("TailFreeSamplingZ") = "tfs_z";
 dict("NumCompletions") = "n";
 dict("StopSequences") = "stop";
 dict("MaxNumTokens") = "num_predict";

@@ -48,6 +48,16 @@ classdef tollamaChat < matlab.unittest.TestCase
             testCase.verifyEqual(response1,response2);
         end
 
+        function extremeTfsZ(testCase)
+            % setting tfs_z to z=0 leaves no random choice,
+            % so we expect to get a fixed response.
+            chat = ollamaChat("mistral",TailFreeSamplingZ=0);
+            prompt = "Sampling with tfs_z=0 returns a definite answer.";
+            response1 = generate(chat,prompt);
+            response2 = generate(chat,prompt);
+            testCase.verifyEqual(response1,response2);
+        end
+
         function stopSequences(testCase)
             chat = ollamaChat("mistral",TopProbabilityNum=1);
             prompt = "Top-k sampling with k=1 returns a definite answer.";
