@@ -57,20 +57,20 @@ function [text, message, response] = callOpenAIChatAPI(messages, functions, nvp)
 arguments
     messages
     functions
-    nvp.ToolChoice = []
-    nvp.ModelName = "gpt-3.5-turbo"
-    nvp.Temperature = 1
-    nvp.TopProbabilityMass = 1
-    nvp.NumCompletions = 1
-    nvp.StopSequences = []
-    nvp.MaxNumTokens = inf
-    nvp.PresencePenalty = 0
-    nvp.FrequencyPenalty = 0
-    nvp.ResponseFormat = "text"
-    nvp.Seed = []
-    nvp.ApiKey = ""
-    nvp.TimeOut = 10
-    nvp.StreamFun = []
+    nvp.ToolChoice
+    nvp.ModelName
+    nvp.Temperature
+    nvp.TopProbabilityMass
+    nvp.NumCompletions
+    nvp.StopSequences
+    nvp.MaxNumTokens
+    nvp.PresencePenalty
+    nvp.FrequencyPenalty
+    nvp.ResponseFormat
+    nvp.Seed
+    nvp.ApiKey
+    nvp.TimeOut
+    nvp.StreamFun
 end
 
 END_POINT = "https://api.openai.com/v1/chat/completions";

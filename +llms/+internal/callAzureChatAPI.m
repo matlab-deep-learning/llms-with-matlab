@@ -21,7 +21,7 @@ function [text, message, response] = callAzureChatAPI(endpoint, deploymentID, me
 %    - ApiKey
 %    - TimeOut
 %    - StreamFun
-%   More details on the parameters: https://platform.openai.com/docs/api-reference/chat/create
+%   More details on the parameters: https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/chatgpt
 %
 %   Example
 %
@@ -58,20 +58,20 @@ arguments
     deploymentID
     messages
     functions
-    nvp.ToolChoice = []
-    nvp.APIVersion = "2023-05-15"
-    nvp.Temperature = 1
-    nvp.TopProbabilityMass = 1
-    nvp.NumCompletions = 1
-    nvp.StopSequences = []
-    nvp.MaxNumTokens = inf
-    nvp.PresencePenalty = 0
-    nvp.FrequencyPenalty = 0
-    nvp.ResponseFormat = "text"
-    nvp.Seed = []
-    nvp.ApiKey = ""
-    nvp.TimeOut = 10
-    nvp.StreamFun = []
+    nvp.ToolChoice
+    nvp.APIVersion
+    nvp.Temperature
+    nvp.TopProbabilityMass
+    nvp.NumCompletions
+    nvp.StopSequences
+    nvp.MaxNumTokens
+    nvp.PresencePenalty
+    nvp.FrequencyPenalty
+    nvp.ResponseFormat
+    nvp.Seed
+    nvp.ApiKey
+    nvp.TimeOut
+    nvp.StreamFun
 end
 
 URL = endpoint + "openai/deployments/" + deploymentID + "/chat/completions?api-version=" + nvp.APIVersion;

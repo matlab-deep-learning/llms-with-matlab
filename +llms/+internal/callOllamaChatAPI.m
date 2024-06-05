@@ -21,7 +21,7 @@ function [text, message, response] = callOllamaChatAPI(model, messages, nvp)
 %    - ApiKey
 %    - TimeOut
 %    - StreamFun
-%   More details on the parameters: https://platform.openai.com/docs/api-reference/chat/create
+%   More details on the parameters: https://github.com/ollama/ollama/blob/main/docs/modelfile.md#valid-parameters-and-values
 %
 %   Example
 %
@@ -41,19 +41,17 @@ function [text, message, response] = callOllamaChatAPI(model, messages, nvp)
 arguments
     model
     messages
-    nvp.Temperature = 1
-    nvp.TopProbabilityMass = 1
-    nvp.TopProbabilityNum = Inf
-    nvp.TailFreeSamplingZ = 1
-    nvp.NumCompletions = 1
-    nvp.StopSequences = []
-    nvp.MaxNumTokens = inf
-    nvp.PresencePenalty = 0
-    nvp.FrequencyPenalty = 0
-    nvp.ResponseFormat = "text"
-    nvp.Seed = []
-    nvp.TimeOut = 10
-    nvp.StreamFun = []
+    nvp.Temperature
+    nvp.TopProbabilityMass
+    nvp.TopProbabilityNum
+    nvp.TailFreeSamplingZ
+    nvp.NumCompletions
+    nvp.StopSequences
+    nvp.MaxNumTokens
+    nvp.ResponseFormat
+    nvp.Seed
+    nvp.TimeOut
+    nvp.StreamFun
 end
 
 URL = "http://localhost:11434/api/chat"; % TODO: model parameter
