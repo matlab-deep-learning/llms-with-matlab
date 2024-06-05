@@ -48,6 +48,14 @@ classdef tazureChat < matlab.unittest.TestCase
             testCase.verifyGreaterThan(strlength(response),0);
         end
 
+        function seedFixesResult(testCase)
+            testCase.assumeTrue(isenv("AZURE_OPENAI_API_KEY"),"end-to-end test requires environment variables AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT.");
+            chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"));
+            response1 = generate(chat,"hi",Seed=1234);
+            response2 = generate(chat,"hi",Seed=1234);
+            testCase.verifyEqual(response1,response2);
+        end
+
         function createOpenAIChatWithStreamFunc(testCase)
             testCase.assumeTrue(isenv("AZURE_OPENAI_API_KEY"),"end-to-end test requires environment variables AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT.");
             function seen = sf(str)
