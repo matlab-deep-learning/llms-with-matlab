@@ -86,9 +86,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & llms.internal.gptPena
                 deploymentID                       {mustBeTextScalar}
                 systemPrompt                       {llms.utils.mustBeTextOrEmpty} = []
                 nvp.Tools                    (1,:) {mustBeA(nvp.Tools, "openAIFunction")} = openAIFunction.empty
-                nvp.APIVersion               (1,1) {mustBeMember(nvp.APIVersion,["2023-03-15-preview", "2023-05-15", "2023-06-01-preview", ...
-                                                        "2023-07-01-preview", "2023-08-01-preview",...
-                                                        "2023-12-01-preview"])} = "2023-05-15"
+                nvp.APIVersion               (1,1) {mustBeAPIVersion} = "2024-02-01"
                 nvp.Temperature                    {llms.utils.mustBeValidTemperature} = 1
                 nvp.TopProbabilityMass             {llms.utils.mustBeValidTopP} = 1
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}
@@ -254,4 +252,8 @@ function mustBeIntegerOrEmpty(value)
     if ~isempty(value)
         mustBeInteger(value)
     end
+end
+
+function mustBeAPIVersion(model)
+    mustBeMember(model,llms.azure.apiVersions);
 end
