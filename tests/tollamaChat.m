@@ -100,6 +100,14 @@ classdef tollamaChat < matlab.unittest.TestCase
 
             testCase.verifyWarningFree(@() assignValueToProperty(ValidValuesSetters.Property,ValidValuesSetters.Value));
         end
+
+        function queryModels(testCase)
+            % our test setup has at least mistral loaded
+            models = ollamaChat.models;
+            testCase.verifyClass(models,"string");
+            testCase.verifyThat(models, ...
+                matlab.unittest.constraints.IsSupersetOf("mistral:latest"));
+        end
     end
 end
 

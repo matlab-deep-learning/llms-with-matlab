@@ -151,11 +151,22 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
                 TimeOut=this.TimeOut, StreamFun=this.StreamFun);
         end
     end
-end
 
-function mustBeNonzeroLengthTextScalar(content)
-mustBeNonzeroLengthText(content)
-mustBeTextScalar(content)
+    methods(Static)
+        function mdls = models
+            %ollamaChat.models - return models available on ollama server
+            %   MDLS = ollamaChat.models returns a string vector MDLS
+            %   listing the models available on the local ollama server.
+            %
+            %   These names can be used in the ollamaChat constructor.
+            %   For names with a colon, such as "phi:latest", it is
+            %   possible to only use the part before the colon, i.e.,
+            %   "phi".
+            endpoint = "http://localhost:11434/api/tags";
+            response = webread(endpoint);
+            mdls = string({response.models.name}).';
+        end
+    end
 end
 
 function mustBeValidMsgs(value)
