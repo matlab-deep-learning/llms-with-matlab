@@ -48,6 +48,27 @@ classdef tazureChat < matlab.unittest.TestCase
             testCase.verifyGreaterThan(strlength(response),0);
         end
 
+        function createOpenAIChatWithStreamFunc(testCase)
+            testCase.assumeTrue(isenv("AZURE_OPENAI_API_KEY"),"end-to-end test requires environment variables AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT.");
+            function seen = sf(str)
+                persistent data;
+                if isempty(data)
+                    data = strings(1, 0);
+                end
+                % Append streamed text to an empty string array of length 1
+                data = [data, str];
+                seen = data;
+            end
+            chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"), ...
+                StreamFun=@sf);
+
+            testCase.verifyWarningFree(@()generate(chat, "Hello world."));
+            % Checking that persistent data, which is still stored in
+            % memory, is greater than 1. This would mean that the stream
+            % function has been called and streamed some text.
+            testCase.verifyGreaterThan(numel(sf("")), 1);
+        end
+
         %% Test is currently unreliable, reasons unclear
         % function verySmallTimeOutErrors(testCase)
         %     chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"), TimeOut=1e-10, ApiKey="false-key");

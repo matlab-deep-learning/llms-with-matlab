@@ -68,11 +68,24 @@ classdef tollamaChat < matlab.unittest.TestCase
             testCase.verifyEqual(response2, extractBefore(response1,"1"));
         end
 
-        %% Test is currently unreliable, reasons unclear
-        % function verySmallTimeOutErrors(testCase)
-        %     chat = ollamaChat("mistral", TimeOut=1e-10);
-        %     testCase.verifyError(@() generate(chat, "please count from 1 to 5000"), "MATLAB:webservices:Timeout")
-        % end
+        function streamFunc(testCase)
+            function seen = sf(str)
+                persistent data;
+                if isempty(data)
+                    data = strings(1, 0);
+                end
+                % Append streamed text to an empty string array of length 1
+                data = [data, str];
+                seen = data;
+            end
+            chat = ollamaChat("mistral", StreamFun=@sf);
+
+            testCase.verifyWarningFree(@()generate(chat, "Hello world."));
+            % Checking that persistent data, which is still stored in
+            % memory, is greater than 1. This would mean that the stream
+            % function has been called and streamed some text.
+            testCase.verifyGreaterThan(numel(sf("")), 1);
+        end
 
         function invalidInputsConstructor(testCase, InvalidConstructorInput)
             testCase.verifyError(@() ollamaChat("mistral", InvalidConstructorInput.Input{:}), InvalidConstructorInput.Error);
