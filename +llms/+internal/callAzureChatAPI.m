@@ -7,20 +7,6 @@ function [text, message, response] = callAzureChatAPI(endpoint, deploymentID, me
 %   required by the OpenAI Chat Completions API.
 %   Ref: https://platform.openai.com/docs/guides/gpt/chat-completions-api
 %
-%   Currently, the supported NVP are, including the equivalent name in the API:
-%    - ToolChoice (tool_choice)
-%    - Temperature (temperature)
-%    - TopProbabilityMass (top_p)
-%    - NumCompletions (n)
-%    - StopSequences (stop)
-%    - MaxNumTokens (max_tokens)
-%    - PresencePenalty (presence_penalty)
-%    - FrequencyPenalty (frequence_penalty)
-%    - ResponseFormat (response_format)
-%    - Seed (seed)
-%    - ApiKey
-%    - TimeOut
-%    - StreamFun
 %   More details on the parameters: https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/chatgpt
 %
 %   Example
@@ -49,7 +35,7 @@ function [text, message, response] = callAzureChatAPI(endpoint, deploymentID, me
 %   apiKey = "your-api-key-here"
 %
 %   % Send a request
-%   [text, message] = llms.internal.callOpenAIChatAPI(messages, functions, ApiKey=apiKey)
+%   [text, message] = llms.internal.callAzureChatAPI(messages, functions, ApiKey=apiKey)
 
 %   Copyright 2023-2024 The MathWorks, Inc.
 

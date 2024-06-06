@@ -7,21 +7,6 @@ function [text, message, response] = callOpenAIChatAPI(messages, functions, nvp)
 %   required by the OpenAI Chat Completions API.
 %   Ref: https://platform.openai.com/docs/guides/gpt/chat-completions-api
 %
-%   Currently, the supported NVP are, including the equivalent name in the API:
-%    - ToolChoice (tool_choice)
-%    - ModelName (model)
-%    - Temperature (temperature)
-%    - TopProbabilityMass (top_p)
-%    - NumCompletions (n)
-%    - StopSequences (stop)
-%    - MaxNumTokens (max_tokens)
-%    - PresencePenalty (presence_penalty)
-%    - FrequencyPenalty (frequence_penalty)
-%    - ResponseFormat (response_format)
-%    - Seed (seed)
-%    - ApiKey
-%    - TimeOut
-%    - StreamFun
 %   More details on the parameters: https://platform.openai.com/docs/api-reference/chat/create
 %
 %   Example
