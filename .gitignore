@@ -4,3 +4,4 @@
 startup.m
 papers_to_read.csv
 data/*
+examples/data/*
