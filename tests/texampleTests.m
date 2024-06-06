@@ -61,8 +61,9 @@ classdef texampleTests < matlab.unittest.TestCase
             UsingDALLEToEditImages;
         end
 
-        function testAnalyzeSentimentinTextUsingChatGPTinJSONMode(~)
-            AnalyzeSentimentinTextUsingChatGPTinJSONMode;
+        function testAnalyzeSentimentinTextUsingChatGPTinJSONMode(testCase)
+            testCase.verifyWarning(@AnalyzeSentimentinTextUsingChatGPTinJSONMode,...
+                "llms:warningJsonInstruction");
         end
     end
     
