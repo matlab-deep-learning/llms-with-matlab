@@ -10,14 +10,6 @@ classdef tazureChat < matlab.unittest.TestCase
     end
 
     methods(Test)
-        % Test methods
-        function keyNotFound(testCase)
-            import matlab.unittest.fixtures.EnvironmentVariableFixture
-            testCase.applyFixture(EnvironmentVariableFixture("AZURE_OPENAI_API_KEY","dummy"));
-            unsetenv("AZURE_OPENAI_API_KEY");
-            testCase.verifyError(@()azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT")), "llms:keyMustBeSpecified");
-        end
-
         function constructChatWithAllNVP(testCase)
             endpoint = getenv("AZURE_OPENAI_ENDPOINT");
             deploymentID = "hello";
@@ -99,6 +91,16 @@ classdef tazureChat < matlab.unittest.TestCase
             end
 
             testCase.verifyError(@()assignValueToProperty(InvalidValuesSetters.Property,InvalidValuesSetters.Value), InvalidValuesSetters.Error);
+        end
+
+        function keyNotFound(testCase)
+            % to verify the error, we need to unset the environment variable
+            % AZURE_OPENAI_API_KEY, if given. Use a fixture to restore the
+            % value on leaving the test point:
+            import matlab.unittest.fixtures.EnvironmentVariableFixture
+            testCase.applyFixture(EnvironmentVariableFixture("AZURE_OPENAI_API_KEY","dummy"));
+            unsetenv("AZURE_OPENAI_API_KEY");
+            testCase.verifyError(@()azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT")), "llms:keyMustBeSpecified");
         end
     end
 end
