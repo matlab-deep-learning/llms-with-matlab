@@ -41,7 +41,7 @@ Some of the [LLMs currently supported out of the box on Ollama](https://ollama.c
 
 - For OpenAI connections: An active OpenAI API subscription and API key.
 - For Azure OpenAI Services: An active Azure subscription with OpenAI access, deployment, and API key.
-- For Ollama: A local ollama installation. Currently, only connections on `localhost` are supported, i.e., Ollama and MATLAB must run on the same machine.
+- For Ollama: A local Ollama installation. Currently, only connections on `localhost` are supported, i.e., Ollama and MATLAB must run on the same machine.
 
 ## Setup
 

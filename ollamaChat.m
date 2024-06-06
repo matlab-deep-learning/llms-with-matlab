@@ -46,7 +46,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
 %       generate             - Generate a response using the ollamaChat instance.
 %
 %   ollamaChat Properties, in addition to the name-value pairs above:
-%       Model                - Model name (as expected by ollama server)
+%       Model                - Model name (as expected by Ollama server)
 %
 %       SystemPrompt         - System prompt.
 
@@ -154,9 +154,9 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
 
     methods(Static)
         function mdls = models
-            %ollamaChat.models - return models available on ollama server
+            %ollamaChat.models - return models available on Ollama server
             %   MDLS = ollamaChat.models returns a string vector MDLS
-            %   listing the models available on the local ollama server.
+            %   listing the models available on the local Ollama server.
             %
             %   These names can be used in the ollamaChat constructor.
             %   For names with a colon, such as "phi:latest", it is

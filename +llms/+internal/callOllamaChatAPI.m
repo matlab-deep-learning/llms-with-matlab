@@ -1,26 +1,12 @@
 function [text, message, response] = callOllamaChatAPI(model, messages, nvp)
 % This function is undocumented and will change in a future release
 
-%callOllamaChatAPI Calls the ollama chat completions API.
+%callOllamaChatAPI Calls the Ollama chat completions API.
 %
 %   MESSAGES and FUNCTIONS should be structs matching the json format
-%   required by the ollama Chat Completions API.
+%   required by the Ollama Chat Completions API.
 %   Ref: https://github.com/ollama/ollama/blob/main/docs/api.md
 %
-%   Currently, the supported NVP are, including the equivalent name in the API:
-%  TODO TODO TODO
-%    - Temperature (temperature)
-%    - TopProbabilityMass (top_p)
-%    - NumCompletions (n)
-%    - StopSequences (stop)
-%    - MaxNumTokens (max_tokens)
-%    - PresencePenalty (presence_penalty)
-%    - FrequencyPenalty (frequence_penalty)
-%    - ResponseFormat (response_format)
-%    - Seed (seed)
-%    - ApiKey
-%    - TimeOut
-%    - StreamFun
 %   More details on the parameters: https://github.com/ollama/ollama/blob/main/docs/modelfile.md#valid-parameters-and-values
 %
 %   Example
