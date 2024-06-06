@@ -9,7 +9,7 @@ function [emb, response] = extractOpenAIEmbeddings(text, nvp)
 %
 %   'ModelName'                 - The ID of the model to use.
 %
-%   'ApiKey'                    - OpenAI API token. It can also be specified by
+%   'APIKey'                    - OpenAI API token. It can also be specified by
 %                                setting the environment variable OPENAI_API_KEY
 %
 %   'TimeOut'                   - Connection Timeout in seconds (default: 10 secs)
@@ -28,7 +28,7 @@ arguments
                         "text-embedding-3-large", "text-embedding-3-small"])} = "text-embedding-ada-002"
     nvp.TimeOut    (1,1) {mustBeReal,mustBePositive} = 10
     nvp.Dimensions (1,1) {mustBeInteger,mustBePositive}
-    nvp.ApiKey           {llms.utils.mustBeNonzeroLengthTextScalar}
+    nvp.APIKey           {llms.utils.mustBeNonzeroLengthTextScalar}
 end
 
 END_POINT = "https://api.openai.com/v1/embeddings";

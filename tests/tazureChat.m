@@ -23,7 +23,7 @@ classdef tazureChat < matlab.unittest.TestCase
             systemPrompt = "This is a system prompt";
             timeout = 3;
             chat = azureChat(endpoint, deploymentID, systemPrompt, Tools=functions, ...
-                Temperature=temperature, TopProbabilityMass=topP, StopSequences=stop, ApiKey=apiKey,...
+                Temperature=temperature, TopProbabilityMass=topP, StopSequences=stop, APIKey=apiKey,...
                 FrequencyPenalty=frequenceP, PresencePenalty=presenceP, TimeOut=timeout);
             testCase.verifyEqual(chat.Temperature, temperature);
             testCase.verifyEqual(chat.TopProbabilityMass, topP);
@@ -70,7 +70,7 @@ classdef tazureChat < matlab.unittest.TestCase
         end
 
         function errorsWhenPassingToolChoiceWithEmptyTools(testCase)
-            chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"), ApiKey="this-is-not-a-real-key");
+            chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"), APIKey="this-is-not-a-real-key");
             testCase.verifyError(@()generate(chat,"input", ToolChoice="bla"), "llms:mustSetFunctionsForCall");
         end
 
@@ -80,12 +80,12 @@ classdef tazureChat < matlab.unittest.TestCase
 
         function invalidInputsGenerate(testCase, InvalidGenerateInput)
             f = openAIFunction("validfunction");
-            chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"), Tools=f, ApiKey="this-is-not-a-real-key");
+            chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"), Tools=f, APIKey="this-is-not-a-real-key");
             testCase.verifyError(@()generate(chat,InvalidGenerateInput.Input{:}), InvalidGenerateInput.Error);
         end
 
         function invalidSetters(testCase, InvalidValuesSetters)
-            chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"), ApiKey="this-is-not-a-real-key");
+            chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"), APIKey="this-is-not-a-real-key");
             function assignValueToProperty(property, value)
                 chat.(property) = value;
             end
@@ -345,11 +345,11 @@ invalidConstructorInput = struct( ...
         "Error","MATLAB:notGreaterEqual"),...
     ...
     "InvalidApiKeyType",struct( ...
-        "Input",{{ "ApiKey" 123 }},...
+        "Input",{{ "APIKey" 123 }},...
         "Error","MATLAB:validators:mustBeNonzeroLengthText"),...
     ...
     "InvalidApiKeySize",struct( ...
-        "Input",{{ "ApiKey" ["abc" "abc"] }},...
+        "Input",{{ "APIKey" ["abc" "abc"] }},...
         "Error","MATLAB:validators:mustBeTextScalar"));
 end
 

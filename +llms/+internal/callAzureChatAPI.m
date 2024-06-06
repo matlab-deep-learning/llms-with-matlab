@@ -35,7 +35,7 @@ function [text, message, response] = callAzureChatAPI(endpoint, deploymentID, me
 %   apiKey = "your-api-key-here"
 %
 %   % Send a request
-%   [text, message] = llms.internal.callAzureChatAPI(messages, functions, ApiKey=apiKey)
+%   [text, message] = llms.internal.callAzureChatAPI(messages, functions, APIKey=apiKey)
 
 %   Copyright 2023-2024 The MathWorks, Inc.
 
@@ -55,7 +55,7 @@ arguments
     nvp.FrequencyPenalty
     nvp.ResponseFormat
     nvp.Seed
-    nvp.ApiKey
+    nvp.APIKey
     nvp.TimeOut
     nvp.StreamFun
 end
@@ -64,7 +64,7 @@ URL = endpoint + "openai/deployments/" + deploymentID + "/chat/completions?api-v
 
 parameters = buildParametersCall(messages, functions, nvp);
 
-[response, streamedText] = llms.internal.sendRequest(parameters,nvp.ApiKey, URL, nvp.TimeOut, nvp.StreamFun);
+[response, streamedText] = llms.internal.sendRequest(parameters,nvp.APIKey, URL, nvp.TimeOut, nvp.StreamFun);
 
 % If call errors, "choices" will not be part of response.Body.Data, instead
 % we get response.Body.Data.error

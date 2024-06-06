@@ -8,7 +8,7 @@ classdef openAIImages
 %       ModelName            - Name of the model to use for image generation.
 %                             "dall-e-2" (default) or "dall-e-3".
 %
-%   MDL = openAIImages(ModelName, ApiKey=key) uses the specified API key
+%   MDL = openAIImages(ModelName, APIKey=key) uses the specified API key
 %
 %   MDL = openAIImages(__, Name=Value) specifies additional options
 %   using one or more name-value arguments:
@@ -30,7 +30,7 @@ classdef openAIImages
 
 % Copyright 2024 The MathWorks, Inc.
 
-    properties(SetAccess=private)  
+    properties(SetAccess=private)
         %ModelName   Model name.
         ModelName
 
@@ -39,49 +39,49 @@ classdef openAIImages
     end
 
     properties (Access=private)
-        ApiKey
+        APIKey
     end
 
     methods
         function this = openAIImages(nvp)
             arguments
                 nvp.ModelName   (1,1) {mustBeMember(nvp.ModelName,["dall-e-2", "dall-e-3"])} = "dall-e-2"
-                nvp.ApiKey            {mustBeNonzeroLengthTextScalar} 
+                nvp.APIKey            {mustBeNonzeroLengthTextScalar}
                 nvp.TimeOut     (1,1) {mustBeReal,mustBePositive} = 10
             end
 
             this.ModelName = nvp.ModelName;
-            this.ApiKey = llms.internal.getApiKeyFromNvpOrEnv(nvp,"OPENAI_API_KEY");
+            this.APIKey = llms.internal.getApiKeyFromNvpOrEnv(nvp,"OPENAI_API_KEY");
             this.TimeOut = nvp.TimeOut;
         end
 
         function [images, response] = generate(this,prompt,nvp)
             %generate Generate images using the openAIImages instance
-            % 
+            %
             %   [IMAGES, RESPONSE] = generate(MDL, PROMPT) generates images
             %   with the specified prompt.  The PROMPT should be a text description
-            %   of the desired image(s). 
+            %   of the desired image(s).
             %
             %   [IMAGES, RESPONSE] = generate(__, Name=Value) specifies
             %   additional options.
-            %       
-            %       NumImages        - Number of images to generate. 
-            %                          Default value is 1. 
-            %                          For "dall-e-3" only 1 output is supported. 
             %
-            %       Size             - Size of the generated images. 
+            %       NumImages        - Number of images to generate.
+            %                          Default value is 1.
+            %                          For "dall-e-3" only 1 output is supported.
+            %
+            %       Size             - Size of the generated images.
             %                          Defaults to 1024x1024
-            %                          "dall-e-2" supports 256x256, 
+            %                          "dall-e-2" supports 256x256,
             %                          512x512, or 1024x1024.
-            %                          "dall-e-3" supports 1024x1024, 
+            %                          "dall-e-3" supports 1024x1024,
             %                          1792x1024, or 1024x1792
             %
-            %       Quality          - Quality of the images to generate. 
-            %                          "standard" (default) or "hd". 
+            %       Quality          - Quality of the images to generate.
+            %                          "standard" (default) or "hd".
             %                          Only "dall-e-3" supports this parameter.
             %
-            %       Style            - The style of the generated images. 
-            %                          "vivid" (default) or "natural". 
+            %       Style            - The style of the generated images.
+            %                          "vivid" (default) or "natural".
             %                          Only "dall-e-3" supports this parameter.
 
             arguments
@@ -92,8 +92,8 @@ classdef openAIImages
                 nvp.Size                (1,1) string {mustBeMember(nvp.Size, ["256x256", "512x512", ...
                                                                 "1024x1024", "1792x1024", ...
                                                                 "1024x1792"])} = "1024x1024"
-                nvp.Quality             (1,1) string {mustBeMember(nvp.Quality,["standard", "hd"])} 
-                nvp.Style               (1,1) string {mustBeMember(nvp.Style,["vivid", "natural"])} 
+                nvp.Quality             (1,1) string {mustBeMember(nvp.Quality,["standard", "hd"])}
+                nvp.Style               (1,1) string {mustBeMember(nvp.Style,["vivid", "natural"])}
             end
 
             endpoint = "https://api.openai.com/v1/images/generations";
@@ -108,12 +108,12 @@ classdef openAIImages
 
             if this.ModelName=="dall-e-2"
                 % dall-e-3 only params
-                if isfield(nvp, "Quality") 
+                if isfield(nvp, "Quality")
                     error("llms:invalidOptionForModel", ...
                         llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", ...
                         "Quality", this.ModelName));
                 end
-                if isfield(nvp, "Style") 
+                if isfield(nvp, "Style")
                     error("llms:invalidOptionForModel", ...
                         llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", ...
                         "Style", this.ModelName));
@@ -143,17 +143,17 @@ classdef openAIImages
 
         function [images, response] = edit(this,imagePath,prompt,nvp)
             %edit Generate an edited or extended image from a given image and prompt
-            % 
-            %   [IMAGES, RESPONSE] = edit(MDL, IMAGEPATH, PROMPT) 
+            %
+            %   [IMAGES, RESPONSE] = edit(MDL, IMAGEPATH, PROMPT)
             %   generates new images from an original image and prompt
             %
-            %       imagePath        - The path to the source image file. 
-            %                          Must be a valid PNG file, less than 4MB, 
-            %                          and square. If mask is not provided, 
-            %                          image must have transparency, which 
+            %       imagePath        - The path to the source image file.
+            %                          Must be a valid PNG file, less than 4MB,
+            %                          and square. If mask is not provided,
+            %                          image must have transparency, which
             %                          will be used as the mask.
             %
-            %       prompt           - A text description of the desired image(s). 
+            %       prompt           - A text description of the desired image(s).
             %                          The maximum length: 1000 characters
             %
             %   [IMAGES, RESPONSE] = edit(__, Name=Value) specifies
@@ -161,16 +161,16 @@ classdef openAIImages
             %
             %       MaskImagePath    - The path to the image file whose
             %                          fully transparent area indicates
-            %                          where the source image should be edited. 
-            %                          Must be a valid PNG file, less than 4MB, 
+            %                          where the source image should be edited.
+            %                          Must be a valid PNG file, less than 4MB,
             %                          and have the same dimensions as
-            %                          source image. 
-            %       
-            %       NumImages        - Number of images to generate.  
-            %                          Default value is 1. The max is 10. 
+            %                          source image.
             %
-            %       Size             - Size of the generated images. 
-            %                          Must be one of 256x256, 512x512, or 
+            %       NumImages        - Number of images to generate.
+            %                          Default value is 1. The max is 10.
+            %
+            %       Size             - Size of the generated images.
+            %                          Must be one of 256x256, 512x512, or
             %                          1024x1024 (default)
 
             arguments
@@ -184,7 +184,7 @@ classdef openAIImages
                                                             "512x512", ...
                                                             "1024x1024"])} = "1024x1024"
             end
-    
+
             % For now, this is only supported for "dall-e-2"
             if this.ModelName~="dall-e-2"
                 error("llms:functionNotAvailableForModel", ...
@@ -218,22 +218,22 @@ classdef openAIImages
 
         function [images, response] = createVariation(this,imagePath,nvp)
             %createVariation Generate variations from a given image
-            % 
+            %
             %   [IMAGES, RESPONSE] = createVariation(MDL, IMAGEPATH) generates new images
             %   from an original image
             %
-            %       imagePath        - The path to the source image file. 
-            %                          Must be a valid PNG file, less than 4MB, 
+            %       imagePath        - The path to the source image file.
+            %                          Must be a valid PNG file, less than 4MB,
             %                          and square.
             %
             %   [IMAGES, RESPONSE] = createVariation(__, Name=Value) specifies
             %   additional options.
-            %       
-            %       NumImages        - Number of images to generate.  
-            %                          Default value is 1. The max is 10. 
             %
-            %       Size             - Size of the generated images. 
-            %                          Must be one of "256x256", "512x512", or 
+            %       NumImages        - Number of images to generate.
+            %                          Default value is 1. The max is 10.
+            %
+            %       Size             - Size of the generated images.
+            %                          Must be one of "256x256", "512x512", or
             %                          "1024x1024" (default)
 
             arguments
@@ -268,7 +268,7 @@ classdef openAIImages
 
         function response = sendRequest(this, endpoint, body)
         %sendRequest send request to the given endpoint, return response
-            headers =  matlab.net.http.HeaderField('Authorization', "Bearer " + this.ApiKey);
+            headers =  matlab.net.http.HeaderField('Authorization', "Bearer " + this.APIKey);
             if isa(body,'struct')
                 headers(2) =  matlab.net.http.HeaderField('Content-Type', 'application/json');
             end

@@ -340,7 +340,7 @@ messages = addUserMessageWithImages(messages,"What is in the image?",image_path)
 
 ## Establishing a connection to Chat Completions API using Azure
 
-If you would like to connect MATLAB to Chat Completions API via Azure instead of directly with OpenAI, you will have to create an `azureChat` object. See [the Azure documentation](https://learn.microsoft.com/en-us/azure/ai-services/openai/chatgpt-quickstart) for details on the setup required and where to find your key, endpoint, and deployment name. As explained above, the key should be in the environment variable `AZURE_OPENAI_API_KEY`, or provided as `ApiKey=…` in the `azureChat` call below.
+If you would like to connect MATLAB to Chat Completions API via Azure instead of directly with OpenAI, you will have to create an `azureChat` object. See [the Azure documentation](https://learn.microsoft.com/en-us/azure/ai-services/openai/chatgpt-quickstart) for details on the setup required and where to find your key, endpoint, and deployment name. As explained above, the key should be in the environment variable `AZURE_OPENAI_API_KEY`, or provided as `APIKey=…` in the `azureChat` call below.
 
 In order to create the chat assistant, you must specify your Azure OpenAI Resource and the LLM you want to use:
 ```matlab

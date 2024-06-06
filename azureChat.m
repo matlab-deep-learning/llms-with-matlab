@@ -29,7 +29,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & llms.internal.gptPena
 %   ResponseFormat          - The format of response the model returns.
 %                             "text" (default) | "json"
 %
-%   ApiKey                  - The API key for accessing the OpenAI Chat API.
+%   APIKey                  - The API key for accessing the OpenAI Chat API.
 %
 %   PresencePenalty         - Penalty value for using a token in the response
 %                             that has already been used. Default value is 0.
@@ -91,7 +91,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & llms.internal.gptPena
                 nvp.TopProbabilityMass             {llms.utils.mustBeValidTopP} = 1
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}
                 nvp.ResponseFormat           (1,1) string {mustBeMember(nvp.ResponseFormat,["text","json"])} = "text"
-                nvp.ApiKey                         {mustBeNonzeroLengthTextScalar}
+                nvp.APIKey                         {mustBeNonzeroLengthTextScalar}
                 nvp.PresencePenalty                {llms.utils.mustBeValidPenalty} = 0
                 nvp.FrequencyPenalty               {llms.utils.mustBeValidPenalty} = 0
                 nvp.TimeOut                  (1,1) {mustBeReal,mustBePositive} = 10
@@ -129,7 +129,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & llms.internal.gptPena
             this.StopSequences = nvp.StopSequences;
             this.PresencePenalty = nvp.PresencePenalty;
             this.FrequencyPenalty = nvp.FrequencyPenalty;
-            this.ApiKey = llms.internal.getApiKeyFromNvpOrEnv(nvp,"AZURE_OPENAI_API_KEY");
+            this.APIKey = llms.internal.getApiKeyFromNvpOrEnv(nvp,"AZURE_OPENAI_API_KEY");
             this.TimeOut = nvp.TimeOut;
         end
 
@@ -185,7 +185,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & llms.internal.gptPena
                 StopSequences=this.StopSequences, MaxNumTokens=nvp.MaxNumTokens, ...
                 PresencePenalty=this.PresencePenalty, FrequencyPenalty=this.FrequencyPenalty, ...
                 ResponseFormat=this.ResponseFormat,Seed=nvp.Seed, ...
-                ApiKey=this.ApiKey,TimeOut=this.TimeOut, StreamFun=this.StreamFun);
+                APIKey=this.APIKey,TimeOut=this.TimeOut, StreamFun=this.StreamFun);
         end
     end
 

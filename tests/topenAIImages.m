@@ -25,9 +25,9 @@ classdef topenAIImages < matlab.unittest.TestCase
     methods(Test)
         % Test methods
         function generateAcceptsSingleStringAsInput(testCase)
-            mdl = openAIImages(ApiKey="this-is-not-a-real-key");
+            mdl = openAIImages(APIKey="this-is-not-a-real-key");
             testCase.verifyWarningFree(@()generate(mdl,"This is okay"));
-            mdl = openAIImages(ApiKey='this-is-not-a-real-key');
+            mdl = openAIImages(APIKey='this-is-not-a-real-key');
             testCase.verifyWarningFree(@()generate(mdl,'This is okay'));
         end
 
@@ -36,39 +36,39 @@ classdef topenAIImages < matlab.unittest.TestCase
         end
 
         function promptSizeLimit(testCase)
-            mdl = openAIImages(ApiKey="this-is-not-a-real-key", Model="dall-e-2");
+            mdl = openAIImages(APIKey="this-is-not-a-real-key", Model="dall-e-2");
             testCase.verifyError(@()generate(mdl, repmat('c', 1, 1001)), "llms:promptLimitCharacter")
             testCase.verifyError(@()edit(mdl, which("peppers.png"), repmat('c', 1, 1001)), "llms:promptLimitCharacter")
-            mdl = openAIImages(ApiKey="this-is-not-a-real-key", Model="dall-e-3");
+            mdl = openAIImages(APIKey="this-is-not-a-real-key", Model="dall-e-3");
             testCase.verifyError(@()generate(mdl, repmat('c', 1, 4001)), "llms:promptLimitCharacter")
         end
 
 
         function invalidOptionsGenerate(testCase)
-            mdl = openAIImages(ApiKey="this-is-not-a-real-key", Model="dall-e-2");
+            mdl = openAIImages(APIKey="this-is-not-a-real-key", Model="dall-e-2");
             testCase.verifyError(@()generate(mdl, "cat", Quality="hd"), "llms:invalidOptionForModel")
             testCase.verifyError(@()generate(mdl, "cat", Style="natural"), "llms:invalidOptionForModel")
             testCase.verifyError(@()generate(mdl, "cat", Size="1024x1792"), "llms:invalidOptionAndValueForModel")
-            mdl = openAIImages(ApiKey="this-is-not-a-real-key", Model="dall-e-3");
+            mdl = openAIImages(APIKey="this-is-not-a-real-key", Model="dall-e-3");
             testCase.verifyError(@()generate(mdl, "cat", Size="256x256"), "llms:invalidOptionAndValueForModel")
             testCase.verifyError(@()generate(mdl, "cat", NumImages=4), "llms:invalidOptionAndValueForModel")
         end
 
         function invalidModelEdit(testCase)
             validImage = string(which("peppers.png"));
-            mdl = openAIImages(ApiKey="this-is-not-a-real-key", Model="dall-e-3");
+            mdl = openAIImages(APIKey="this-is-not-a-real-key", Model="dall-e-3");
             testCase.verifyError(@()edit(mdl, validImage, "cat"), "llms:functionNotAvailableForModel")
         end
 
         function invalidModelVariation(testCase)
             validImage = string(which("peppers.png"));
-            mdl = openAIImages(ApiKey="this-is-not-a-real-key", Model="dall-e-3");
+            mdl = openAIImages(APIKey="this-is-not-a-real-key", Model="dall-e-3");
             testCase.verifyError(@()createVariation(mdl, validImage), ...
                 "llms:functionNotAvailableForModel")
         end
 
         function generateWithAllNVP(testCase)
-            mdl = openAIImages(ApiKey="this-is-not-a-real-key", Model="dall-e-3");
+            mdl = openAIImages(APIKey="this-is-not-a-real-key", Model="dall-e-3");
             testCase.verifyWarningFree(@()generate(mdl, ...
                 "prompt", ...
                 Quality="hd", ...
@@ -79,7 +79,7 @@ classdef topenAIImages < matlab.unittest.TestCase
 
         function editWithAllNVP(testCase)
             validImage = string(which("peppers.png"));
-            mdl = openAIImages(ApiKey="this-is-not-a-real-key", Model="dall-e-2");
+            mdl = openAIImages(APIKey="this-is-not-a-real-key", Model="dall-e-2");
             testCase.verifyWarningFree(@()edit(mdl, ...
                 validImage,...
                 "prompt", ...
@@ -90,7 +90,7 @@ classdef topenAIImages < matlab.unittest.TestCase
 
         function variationWithAllNVP(testCase)
             validImage = string(which("peppers.png"));
-            mdl = openAIImages(ApiKey="this-is-not-a-real-key", Model="dall-e-2");
+            mdl = openAIImages(APIKey="this-is-not-a-real-key", Model="dall-e-2");
             testCase.verifyWarningFree(@()createVariation(mdl, ...
                 validImage,...
                 Size="512x512",...
@@ -101,12 +101,12 @@ classdef topenAIImages < matlab.unittest.TestCase
             modelName = "dall-e-2";
             apiKey = "this-is-not-a-real-key";
             timeout = 3;
-            mdl = openAIImages(ModelName=modelName, ApiKey=apiKey, TimeOut=timeout);
+            mdl = openAIImages(ModelName=modelName, APIKey=apiKey, TimeOut=timeout);
             testCase.verifyEqual(mdl.ModelName, modelName);
         end
 
         function fakePNGImage(testCase)
-            mdl = openAIImages(ApiKey="this-is-not-a-real-key");
+            mdl = openAIImages(APIKey="this-is-not-a-real-key");
             fakePng = fullfile("test_files", "solar.png");
             testCase.verifyError(@()edit(mdl,fakePng, "bla"), "llms:pngExpected");
         end
@@ -116,22 +116,22 @@ classdef topenAIImages < matlab.unittest.TestCase
         end
 
         function invalidInputsGenerate(testCase, InvalidGenerateInput)
-            mdl = openAIImages(ApiKey="this-is-not-a-real-key");
+            mdl = openAIImages(APIKey="this-is-not-a-real-key");
             testCase.verifyError(@()generate(mdl,InvalidGenerateInput.Input{:}), InvalidGenerateInput.Error);
         end
 
         function invalidInputsEdit(testCase, InvalidEditInput)
-            mdl = openAIImages(ApiKey="this-is-not-a-real-key");
+            mdl = openAIImages(APIKey="this-is-not-a-real-key");
             testCase.verifyError(@()edit(mdl,InvalidEditInput.Input{:}), InvalidEditInput.Error);
         end
 
         function invalidInputsVariation(testCase, InvalidVariationInput)
-            mdl = openAIImages(ApiKey="this-is-not-a-real-key");
+            mdl = openAIImages(APIKey="this-is-not-a-real-key");
             testCase.verifyError(@()createVariation(mdl,InvalidVariationInput.Input{:}), InvalidVariationInput.Error);
         end
 
         function testThatImageIsReturned(testCase)
-            mdl = openAIImages(ApiKey=getenv("OPENAI_KEY"));
+            mdl = openAIImages(APIKey=getenv("OPENAI_KEY"));
 
             [images, response] = generate(mdl, ...
                 "Create a 3D avatar of a whimsical sushi on the beach. " + ...
@@ -163,11 +163,11 @@ invalidConstructorInput = struct( ...
         "Error","MATLAB:validators:mustBeMember"),...
     ...
     "InvalidApiKeyType",struct( ...
-        "Input",{{ "ApiKey" 123 }},...
+        "Input",{{ "APIKey" 123 }},...
         "Error","MATLAB:validators:mustBeNonzeroLengthText"),...
     ...
     "InvalidApiKeySize",struct( ...
-        "Input",{{ "ApiKey" ["abc" "abc"] }},...
+        "Input",{{ "APIKey" ["abc" "abc"] }},...
         "Error","MATLAB:validators:mustBeTextScalar"));
 end
 

@@ -4,7 +4,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & llms.internal.gptPen
 %   CHAT = openAIChat(systemPrompt) creates an openAIChat object with the
 %   specified system prompt.
 %
-%   CHAT = openAIChat(systemPrompt,ApiKey=key) uses the specified API key
+%   CHAT = openAIChat(systemPrompt,APIKey=key) uses the specified API key
 %
 %   CHAT = openAIChat(systemPrompt,Name=Value) specifies additional options
 %   using one or more name-value arguments:
@@ -68,14 +68,14 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & llms.internal.gptPen
 
 % Copyright 2023-2024 The MathWorks, Inc.
 
-    properties(SetAccess=private) 
+    properties(SetAccess=private)
         %MODELNAME   Model name.
         ModelName
     end
 
 
     methods
-        function this = openAIChat(systemPrompt, nvp)           
+        function this = openAIChat(systemPrompt, nvp)
             arguments
                 systemPrompt                       {llms.utils.mustBeTextOrEmpty} = []
                 nvp.Tools                    (1,:) {mustBeA(nvp.Tools, "openAIFunction")} = openAIFunction.empty
@@ -84,7 +84,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & llms.internal.gptPen
                 nvp.TopProbabilityMass             {llms.utils.mustBeValidTopP} = 1
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}
                 nvp.ResponseFormat           (1,1) string {mustBeMember(nvp.ResponseFormat,["text","json"])} = "text"
-                nvp.ApiKey                         {mustBeNonzeroLengthTextScalar} 
+                nvp.APIKey                         {mustBeNonzeroLengthTextScalar}
                 nvp.PresencePenalty                {llms.utils.mustBeValidPenalty} = 0
                 nvp.FrequencyPenalty               {llms.utils.mustBeValidPenalty} = 0
                 nvp.TimeOut                  (1,1) {mustBeReal,mustBePositive} = 10
@@ -105,7 +105,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & llms.internal.gptPen
                 this.Tools = nvp.Tools;
                 [this.FunctionsStruct, this.FunctionNames] = functionAsStruct(nvp.Tools);
             end
-            
+
             if ~isempty(systemPrompt)
                 systemPrompt = string(systemPrompt);
                 if systemPrompt ~= ""
@@ -124,7 +124,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & llms.internal.gptPen
 
             this.PresencePenalty = nvp.PresencePenalty;
             this.FrequencyPenalty = nvp.FrequencyPenalty;
-            this.ApiKey = llms.internal.getApiKeyFromNvpOrEnv(nvp,"OPENAI_API_KEY");
+            this.APIKey = llms.internal.getApiKeyFromNvpOrEnv(nvp,"OPENAI_API_KEY");
             this.TimeOut = nvp.TimeOut;
         end
 
@@ -143,13 +143,13 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & llms.internal.gptPen
             %       MaxNumTokens     - Maximum number of tokens in the generated response.
             %                          Default value is inf.
             %
-            %       ToolChoice       - Function to execute. 'none', 'auto', 
+            %       ToolChoice       - Function to execute. 'none', 'auto',
             %                          or specify the function to call.
             %
             %       Seed             - An integer value to use to obtain
             %                          reproducible responses
-            %                           
-            % Currently, GPT-4 Turbo with vision does not support the message.name 
+            %
+            % Currently, GPT-4 Turbo with vision does not support the message.name
             % parameter, functions/tools, response_format parameter, and stop
             % sequences. It also has a low MaxNumTokens default, which can be overridden.
 
@@ -165,7 +165,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & llms.internal.gptPen
             toolChoice = convertToolChoice(this, nvp.ToolChoice);
 
             if isstring(messages) && isscalar(messages)
-                messagesStruct = {struct("role", "user", "content", messages)};               
+                messagesStruct = {struct("role", "user", "content", messages)};
             else
                 messagesStruct = messages.Messages;
             end
@@ -175,14 +175,14 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & llms.internal.gptPen
             if ~isempty(this.SystemPrompt)
                 messagesStruct = horzcat(this.SystemPrompt, messagesStruct);
             end
-            
+
             [text, message, response] = llms.internal.callOpenAIChatAPI(messagesStruct, this.FunctionsStruct,...
                 ModelName=this.ModelName, ToolChoice=toolChoice, Temperature=this.Temperature, ...
                 TopProbabilityMass=this.TopProbabilityMass, NumCompletions=nvp.NumCompletions,...
                 StopSequences=this.StopSequences, MaxNumTokens=nvp.MaxNumTokens, ...
                 PresencePenalty=this.PresencePenalty, FrequencyPenalty=this.FrequencyPenalty, ...
                 ResponseFormat=this.ResponseFormat,Seed=nvp.Seed, ...
-                ApiKey=this.ApiKey,TimeOut=this.TimeOut, StreamFun=this.StreamFun);
+                APIKey=this.APIKey,TimeOut=this.TimeOut, StreamFun=this.StreamFun);
 
             if isfield(response.Body.Data,"error")
                 err = response.Body.Data.error.message;
@@ -208,7 +208,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & llms.internal.gptPen
             % if toolChoice is empty
             if isempty(toolChoice)
                 % if Tools is not empty, the default is 'auto'.
-                if ~isempty(this.Tools) 
+                if ~isempty(this.Tools)
                     toolChoice = "auto";
                 end
             elseif ~ismember(toolChoice,["auto","none"])
@@ -240,11 +240,11 @@ end
 
 function mustBeValidMsgs(value)
 if isa(value, "openAIMessages")
-    if numel(value.Messages) == 0 
+    if numel(value.Messages) == 0
         error("llms:mustHaveMessages", llms.utils.errorMessageCatalog.getMessage("llms:mustHaveMessages"));
     end
 else
-    try 
+    try
         llms.utils.mustBeNonzeroLengthTextScalar(value);
     catch ME
         error("llms:mustBeMessagesOrTxt", llms.utils.errorMessageCatalog.getMessage("llms:mustBeMessagesOrTxt"));
