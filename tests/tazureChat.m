@@ -77,12 +77,6 @@ classdef tazureChat < matlab.unittest.TestCase
             testCase.verifyGreaterThan(numel(sf("")), 1);
         end
 
-        %% Test is currently unreliable, reasons unclear
-        % function verySmallTimeOutErrors(testCase)
-        %     chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"), TimeOut=1e-10, ApiKey="false-key");
-        %     testCase.verifyError(@()generate(chat, "hi"), "MATLAB:webservices:Timeout")
-        % end
-
         function errorsWhenPassingToolChoiceWithEmptyTools(testCase)
             chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"), ApiKey="this-is-not-a-real-key");
             testCase.verifyError(@()generate(chat,"input", ToolChoice="bla"), "llms:mustSetFunctionsForCall");
