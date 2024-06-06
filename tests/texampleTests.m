@@ -60,6 +60,10 @@ classdef texampleTests < matlab.unittest.TestCase
         function testUsingDALLEToEditImages(~)
             UsingDALLEToEditImages;
         end
+
+        function testAnalyzeSentimentinTextUsingChatGPTinJSONMode(~)
+            AnalyzeSentimentinTextUsingChatGPTinJSONMode;
+        end
     end
     
 end
