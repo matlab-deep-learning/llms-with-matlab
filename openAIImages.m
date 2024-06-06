@@ -298,7 +298,7 @@ if response.StatusCode=="OK" &&  isfield(response.Body.Data.data,"url")
     % Output the images
     if isfield(response.Body.Data.data,"url")
         urls = arrayfun(@(x) string(x.url), response.Body.Data.data);
-        images = arrayfun(@imread,urls,UniformOutput=false);
+        images = arrayfun(@myImread,urls,UniformOutput=false);
     else
         images = [];
     end
@@ -357,4 +357,14 @@ end
 function mustBeNonzeroLengthTextScalar(content)
 mustBeNonzeroLengthText(content)
 mustBeTextScalar(content)
+end
+
+function data = myImread(URI)
+    % imread usually, but not always, fails to read from the
+    % https://oaidalleapiprodscus.blob.core.windows.net URLs returned by
+    % DALL•E. Use websave instead.
+    filename = tempname + ".png";
+    clean = onCleanup(@() delete(filename));
+    websave(filename,URI);
+    data = imread(filename);
 end
