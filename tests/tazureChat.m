@@ -48,7 +48,7 @@ classdef tazureChat < matlab.unittest.TestCase
             testCase.verifyEqual(response1,response2);
         end
 
-        function createOpenAIChatWithStreamFunc(testCase)
+        function createAzureChatWithStreamFunc(testCase)
             testCase.assumeTrue(isenv("AZURE_OPENAI_API_KEY"),"end-to-end test requires environment variables AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT.");
             function seen = sf(str)
                 persistent data;
@@ -67,6 +67,27 @@ classdef tazureChat < matlab.unittest.TestCase
             % memory, is greater than 1. This would mean that the stream
             % function has been called and streamed some text.
             testCase.verifyGreaterThan(numel(sf("")), 1);
+        end
+
+        function generateWithTools(testCase)
+            import matlab.unittest.constraints.HasField
+
+            f = openAIFunction("getCurrentWeather", "Get the current weather in a given location");
+            f = addParameter(f, "location", type="string", description="The city and country, optionally state. E.g., San Francisco, CA, USA");
+            f = addParameter(f, "unit", type="string", enum=["Kelvin","Celsius"], RequiredParameter=false);
+
+            chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"), ...
+                Tools=f);
+
+            prompt =  "What's the weather like in San Francisco, Tokyo, and Paris?";
+            [~, response] = generate(chat, prompt, ToolChoice="getCurrentWeather");
+
+            testCase.assertThat(response, HasField("tool_calls"));
+            testCase.assertEqual(response.tool_calls.type,'function');
+            testCase.assertEqual(response.tool_calls.function.name,'getCurrentWeather');
+            data = testCase.verifyWarningFree( ...
+                @() jsondecode(response.tool_calls.function.arguments));
+            testCase.verifyThat(data,HasField("location"));
         end
 
         function errorsWhenPassingToolChoiceWithEmptyTools(testCase)

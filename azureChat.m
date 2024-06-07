@@ -14,7 +14,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & llms.internal.gptPena
 %                             This parameter requires API version 2023-12-01-preview.
 %
 %   API Version             - A list of API versions to use for this operation.
-%                             Default value is 2023-05-15.
+%                             Default value is 2024-02-01.
 %
 %   Temperature             - Temperature value for controlling the randomness
 %                             of the output. Default value is 1.
@@ -207,7 +207,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & llms.internal.gptPena
                 if ~isempty(this.Tools)
                     toolChoice = "auto";
                 end
-            elseif ToolChoice ~= "auto"
+            elseif toolChoice ~= "auto"
                 % if toolChoice is not empty, then it must be in the format
                 % {"type": "function", "function": {"name": "my_function"}}
                 toolChoice = struct("type","function","function",struct("name",toolChoice));
