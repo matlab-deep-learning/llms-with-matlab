@@ -88,7 +88,7 @@ classdef topenAIChat < matlab.unittest.TestCase
             testCase.verifyError(@()openAIChat(InvalidConstructorInput.Input{:}), InvalidConstructorInput.Error);
         end
 
-        function generateWithTools(testCase)
+        function generateWithToolsAndStreamFunc(testCase)
             import matlab.unittest.constraints.HasField
 
             f = openAIFunction("writePaperDetails", "Function to write paper details to a table.");
@@ -96,7 +96,9 @@ classdef topenAIChat < matlab.unittest.TestCase
             f = addParameter(f, "url", type="string", description="URL containing the paper.");
             f = addParameter(f, "explanation", type="string", description="Explanation on why the paper is related to the given topic.");
 
-            paperExtractor = openAIChat("You are an expert in extracting information from a paper.", APIKey=getenv("OPENAI_KEY"), Tools=f);
+            paperExtractor = openAIChat( ...
+                "You are an expert in extracting information from a paper.", ...
+                APIKey=getenv("OPENAI_KEY"), Tools=f, StreamFun=@(s) s);
 
             input = join([
             "    <id>http://arxiv.org/abs/2406.04344v1</id>"
