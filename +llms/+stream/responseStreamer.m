@@ -25,11 +25,16 @@ classdef responseStreamer < matlab.net.http.io.BinaryConsumer
             end
         end
     end
-    
+
     methods
         function [len,stop] = putData(this, data)
             [len,stop] = this.putData@matlab.net.http.io.BinaryConsumer(data);
-            
+            stop = doPutData(this, data, stop);
+        end
+    end
+
+    methods (Access=?tresponseStreamer)
+        function stop = doPutData(this, data, stop)
             % Extract out the response text from the message
             str = native2unicode(data','UTF-8');
             str = this.Incomplete + string(str);
@@ -88,8 +93,13 @@ classdef responseStreamer < matlab.net.http.io.BinaryConsumer
                         end
                     else
                         txt = json.message.content;
-                        this.StreamFun(txt);
-                        this.ResponseText = [this.ResponseText txt];
+                        if strlength(txt) > 0
+                            this.StreamFun(txt);
+                            this.ResponseText = [this.ResponseText txt];
+                        end
+                        if isfield(json,"done")
+                            stop = json.done;
+                        end
                     end
                 end
             end
