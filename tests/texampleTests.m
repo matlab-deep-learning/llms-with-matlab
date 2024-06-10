@@ -65,6 +65,47 @@ classdef texampleTests < matlab.unittest.TestCase
             testCase.verifyWarning(@AnalyzeSentimentinTextUsingChatGPTinJSONMode,...
                 "llms:warningJsonInstruction");
         end
+
+        function testCreateSimpleChatBot(testCase)
+            % set up a fake input command, returning canned user prompts
+            count = 0;
+            prompts = [
+                "Hello, how much do you know about physics?"
+                "What is torque?"
+                "What is force?"
+                "What is motion?"
+                "What is time?"
+                "end"
+                "end"
+                "end"
+            ];
+            function res = input_(varargin)
+                count = count + 1;
+                res = prompts(count);
+            end
+            input = @input_; %#ok<NASGU>
+
+            % to avoid errors about a static workspace, let MATLAB know we
+            % want these variables to exist
+            wordLimit = []; %#ok<NASGU>
+            stopWord = []; %#ok<NASGU>
+            modelName = []; %#ok<NASGU>
+            chat = []; %#ok<NASGU>
+            messages = [];
+            totalWords = []; %#ok<NASGU>
+            messagesSizes = []; %#ok<NASGU>
+            query = []; %#ok<NASGU>
+            numWordsQuery = []; %#ok<NASGU>
+            text = []; %#ok<NASGU>
+            response = []; %#ok<NASGU>
+            numWordsResponse = []; %#ok<NASGU>
+
+            % Run the example
+            CreateSimpleChatBot;
+
+            testCase.verifyEqual(count,find(prompts=="end",1));
+            testCase.verifySize(messages.Messages,[1 2*(count-1)]);
+        end
     end
     
 end
