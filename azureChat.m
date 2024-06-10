@@ -186,6 +186,11 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & llms.internal.gptPena
                 PresencePenalty=this.PresencePenalty, FrequencyPenalty=this.FrequencyPenalty, ...
                 ResponseFormat=this.ResponseFormat,Seed=nvp.Seed, ...
                 APIKey=this.APIKey,TimeOut=this.TimeOut, StreamFun=this.StreamFun);
+
+            if isfield(response.Body.Data,"error")
+                err = response.Body.Data.error.message;
+                error("llms:apiReturnedError",llms.utils.errorMessageCatalog.getMessage("llms:apiReturnedError",err));
+            end
         end
     end
 

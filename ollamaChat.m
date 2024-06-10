@@ -149,6 +149,11 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
                 StopSequences=this.StopSequences, MaxNumTokens=nvp.MaxNumTokens, ...
                 ResponseFormat=this.ResponseFormat,Seed=nvp.Seed, ...
                 TimeOut=this.TimeOut, StreamFun=this.StreamFun);
+
+            if isfield(response.Body.Data,"error")
+                err = response.Body.Data.error;
+                error("llms:apiReturnedError",llms.utils.errorMessageCatalog.getMessage("llms:apiReturnedError",err));
+            end
         end
     end
 

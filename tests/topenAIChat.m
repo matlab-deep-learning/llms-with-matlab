@@ -13,14 +13,12 @@ classdef topenAIChat < matlab.unittest.TestCase
     methods(Test)
         % Test methods
         function generateAcceptsSingleStringAsInput(testCase)
-            chat = openAIChat(APIKey="this-is-not-a-real-key");
-            testCase.verifyWarningFree(@()generate(chat,"This is okay"));
-            chat = openAIChat(APIKey='this-is-not-a-real-key');
+            chat = openAIChat;
             testCase.verifyWarningFree(@()generate(chat,"This is okay"));
         end
 
         function generateAcceptsMessagesAsInput(testCase)
-            chat = openAIChat(APIKey="this-is-not-a-real-key");
+            chat = openAIChat;
             messages = openAIMessages;
             messages = addUserMessage(messages, "This should be okay.");
 
@@ -73,15 +71,17 @@ classdef topenAIChat < matlab.unittest.TestCase
 
         function settingToolChoiceWithNone(testCase)
             functions = openAIFunction("funName");
-            chat = openAIChat(APIKey="this-is-not-a-real-key",Tools=functions);
+            chat = openAIChat(Tools=functions);
 
             testCase.verifyWarningFree(@()generate(chat,"This is okay","ToolChoice","none"));
         end
 
-        function settingSeedToInteger(testCase)
-            chat = openAIChat(APIKey="this-is-not-a-real-key");
+        function fixedSeedFixesResult(testCase)
+            chat = openAIChat;
 
-            testCase.verifyWarningFree(@()generate(chat,"This is okay", "Seed", 2));
+            result1 = generate(chat,"This is okay", "Seed", 2);
+            result2 = generate(chat,"This is okay", "Seed", 2);
+            testCase.verifyEqual(result1,result2);
         end
 
         function invalidInputsConstructor(testCase, InvalidConstructorInput)
@@ -189,10 +189,12 @@ classdef topenAIChat < matlab.unittest.TestCase
             testCase.verifyError(@()generate(chat,inValidMessages), "llms:invalidContentTypeForModel")
         end
 
-        function noStopSequencesNoMaxNumTokens(testCase)
-            chat = openAIChat(APIKey="this-is-not-a-real-key");
-
-            testCase.verifyWarningFree(@()generate(chat,"This is okay"));
+        function doReturnErrors(testCase)
+            chat = openAIChat;
+            % This input is considerably longer than accepted as input for
+            % GPT-3.5 (16385 tokens)
+            wayTooLong = string(repmat('a ',1,20000));
+            testCase.verifyError(@() generate(chat,wayTooLong), "llms:apiReturnedError");
         end
 
         function createOpenAIChatWithStreamFunc(testCase)

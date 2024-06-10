@@ -87,6 +87,15 @@ classdef tollamaChat < matlab.unittest.TestCase
             testCase.verifyGreaterThan(numel(sf("")), 1);
         end
 
+        function doReturnErrors(testCase)
+            testCase.assumeFalse( ...
+                any(startsWith(ollamaChat.models,"abcdefghijklmnop")), ...
+                "We want a model name that does not exist on this server");
+            chat = ollamaChat("abcdefghijklmnop");
+            testCase.verifyError(@() generate(chat,"hi!"), "llms:apiReturnedError");
+        end
+
+
         function invalidInputsConstructor(testCase, InvalidConstructorInput)
             testCase.verifyError(@() ollamaChat("mistral", InvalidConstructorInput.Input{:}), InvalidConstructorInput.Error);
         end

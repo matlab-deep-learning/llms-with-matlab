@@ -186,10 +186,8 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & llms.internal.gptPen
 
             if isfield(response.Body.Data,"error")
                 err = response.Body.Data.error.message;
-                text = llms.utils.errorMessageCatalog.getMessage("llms:apiReturnedError",err);
-                message = struct("role","assistant","content",text);
+                error("llms:apiReturnedError",llms.utils.errorMessageCatalog.getMessage("llms:apiReturnedError",err));
             end
-
         end
     end
 

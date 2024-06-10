@@ -55,6 +55,6 @@ catalog("llms:promptLimitCharacter") = "Prompt must have a maximum length of {1}
 catalog("llms:pngExpected") = "Argument must be a PNG image.";
 catalog("llms:warningJsonInstruction") = "When using JSON mode, you must also prompt the model to produce JSON yourself via a system or user message.";
 catalog("llms:invalidOptionsForAzureBackEnd") = "The parameter Model Name is not compatible with Azure.";
-catalog("llms:apiReturnedError") = "OpenAI API Error: {1}";
+catalog("llms:apiReturnedError") = "Server error: ""{1}""";
 catalog("llms:dimensionsMustBeSmallerThan") = "Dimensions must be less than or equal to {1}.";
 end
