@@ -12,41 +12,53 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
 %   Temperature             - Temperature value for controlling the randomness
 %                             of the output. Default value depends on the model;
 %                             if not specified in the model, defaults to 0.8.
+%                             Higher values increase the randomness (in some
+%                             sense, the “creativity”) of outputs, lower
+%                             values reduce it. Setting Temperature=0 removes
+%                             randomness from the output altogether.
 %
 %   TopProbabilityMass      - Top probability mass value for controlling the
-%                             diversity of the output. Default value is 1; with
-%                             smaller value TopProbabilityMass=p, only the most
-%                             probable tokens up to a cumulative probability p
-%                             are used.
+%                             diversity of the output. Default value is 1;
+%                             lower values imply that only the more likely
+%                             words can appear in any particular place.
+%                             This is also known as top-p sampling.
 %
 %   TopProbabilityNum       - Maximum number of most likely tokens that are
 %                             considered for output. Default is Inf, allowing
 %                             all tokens. Smaller values reduce diversity in
 %                             the output.
 %
+%   TailFreeSamplingZ       - Reduce the use of less probable tokens, based on
+%                             the second-order differences of ordered
+%                             probabilities. Default value is 1, disabling
+%                             tail-free sampling. Lower values reduce
+%                             diversity, with some authors recommending
+%                             values around 0.95. Tail-free sampling is
+%                             slower than using TopProbabilityMass or
+%                             TopProbabilityNum.
+%
 %   StopSequences           - Vector of strings that when encountered, will
 %                             stop the generation of tokens. Default
 %                             value is empty.
+%                             Example: ["The end.", "And that's all she wrote."]
+%
 %
 %   ResponseFormat          - The format of response the model returns.
 %                             "text" (default) | "json"
 %
-%   TailFreeSamplingZ       - Reduce the use of less probable tokens, based on
-%                             the second-order differences of ordered probabilities.
-%
 %   StreamFun               - Function to callback when streaming the
-%                             result
+%                             result.
 %
-%   TimeOut                 - Connection Timeout in seconds (default: 120 secs)
+%   TimeOut                 - Connection Timeout in seconds. Default is 120.
 %
 %
 %
 %   ollamaChat Functions:
-%       ollamaChat            - Chat completion API from OpenAI.
+%       ollamaChat           - Chat completion API from OpenAI.
 %       generate             - Generate a response using the ollamaChat instance.
 %
 %   ollamaChat Properties, in addition to the name-value pairs above:
-%       Model                - Model name (as expected by Ollama server)
+%       Model                - Model name (as expected by Ollama server).
 %
 %       SystemPrompt         - System prompt.
 

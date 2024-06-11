@@ -9,27 +9,39 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & llms.internal.gptPen
 %   CHAT = openAIChat(systemPrompt,Name=Value) specifies additional options
 %   using one or more name-value arguments:
 %
-%   Tools                   - Array of openAIFunction objects representing
-%                             custom functions to be used during chat completions.
-%
 %   ModelName               - Name of the model to use for chat completions.
 %                             The default value is "gpt-3.5-turbo".
 %
 %   Temperature             - Temperature value for controlling the randomness
-%                             of the output. Default value is 1.
+%                             of the output. Default value is 1; higher values
+%                             increase the randomness (in some sense,
+%                             the “creativity”) of outputs, lower values
+%                             reduce it. Setting Temperature=0 removes
+%                             randomness from the output altogether.
 %
 %   TopProbabilityMass      - Top probability mass value for controlling the
-%                             diversity of the output. Default value is 1.
+%                             diversity of the output. Default value is 1;
+%                             lower values imply that only the more likely
+%                             words can appear in any particular place.
+%                             This is also known as top-p sampling.
+%
+%   Tools                   - Array of openAIFunction objects representing
+%                             custom functions to be used during chat completions.
 %
 %   StopSequences           - Vector of strings that when encountered, will
 %                             stop the generation of tokens. Default
 %                             value is empty.
+%                             Example: ["The end.", "And that's all she wrote."]
 %
 %   PresencePenalty         - Penalty value for using a token in the response
 %                             that has already been used. Default value is 0.
+%                             Higher values reduce repetition of words in the output.
 %
 %   FrequencyPenalty        - Penalty value for using a token that is frequent
-%                             in the training data. Default value is 0.
+%                             in the output. Default value is 0.
+%                             Higher values reduce repetition of words in the output.
+%
+%   TimeOut                 - Connection Timeout in seconds. Default value is 10.
 %
 %   StreamFun               - Function to callback when streaming the
 %                             result
@@ -61,9 +73,9 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & llms.internal.gptPen
 %       FunctionNames        - Names of the functions that the model can
 %                              request calls.
 %
-%       ResponseFormat       - Specifies the response format, text or json
+%       ResponseFormat       - Specifies the response format, "text" or "json".
 %
-%       TimeOut              - Connection Timeout in seconds (default: 10 secs)
+%       TimeOut              - Connection Timeout in seconds.
 %
 
 % Copyright 2023-2024 The MathWorks, Inc.
