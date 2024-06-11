@@ -104,6 +104,19 @@ classdef tazureChat < matlab.unittest.TestCase
             testCase.verifyError(@()generate(chat,"input", ToolChoice="bla"), "llms:mustSetFunctionsForCall");
         end
 
+        function shortErrorForBadEndpoint(testCase)
+            chat = azureChat("https://nobodyhere.whatever/","deployment");
+            caught = false;
+            try
+                generate(chat,"input");
+            catch ME
+                caught = ME;
+            end
+            testCase.assertClass(caught,"MException");
+            testCase.verifyEqual(caught.identifier,'MATLAB:webservices:UnknownHost');
+            testCase.verifyEmpty(caught.cause);
+        end
+
         function invalidInputsConstructor(testCase, InvalidConstructorInput)
             testCase.verifyError(@()azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"), InvalidConstructorInput.Input{:}), InvalidConstructorInput.Error);
         end
