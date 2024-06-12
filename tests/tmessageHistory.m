@@ -1,5 +1,5 @@
-classdef topenAIMessages < matlab.unittest.TestCase
-% Tests for openAIMessages
+classdef tmessageHistory < matlab.unittest.TestCase
+% Tests for messageHistory
 
 %   Copyright 2023-2024 The MathWorks, Inc.
 
@@ -9,30 +9,29 @@ classdef topenAIMessages < matlab.unittest.TestCase
         InvalidInputsFunctionPrompt = iGetInvalidFunctionPrompt();
         InvalidInputsSystemPrompt = iGetInvalidInputsSystemPrompt();
         InvalidInputsResponseMessage = iGetInvalidInputsResponseMessage();
-        InvalidRemoveMessage = iGetInvalidRemoveMessage();  
+        InvalidRemoveMessage = iGetInvalidRemoveMessage();
         InvalidFuncCallsCases = iGetInvalidFuncCallsCases()
         ValidTextInput = {"This is okay"; 'this is ok'};
     end
 
     methods(Test)
         function constructorStartsWithEmptyMessages(testCase)
-            msgs = openAIMessages;
+            msgs = messageHistory;
             testCase.verifyTrue(isempty(msgs.Messages));
         end
 
         function differentInputTextAccepted(testCase, ValidTextInput)
-            msgs = openAIMessages;
+            msgs = messageHistory;
             testCase.verifyWarningFree(@()addSystemMessage(msgs, ValidTextInput, ValidTextInput));
             testCase.verifyWarningFree(@()addSystemMessage(msgs, ValidTextInput, ValidTextInput));
             testCase.verifyWarningFree(@()addUserMessage(msgs, ValidTextInput));
             testCase.verifyWarningFree(@()addToolMessage(msgs, ValidTextInput, ValidTextInput, ValidTextInput));
         end
-        
 
         function systemMessageIsAdded(testCase)
             prompt = "Here is a system prompt";
             name = "example";
-            msgs = openAIMessages;
+            msgs = messageHistory;
             systemPrompt = struct("role", "system", "name", name, "content", prompt);
             msgs = addSystemMessage(msgs, name, prompt);
             testCase.verifyEqual(msgs.Messages{1}, systemPrompt);
@@ -40,7 +39,7 @@ classdef topenAIMessages < matlab.unittest.TestCase
 
         function userMessageIsAdded(testCase)
             prompt = "Here is a user prompt";
-            msgs = openAIMessages;
+            msgs = messageHistory;
             userPrompt = struct("role", "user", "content", prompt);
             msgs = addUserMessage(msgs, prompt);
             testCase.verifyEqual(msgs.Messages{1}, userPrompt);
@@ -48,14 +47,14 @@ classdef topenAIMessages < matlab.unittest.TestCase
 
         function userImageMessageIsAddedWithLocalImg(testCase)
             prompt = "Here is a user prompt";
-            msgs = openAIMessages;
+            msgs = messageHistory;
             img = "peppers.png";
             testCase.verifyWarningFree(@()addUserMessageWithImages(msgs, prompt, img));
         end
 
         function userImageMessageIsAddedWithRemoteImg(testCase)
             prompt = "Here is a user prompt";
-            msgs = openAIMessages;
+            msgs = messageHistory;
             img = "https://www.mathworks.com/help/examples/matlab/win64/DisplayGrayscaleRGBIndexedOrBinaryImageExample_04.png";
             testCase.verifyWarningFree(@()addUserMessageWithImages(msgs, prompt, img));
         end
@@ -64,7 +63,7 @@ classdef topenAIMessages < matlab.unittest.TestCase
             prompt = "20";
             name = "sin";
             id = "123";
-            msgs = openAIMessages;
+            msgs = messageHistory;
             systemPrompt = struct("tool_call_id", id, "role", "tool", "name", name, "content", prompt);
             msgs = addToolMessage(msgs, id, name, prompt);
             testCase.verifyEqual(msgs.Messages{1}, systemPrompt);
@@ -72,14 +71,14 @@ classdef topenAIMessages < matlab.unittest.TestCase
 
         function assistantMessageIsAdded(testCase)
             prompt = "Here is an assistant prompt";
-            msgs = openAIMessages;
+            msgs = messageHistory;
             assistantPrompt = struct("role", "assistant", "content", prompt);
             msgs = addResponseMessage(msgs, assistantPrompt);
             testCase.verifyEqual(msgs.Messages{1}, assistantPrompt);
         end
 
         function assistantToolCallMessageIsAdded(testCase)
-            msgs = openAIMessages;
+            msgs = messageHistory;
             functionName = "functionName";
             args = "{""arg1"": 1, ""arg2"": 2, ""arg3"": ""3""}";
             funCall = struct("name", functionName, "arguments", args);
@@ -94,7 +93,7 @@ classdef topenAIMessages < matlab.unittest.TestCase
         end
 
         function errorsAssistantWithWithoutToolCallId(testCase)
-            msgs = openAIMessages;
+            msgs = messageHistory;
             functionName = "functionName";
             args = "{""arg1"": 1, ""arg2"": 2, ""arg3"": ""3""}";
             funCall = struct("name", functionName, "arguments", args);
@@ -107,7 +106,7 @@ classdef topenAIMessages < matlab.unittest.TestCase
         end
 
         function errorsAssistantWithToolCallsWithoutNameOrArgs(testCase, InvalidFuncCallsCases)
-            msgs = openAIMessages;
+            msgs = messageHistory;
             funCall = InvalidFuncCallsCases.FunCallStruct;
             toolCall = struct("id", "123", "type", "function", "function", funCall);
             toolCallPrompt = struct("role", "assistant", "content", "", "tool_calls", []);
@@ -118,7 +117,7 @@ classdef topenAIMessages < matlab.unittest.TestCase
         end
 
         function errorsAssistantWithWithNonTextNameAndArguments(testCase)
-            msgs = openAIMessages;
+            msgs = messageHistory;
             funCall = struct("name", 1, "arguments", 2);
             toolCall = struct("id", "123", "type", "function", "function", funCall);
             toolCallPrompt = struct("role", "assistant", "content", "", "tool_calls", []);
@@ -129,7 +128,7 @@ classdef topenAIMessages < matlab.unittest.TestCase
         end
 
         function assistantToolCallMessageWithoutArgsIsAdded(testCase)
-            msgs = openAIMessages;
+            msgs = messageHistory;
             functionName = "functionName";
             funCall = struct("name", functionName, "arguments", "{}");
             toolCall = struct("id", "123", "type", "function", "function", funCall);
@@ -142,7 +141,7 @@ classdef topenAIMessages < matlab.unittest.TestCase
         end
 
         function assistantParallelToolCallMessageIsAdded(testCase)
-            msgs = openAIMessages;
+            msgs = messageHistory;
             functionName = "functionName";
             args = "{""arg1"": 1, ""arg2"": 2, ""arg3"": ""3""}";
             funCall = struct("name", functionName, "arguments", args);
@@ -155,27 +154,27 @@ classdef topenAIMessages < matlab.unittest.TestCase
         end
 
         function messageGetsRemoved(testCase)
-            msgs = openAIMessages;
+            msgs = messageHistory;
             idx = 2;
-            
+
             msgs = addSystemMessage(msgs, "name", "content");
-            msgs = addUserMessage(msgs, "content"); 
+            msgs = addUserMessage(msgs, "content");
             msgs = addToolMessage(msgs, "123", "name", "content");
             sizeMsgs = length(msgs.Messages);
             % Message exists before removal
             msgToBeRemoved = msgs.Messages{idx};
             testCase.verifyTrue(any(cellfun(@(c) isequal(c,  msgToBeRemoved), msgs.Messages)));
-            
+
             msgs = removeMessage(msgs, idx);
             testCase.verifyFalse(any(cellfun(@(c) isequal(c,  msgToBeRemoved), msgs.Messages)));
             testCase.verifyEqual(length(msgs.Messages), sizeMsgs-1);
         end
 
         function removalIdxCantBeLargerThanNumElements(testCase)
-            msgs = openAIMessages;
-            
+            msgs = messageHistory;
+
             msgs = addSystemMessage(msgs, "name", "content");
-            msgs = addUserMessage(msgs, "content"); 
+            msgs = addUserMessage(msgs, "content");
             msgs = addToolMessage(msgs, "123", "name", "content");
             sizeMsgs = length(msgs.Messages);
 
@@ -183,35 +182,35 @@ classdef topenAIMessages < matlab.unittest.TestCase
         end
 
         function invalidInputsSystemPrompt(testCase, InvalidInputsSystemPrompt)
-            msgs = openAIMessages;
+            msgs = messageHistory;
             testCase.verifyError(@()addSystemMessage(msgs,InvalidInputsSystemPrompt.Input{:}), InvalidInputsSystemPrompt.Error);
         end
 
         function invalidInputsUserPrompt(testCase, InvalidInputsUserPrompt)
-            msgs = openAIMessages;
+            msgs = messageHistory;
             testCase.verifyError(@()addUserMessage(msgs,InvalidInputsUserPrompt.Input{:}), InvalidInputsUserPrompt.Error);
         end
 
         function invalidInputsUserImagesPrompt(testCase, InvalidInputsUserImagesPrompt)
-            msgs = openAIMessages;
+            msgs = messageHistory;
             testCase.verifyError(@()addUserMessageWithImages(msgs,InvalidInputsUserImagesPrompt.Input{:}), InvalidInputsUserImagesPrompt.Error);
         end
 
         function invalidInputsFunctionPrompt(testCase, InvalidInputsFunctionPrompt)
-            msgs = openAIMessages;
+            msgs = messageHistory;
             testCase.verifyError(@()addToolMessage(msgs,InvalidInputsFunctionPrompt.Input{:}), InvalidInputsFunctionPrompt.Error);
         end
 
         function invalidInputsRemove(testCase, InvalidRemoveMessage)
-            msgs = openAIMessages;
+            msgs = messageHistory;
             testCase.verifyError(@()removeMessage(msgs,InvalidRemoveMessage.Input{:}), InvalidRemoveMessage.Error);
         end
 
         function invalidInputsResponsePrompt(testCase, InvalidInputsResponseMessage)
-            msgs = openAIMessages;
+            msgs = messageHistory;
             testCase.verifyError(@()addResponseMessage(msgs,InvalidInputsResponseMessage.Input{:}), InvalidInputsResponseMessage.Error);
         end
-    end  
+    end
 end
 
 function invalidInputsSystemPrompt = iGetInvalidInputsSystemPrompt()

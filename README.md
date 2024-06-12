@@ -134,10 +134,10 @@ txt = generate(chat,"The team is feeling very motivated")
 
 If you want to create a chat system, you will have to create a history of the conversation and pass that to the `generate` function.
 
-To start a conversation history, create a `openAIMessages` object:
+To start a conversation history, create a `messageHistory` object:
 
 ```matlab
-history = openAIMessages;
+history = messageHistory;
 ```
 
 Then create the chat assistant:
@@ -146,7 +146,7 @@ Then create the chat assistant:
 chat = openAIChat("You are a helpful AI assistant.");
 ```
 
-(Side note: `azureChat` and `ollamaChat` work with `openAIMessages`, too.)
+(Side note: `azureChat` and `ollamaChat` work with `messageHistory`, too.)
 
 Add a user message to the history and pass it to `generate`:
 
@@ -197,7 +197,7 @@ chat = openAIChat("You are a helpful assistant.",Tools=f);
 When the model identifies that it could use the defined functions to answer a query, it will return a `tool_calls` request, instead of directly generating the response:
 
 ```matlab
-messages = openAIMessages;
+messages = messageHistory;
 messages = addUserMessage(messages, "What is the sine of 30?");
 [txt, response] = generate(chat, messages);
 messages = addResponseMessage(messages, response);
@@ -287,7 +287,7 @@ Note that this function does not need to exist, since it will only be used to ex
 ```matlab
 chat = openAIChat("You are helpful assistant that reads patient records and extracts information", ...
     Tools=f);
-messages = openAIMessages;
+messages = messageHistory;
 messages = addUserMessage(messages,"Extract the information from the report:" + newline + patientReport);
 [txt, response] = generate(chat, messages);
 ```
@@ -332,7 +332,7 @@ You can use gpt-4-turbo to experiment with image understanding.
 ```matlab
 chat = openAIChat("You are an AI assistant.", ModelName="gpt-4-turbo");
 image_path = "peppers.png";
-messages = openAIMessages;
+messages = messageHistory;
 messages = addUserMessageWithImages(messages,"What is in the image?",image_path);
 [txt,response] = generate(chat,messages,MaxNumTokens=4096);
 % Should output the description of the image
@@ -357,8 +357,8 @@ After establishing your connection with Azure, you can continue using the `gener
 % Initialize the Azure Chat object, passing a system prompt and specifying the API version
 chat = azureChat(YOUR_RESOURCE_NAME, YOUR_DEPLOYMENT_NAME, "You are a helpful AI assistant", APIVersion="2023-12-01-preview");
 
-% Create an openAIMessages object to start the conversation history
-history = openAIMessages;
+% Create a messageHistory object to start the conversation history
+history = messageHistory;
 
 % Ask your question and store it in the history, create the response using the generate method, and store the response in the history 
 history = addUserMessage(history,"What is an eigenvalue?");
@@ -382,8 +382,8 @@ In many workflows, `ollamaChat` is drop-in compatible with `openAIChat`:
 % Initialize the chat object
 chat = ollamaChat("phi3");
 
-% Create an openAIMessages object to start the conversation history
-history = openAIMessages;
+% Create a messageHistory object to start the conversation history
+history = messageHistory;
 
 % Ask your question and store it in the history, create the response using the generate method, and store the response in the history 
 history = addUserMessage(history,"What is an eigenvalue?");

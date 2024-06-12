@@ -19,7 +19,7 @@ classdef topenAIChat < matlab.unittest.TestCase
 
         function generateAcceptsMessagesAsInput(testCase)
             chat = openAIChat;
-            messages = openAIMessages;
+            messages = messageHistory;
             messages = addUserMessage(messages, "This should be okay.");
 
             testCase.verifyWarningFree(@()generate(chat,messages));
@@ -183,7 +183,7 @@ classdef topenAIChat < matlab.unittest.TestCase
         function invalidGenerateInputforModel(testCase)
             chat = openAIChat(APIKey="this-is-not-a-real-key");
             image_path = "peppers.png";
-            emptyMessages = openAIMessages;
+            emptyMessages = messageHistory;
             inValidMessages = addUserMessageWithImages(emptyMessages,"What is in the image?",image_path);
 
             testCase.verifyError(@()generate(chat,inValidMessages), "llms:invalidContentTypeForModel")
@@ -656,7 +656,7 @@ invalidConstructorInput = struct( ...
 end
 
 function invalidGenerateInput = iGetInvalidGenerateInput()
-emptyMessages = openAIMessages;
+emptyMessages = messageHistory;
 validMessages = addUserMessage(emptyMessages,"Who invented the telephone?");
 
 invalidGenerateInput = struct( ...

@@ -397,7 +397,7 @@ invalidConstructorInput = struct( ...
 end
 
 function invalidGenerateInput = iGetInvalidGenerateInput
-emptyMessages = openAIMessages;
+emptyMessages = messageHistory;
 validMessages = addUserMessage(emptyMessages,"Who invented the telephone?");
 
 invalidGenerateInput = struct( ...

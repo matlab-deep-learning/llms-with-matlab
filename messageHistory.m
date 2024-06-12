@@ -1,8 +1,8 @@
-classdef (Sealed) openAIMessages   
-    %openAIMessages - Create an object to manage and store messages in a conversation.
-    %   messages = openAIMessages creates an openAIMessages object.
+classdef (Sealed) messageHistory   
+    %messageHistory - Create an object to manage and store messages in a conversation.
+    %   messages = messageHistory creates a messageHistory object.
     %
-    %   openAIMessages functions:
+    %   messageHistory functions:
     %       addSystemMessage         - Add system message.
     %       addUserMessage           - Add user message.
     %       addUserMessageWithImages - Add user message with images for
@@ -11,7 +11,7 @@ classdef (Sealed) openAIMessages
     %       addResponseMessage       - Add a response message.
     %       removeMessage            - Remove message from history.
     %
-    %   openAIMessages properties:
+    %   messageHistory properties:
     %       Messages                 - Messages in the conversation history.
 
     % Copyright 2023-2024 The MathWorks, Inc.
@@ -31,7 +31,7 @@ classdef (Sealed) openAIMessages
             %
             %   Example:
             %   % Create messages object
-            %   messages = openAIMessages;
+            %   messages = messageHistory;
             %
             %   % Add system messages to provide examples of the conversation
             %   messages = addSystemMessage(messages, "example_user", "Hello, how are you?");
@@ -40,7 +40,7 @@ classdef (Sealed) openAIMessages
             %   messages = addSystemMessage(messages, "example_assistant", "O céu está lindo hoje.");
 
             arguments
-                this (1,1) openAIMessages 
+                this (1,1) messageHistory 
                 name {mustBeNonzeroLengthTextScalar}
                 content {mustBeNonzeroLengthTextScalar}
             end
@@ -57,13 +57,13 @@ classdef (Sealed) openAIMessages
             %
             %   Example:
             %   % Create messages object
-            %   messages = openAIMessages;
+            %   messages = messageHistory;
             %
             %   % Add user message
             %   messages = addUserMessage(messages, "Where is Natick located?");
 
             arguments
-                this (1,1) openAIMessages
+                this (1,1) messageHistory
                 content {mustBeNonzeroLengthTextScalar}
             end
 
@@ -94,7 +94,7 @@ classdef (Sealed) openAIMessages
             %   chat = openAIChat("You are an AI assistant.", ModelName="gpt-4-vision-preview"); 
             %
             %   % Create messages object
-            %   messages = openAIMessages;
+            %   messages = messageHistory;
             %
             %   % Add user message with an image
             %   content = "What is in this picture?"
@@ -105,7 +105,7 @@ classdef (Sealed) openAIMessages
             %   [text, response] = generate(chat, messages, MaxNumTokens=300);
             
             arguments
-                this (1,1) openAIMessages
+                this (1,1) messageHistory
                 content {mustBeNonzeroLengthTextScalar}
                 images (1,:) {mustBeNonzeroLengthText}
                 nvp.Detail string {mustBeMember(nvp.Detail,["low","high","auto"])} = "auto"
@@ -148,14 +148,14 @@ classdef (Sealed) openAIMessages
             %
             %   Example:
             %   % Create messages object
-            %   messages = openAIMessages;
+            %   messages = messageHistory;
             %
             %   % Add function message, containing the result of 
             %   % calling strcat("Hello", " World")
             %   messages = addToolMessage(messages, "call_123", "strcat", "Hello World");
 
             arguments
-                this (1,1) openAIMessages
+                this (1,1) messageHistory
                 id {mustBeNonzeroLengthTextScalar}
                 name {mustBeNonzeroLengthTextScalar}
                 content {mustBeNonzeroLengthTextScalar}
@@ -182,7 +182,7 @@ classdef (Sealed) openAIMessages
             %   chat = openAIChat("You are a helpful AI Assistant.");
             %
             %   % Create messages object
-            %   messages = openAIMessages;
+            %   messages = messageHistory;
             %
             %   % Add user message
             %   messages = addUserMessage(messages, "What is the capital of England?");
@@ -194,7 +194,7 @@ classdef (Sealed) openAIMessages
             %   messages = addResponseMessage(messages, response);
 
             arguments
-                this (1,1) openAIMessages
+                this (1,1) messageHistory
                 messageStruct (1,1) struct
             end
 
@@ -223,7 +223,7 @@ classdef (Sealed) openAIMessages
             %   Example:
             %
             %   % Create messages object
-            %   messages = openAIMessages;
+            %   messages = messageHistory;
             %
             %   % Add user messages
             %   messages = addUserMessage(messages, "What is the capital of England?");
@@ -233,7 +233,7 @@ classdef (Sealed) openAIMessages
             %   messages = removeMessage(messages,1);
 
             arguments
-                this (1,1) openAIMessages
+                this (1,1) messageHistory
                 idx (1,1) {mustBeInteger, mustBePositive}
             end
             if idx>numel(this.Messages)
@@ -247,7 +247,7 @@ classdef (Sealed) openAIMessages
 
         function this = addAssistantMessage(this, content, toolCalls)
             arguments
-                this (1,1) openAIMessages
+                this (1,1) messageHistory
                 content string
                 toolCalls struct = []
             end

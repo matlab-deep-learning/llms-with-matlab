@@ -27,7 +27,7 @@
         "inputs":
         [
             {"name":"this","kind":"required","type":["openAIChat","scalar"]},
-            {"name":"messages","kind":"required","type":[["openAIMessages","row"],["string","scalar"]]},
+            {"name":"messages","kind":"required","type":[["messageHistory","row"],["string","scalar"]]},
             {"name":"NumCompletions","kind":"namevalue","type":["numeric","scalar","integer","positive"]},
             {"name":"MaxNumTokens","kind":"namevalue","type":["numeric","scalar","positive"]},
             {"name":"ToolChoice","kind":"namevalue","type":"choices=[\"none\",\"auto\",this.FunctionNames]"},
@@ -69,7 +69,7 @@
         "inputs":
         [
             {"name":"this","kind":"required","type":["azureChat","scalar"]},
-            {"name":"messages","kind":"required","type":[["openAIMessages","row"],["string","scalar"]]},
+            {"name":"messages","kind":"required","type":[["messageHistory","row"],["string","scalar"]]},
             {"name":"NumCompletions","kind":"namevalue","type":["numeric","scalar","integer","positive"]},
             {"name":"MaxNumTokens","kind":"namevalue","type":["numeric","scalar","positive"]},
             {"name":"ToolChoice","kind":"namevalue","type":"choices=[\"none\",\"auto\",this.FunctionNames]"},
@@ -107,7 +107,7 @@
         "inputs":
         [
             {"name":"this","kind":"required","type":["ollamaChat","scalar"]},
-            {"name":"messages","kind":"required","type":[["openAIMessages","row"],["string","scalar"]]},
+            {"name":"messages","kind":"required","type":[["messageHistory","row"],["string","scalar"]]},
             {"name":"NumCompletions","kind":"namevalue","type":["numeric","scalar","integer","positive"]},
             {"name":"MaxNumTokens","kind":"namevalue","type":["numeric","scalar","positive"]},
             {"name":"Seed","kind":"namevalue","type":["numeric","integer","scalar"]}

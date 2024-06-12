@@ -249,7 +249,7 @@ end
 end
 
 function mustBeValidMsgs(value)
-if isa(value, "openAIMessages")
+if isa(value, "messageHistory")
     if numel(value.Messages) == 0
         error("llms:mustHaveMessages", llms.utils.errorMessageCatalog.getMessage("llms:mustHaveMessages"));
     end
