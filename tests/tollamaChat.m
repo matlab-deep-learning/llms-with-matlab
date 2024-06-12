@@ -128,7 +128,7 @@ classdef tollamaChat < matlab.unittest.TestCase
             models = ollamaChat.models;
             testCase.verifyClass(models,"string");
             testCase.verifyThat(models, ...
-                matlab.unittest.constraints.IsSupersetOf("mistral:latest"));
+                matlab.unittest.constraints.IsSupersetOf("mistral"));
         end
     end
 end
