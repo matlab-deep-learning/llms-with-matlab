@@ -91,7 +91,8 @@ classdef openAIImages
                                                 mustBeLessThanOrEqual(nvp.NumImages,10)} = 1
                 nvp.Size                (1,1) string {mustBeMember(nvp.Size, ["256x256", "512x512", ...
                                                                 "1024x1024", "1792x1024", ...
-                                                                "1024x1792"])} = "1024x1024"
+                                                                "1024x1792"]), ...
+                                                    mustBeValidSize(this,nvp.Size)} = "1024x1024"
                 nvp.Quality             (1,1) string {mustBeMember(nvp.Quality,["standard", "hd"])} 
                 nvp.Style               (1,1) string {mustBeMember(nvp.Style,["vivid", "natural"])} 
             end
@@ -99,7 +100,6 @@ classdef openAIImages
             endpoint = "https://api.openai.com/v1/images/generations";
 
             validatePromptSize(this.ModelName, prompt)
-            validateSizeNVP(this.ModelName, nvp.Size)
 
              params = struct("prompt",prompt,...
                 "model",this.ModelName,...
@@ -180,9 +180,9 @@ classdef openAIImages
                 nvp.MaskImagePath             {mustBeValidFileType(nvp.MaskImagePath)}
                 nvp.NumImages           (1,1) {mustBePositive, mustBeInteger,...
                                                 mustBeLessThanOrEqual(nvp.NumImages,10)} = 1
-                nvp.Size                (1,1) string {mustBeMember(nvp.Size,["256x256", ...
-                                                            "512x512", ...
-                                                            "1024x1024"])} = "1024x1024"
+                nvp.Size                (1,1) string {mustBeMember(nvp.Size,...
+                                                ["256x256", "512x512","1024x1024"]), ...
+                                                mustBeValidSize(this,nvp.Size)} = "1024x1024"
             end
     
             % For now, this is only supported for "dall-e-2"
@@ -241,8 +241,9 @@ classdef openAIImages
                 imagePath                     {mustBeValidFileType(imagePath)}
                 nvp.NumImages           (1,1) {mustBePositive, mustBeInteger,...
                                                 mustBeLessThanOrEqual(nvp.NumImages,10)} = 1
-                nvp.Size                (1,1) string {mustBeMember(nvp.Size,["256x256", ...
-                                                "512x512","1024x1024"])} = "1024x1024"
+                nvp.Size                (1,1) string {mustBeMember(nvp.Size,...
+                                                ["256x256", "512x512","1024x1024"]), ...
+                                                mustBeValidSize(this,nvp.Size)} = "1024x1024"
             end
 
             % For now, this is only supported for "dall-e-2"
@@ -305,20 +306,6 @@ if response.StatusCode=="OK" &&  isfield(response.Body.Data.data,"url")
 
 else
     images = [];
-end
-end
-
-function validateSizeNVP(model, size)
-if ismember(size,["1792x1024", "1024x1792"]) && model=="dall-e-2"
-    error("llms:invalidOptionAndValueForModel", ...
-        llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionAndValueForModel", ...
-        "Size", size, model));
-end
-
-if ismember(size,["256x256", "512x512"]) && model=="dall-e-3"
-    error("llms:invalidOptionAndValueForModel", ...
-        llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionAndValueForModel", ...
-        "Size", size, model));
 end
 end
 
