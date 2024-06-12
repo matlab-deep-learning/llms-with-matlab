@@ -54,7 +54,6 @@ catalog("llms:functionNotAvailableForModel") = "This function is not supported f
 catalog("llms:promptLimitCharacter") = "Prompt must have a maximum length of {1} characters for ModelName '{2}'";
 catalog("llms:pngExpected") = "Argument must be a PNG image.";
 catalog("llms:warningJsonInstruction") = "When using JSON mode, you must also prompt the model to produce JSON yourself via a system or user message.";
-catalog("llms:invalidOptionsForAzureBackEnd") = "The parameter Model Name is not compatible with Azure.";
 catalog("llms:apiReturnedError") = "Server error: ""{1}""";
 catalog("llms:dimensionsMustBeSmallerThan") = "Dimensions must be less than or equal to {1}.";
 end
