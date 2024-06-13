@@ -1,5 +1,5 @@
 classdef (Sealed) ollamaChat < llms.internal.textGenerator
-%ollamaChat Chat completion API from Azure.
+%ollamaChat Chat completion API from Ollama®.
 %
 %   CHAT = ollamaChat(modelName) creates an ollamaChat object for the given model.
 %
