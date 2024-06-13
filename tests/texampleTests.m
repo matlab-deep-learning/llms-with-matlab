@@ -3,6 +3,12 @@ classdef texampleTests < matlab.unittest.TestCase
 
 %   Copyright 2024 The MathWorks, Inc.
 
+
+    properties(TestParameter)
+        ChatBotExample = {"CreateSimpleChatBot", "CreateSimpleOllamaChatBot"};
+    end
+
+
     methods (TestClassSetup)
         function setUpAndTearDowns(testCase)
             import matlab.unittest.fixtures.CurrentFolderFixture
@@ -66,7 +72,7 @@ classdef texampleTests < matlab.unittest.TestCase
                 "llms:warningJsonInstruction");
         end
 
-        function testCreateSimpleChatBot(testCase)
+        function testCreateSimpleChatBot(testCase,ChatBotExample)
             % set up a fake input command, returning canned user prompts
             count = 0;
             prompts = [
@@ -101,7 +107,7 @@ classdef texampleTests < matlab.unittest.TestCase
             numWordsResponse = []; %#ok<NASGU>
 
             % Run the example
-            CreateSimpleChatBot;
+            eval(ChatBotExample);
 
             testCase.verifyEqual(count,find(prompts=="end",1));
             testCase.verifySize(messages.Messages,[1 2*(count-1)]);
