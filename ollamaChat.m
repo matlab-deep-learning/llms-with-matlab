@@ -182,7 +182,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
             endpoint = "http://localhost:11434/api/tags";
             response = webread(endpoint);
             mdls = string({response.models.name}).';
-            baseMdls = unique(extractBefore(mdls,":"));
+            baseMdls = unique(extractBefore(mdls,":latest"));
             % remove all those "mistral:latest", iff those are the only
             % model entries pointing at some model
             for base=baseMdls.'
