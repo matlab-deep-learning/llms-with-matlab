@@ -29,9 +29,6 @@ classdef (Abstract) textGenerator
     end
 
     properties (Access=protected)
-        Tools
-        FunctionsStruct
-        APIKey
         StreamFun
     end
 end

@@ -1,4 +1,5 @@
-classdef(Sealed) openAIChat < llms.internal.textGenerator & llms.internal.gptPenalties
+classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
+    llms.internal.gptPenalties & llms.internal.hasTools & llms.internal.needsAPIKey
 %openAIChat Chat completion API from OpenAI.
 %
 %   CHAT = openAIChat(systemPrompt) creates an openAIChat object with the

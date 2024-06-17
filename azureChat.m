@@ -1,4 +1,5 @@
-classdef(Sealed) azureChat < llms.internal.textGenerator & llms.internal.gptPenalties
+classdef(Sealed) azureChat < llms.internal.textGenerator & ...
+    llms.internal.gptPenalties & llms.internal.hasTools & llms.internal.needsAPIKey
 %azureChat Chat completion API from Azure.
 %
 %   CHAT = azureChat(endpoint, deploymentID) creates an azureChat object with
