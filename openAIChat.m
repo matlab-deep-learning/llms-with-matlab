@@ -19,7 +19,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & llms.internal.gptPen
 %                             reduce it. Setting Temperature=0 removes
 %                             randomness from the output altogether.
 %
-%   TopProbabilityMass      - Top probability mass value for controlling the
+%   TopP      - Top probability mass value for controlling the
 %                             diversity of the output. Default value is 1;
 %                             lower values imply that only the more likely
 %                             words can appear in any particular place.
@@ -58,7 +58,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & llms.internal.gptPen
 %
 %       Temperature          - Temperature of generation.
 %
-%       TopProbabilityMass   - Top probability mass to consider for generation.
+%       TopP   - Top probability mass to consider for generation.
 %
 %       StopSequences        - Sequences to stop the generation of tokens.
 %
@@ -93,7 +93,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & llms.internal.gptPen
                 nvp.Tools                    (1,:) {mustBeA(nvp.Tools, "openAIFunction")} = openAIFunction.empty
                 nvp.ModelName                (1,1) string {mustBeModel} = "gpt-3.5-turbo"
                 nvp.Temperature                    {llms.utils.mustBeValidTemperature} = 1
-                nvp.TopProbabilityMass             {llms.utils.mustBeValidTopP} = 1
+                nvp.TopP             {llms.utils.mustBeValidTopP} = 1
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}
                 nvp.ResponseFormat           (1,1) string {mustBeMember(nvp.ResponseFormat,["text","json"])} = "text"
                 nvp.APIKey                         {mustBeNonzeroLengthTextScalar}
@@ -127,7 +127,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & llms.internal.gptPen
 
             this.ModelName = nvp.ModelName;
             this.Temperature = nvp.Temperature;
-            this.TopProbabilityMass = nvp.TopProbabilityMass;
+            this.TopP = nvp.TopP;
             this.StopSequences = nvp.StopSequences;
 
             % ResponseFormat is only supported in the latest models only
@@ -190,7 +190,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & llms.internal.gptPen
 
             [text, message, response] = llms.internal.callOpenAIChatAPI(messagesStruct, this.FunctionsStruct,...
                 ModelName=this.ModelName, ToolChoice=toolChoice, Temperature=this.Temperature, ...
-                TopProbabilityMass=this.TopProbabilityMass, NumCompletions=nvp.NumCompletions,...
+                TopP=this.TopP, NumCompletions=nvp.NumCompletions,...
                 StopSequences=this.StopSequences, MaxNumTokens=nvp.MaxNumTokens, ...
                 PresencePenalty=this.PresencePenalty, FrequencyPenalty=this.FrequencyPenalty, ...
                 ResponseFormat=this.ResponseFormat,Seed=nvp.Seed, ...

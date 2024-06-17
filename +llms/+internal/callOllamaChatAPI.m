@@ -28,8 +28,8 @@ arguments
     model
     messages
     nvp.Temperature
-    nvp.TopProbabilityMass
-    nvp.TopProbabilityNum
+    nvp.TopP
+    nvp.TopK
     nvp.TailFreeSamplingZ
     nvp.NumCompletions
     nvp.StopSequences
@@ -99,8 +99,8 @@ end
 function dict = mapNVPToParameters()
 dict = dictionary();
 dict("Temperature") = "temperature";
-dict("TopProbabilityMass") = "top_p";
-dict("TopProbabilityNum") = "top_k";
+dict("TopP") = "top_p";
+dict("TopK") = "top_k";
 dict("TailFreeSamplingZ") = "tfs_z";
 dict("NumCompletions") = "n";
 dict("StopSequences") = "stop";

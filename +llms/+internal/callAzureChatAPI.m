@@ -47,7 +47,7 @@ arguments
     nvp.ToolChoice
     nvp.APIVersion
     nvp.Temperature
-    nvp.TopProbabilityMass
+    nvp.TopP
     nvp.NumCompletions
     nvp.StopSequences
     nvp.MaxNumTokens
@@ -121,7 +121,7 @@ end
 function dict = mapNVPToParameters()
 dict = dictionary();
 dict("Temperature") = "temperature";
-dict("TopProbabilityMass") = "top_p";
+dict("TopP") = "top_p";
 dict("NumCompletions") = "n";
 dict("StopSequences") = "stop";
 dict("MaxNumTokens") = "max_tokens";
