@@ -8,6 +8,7 @@ classdef tollamaChat < matlab.unittest.TestCase
         InvalidGenerateInput = iGetInvalidGenerateInput;
         InvalidValuesSetters = iGetInvalidValuesSetters;
         ValidValuesSetters = iGetValidValuesSetters;
+        StringInputs = struct('string',{"hi"},'char',{'hi'},'cellstr',{{'hi'}});
     end
 
     methods(Test)
@@ -31,9 +32,9 @@ classdef tollamaChat < matlab.unittest.TestCase
             testCase.verifyEqual(chat.StopSequences, stop);
         end
 
-        function doGenerate(testCase)
+        function doGenerate(testCase,StringInputs)
             chat = ollamaChat("mistral");
-            response = testCase.verifyWarningFree(@() generate(chat,"hi"));
+            response = testCase.verifyWarningFree(@() generate(chat,StringInputs));
             testCase.verifyClass(response,'string');
             testCase.verifyGreaterThan(strlength(response),0);
         end
@@ -290,7 +291,7 @@ validMessages = addUserMessage(emptyMessages,"Who invented the telephone?");
 invalidGenerateInput = struct( ...
         "EmptyInput",struct( ...
             "Input",{{ [] }},...
-            "Error","MATLAB:validation:IncompatibleSize"),...
+            "Error","llms:mustBeMessagesOrTxt"),...
         ...
         "InvalidInputType",struct( ...
             "Input",{{ 123 }},...

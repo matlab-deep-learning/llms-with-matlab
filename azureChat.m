@@ -171,13 +171,14 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
 
             arguments
                 this                    (1,1) azureChat
-                messages                (1,1) {mustBeValidMsgs}
+                messages                {mustBeValidMsgs}
                 nvp.NumCompletions      (1,1) {mustBePositive, mustBeInteger} = 1
                 nvp.MaxNumTokens        (1,1) {mustBePositive} = inf
                 nvp.ToolChoice          {mustBeValidFunctionCall(this, nvp.ToolChoice)} = []
                 nvp.Seed                {mustBeIntegerOrEmpty(nvp.Seed)} = []
             end
 
+            messages = convertCharsToStrings(messages);
             if isstring(messages) && isscalar(messages)
                 messagesStruct = {struct("role", "user", "content", messages)};
             else

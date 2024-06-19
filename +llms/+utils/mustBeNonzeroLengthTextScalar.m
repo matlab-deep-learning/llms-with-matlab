@@ -5,5 +5,8 @@ function mustBeNonzeroLengthTextScalar(content)
 
 %   Copyright 2024 The MathWorks, Inc.
 mustBeNonzeroLengthText(content)
+if iscellstr(content)
+    content = string(content);
+end
 mustBeTextScalar(content)
 end

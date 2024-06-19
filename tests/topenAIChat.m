@@ -6,15 +6,16 @@ classdef topenAIChat < matlab.unittest.TestCase
     properties(TestParameter)
         ValidConstructorInput = iGetValidConstructorInput();
         InvalidConstructorInput = iGetInvalidConstructorInput();
-        InvalidGenerateInput = iGetInvalidGenerateInput();  
-        InvalidValuesSetters = iGetInvalidValuesSetters();  
+        InvalidGenerateInput = iGetInvalidGenerateInput();
+        InvalidValuesSetters = iGetInvalidValuesSetters();
+        StringInputs = struct('string',{"hi"},'char',{'hi'},'cellstr',{{'hi'}});
     end
     
     methods(Test)
         % Test methods
-        function generateAcceptsSingleStringAsInput(testCase)
+        function generateAcceptsSingleStringAsInput(testCase,StringInputs)
             chat = openAIChat;
-            testCase.verifyWarningFree(@()generate(chat,"This is okay"));
+            testCase.verifyWarningFree(@()generate(chat,StringInputs));
         end
 
         function generateAcceptsMessagesAsInput(testCase)

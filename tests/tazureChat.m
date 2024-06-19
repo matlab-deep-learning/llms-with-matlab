@@ -7,6 +7,7 @@ classdef tazureChat < matlab.unittest.TestCase
         InvalidConstructorInput = iGetInvalidConstructorInput;
         InvalidGenerateInput = iGetInvalidGenerateInput;
         InvalidValuesSetters = iGetInvalidValuesSetters;
+        StringInputs = struct('string',{"hi"},'char',{'hi'},'cellstr',{{'hi'}});
     end
 
     methods(Test)
@@ -32,10 +33,10 @@ classdef tazureChat < matlab.unittest.TestCase
             testCase.verifyEqual(chat.PresencePenalty, presenceP);
         end
 
-        function doGenerate(testCase)
+        function doGenerate(testCase,StringInputs)
             testCase.assumeTrue(isenv("AZURE_OPENAI_API_KEY"),"end-to-end test requires environment variables AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT.");
             chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"));
-            response = testCase.verifyWarningFree(@() generate(chat,"hi"));
+            response = testCase.verifyWarningFree(@() generate(chat,StringInputs));
             testCase.verifyClass(response,'string');
             testCase.verifyGreaterThan(strlength(response),0);
         end
