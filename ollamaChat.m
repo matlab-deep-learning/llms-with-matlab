@@ -17,13 +17,13 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
 %                             values reduce it. Setting Temperature=0 removes
 %                             randomness from the output altogether.
 %
-%   TopP      - Top probability mass value for controlling the
+%   TopP                    - Top probability mass value for controlling the
 %                             diversity of the output. Default value is 1;
 %                             lower values imply that only the more likely
 %                             words can appear in any particular place.
 %                             This is also known as top-p sampling.
 %
-%   TopK       - Maximum number of most likely tokens that are
+%   TopK                    - Maximum number of most likely tokens that are
 %                             considered for output. Default is Inf, allowing
 %                             all tokens. Smaller values reduce diversity in
 %                             the output.
@@ -34,8 +34,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
 %                             tail-free sampling. Lower values reduce
 %                             diversity, with some authors recommending
 %                             values around 0.95. Tail-free sampling is
-%                             slower than using TopP or
-%                             TopK.
+%                             slower than using TopP or TopK.
 %
 %   StopSequences           - Vector of strings that when encountered, will
 %                             stop the generation of tokens. Default
@@ -81,8 +80,8 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
                 modelName                          {mustBeTextScalar}
                 systemPrompt                       {llms.utils.mustBeTextOrEmpty} = []
                 nvp.Temperature                    {llms.utils.mustBeValidTemperature} = 1
-                nvp.TopP             {llms.utils.mustBeValidTopP} = 1
-                nvp.TopK        (1,1) {mustBeReal,mustBePositive} = Inf
+                nvp.TopP                           {llms.utils.mustBeValidTopP} = 1
+                nvp.TopK                     (1,1) {mustBeReal,mustBePositive} = Inf
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}
                 nvp.ResponseFormat           (1,1) string {mustBeMember(nvp.ResponseFormat,["text","json"])} = "text"
                 nvp.TimeOut                  (1,1) {mustBeReal,mustBePositive} = 120

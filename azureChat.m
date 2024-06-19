@@ -19,7 +19,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
 %                             reduce it. Setting Temperature=0 removes
 %                             randomness from the output altogether.
 %
-%   TopP      - Top probability mass value for controlling the
+%   TopP                    - Top probability mass value for controlling the
 %                             diversity of the output. Default value is 1;
 %                             lower values imply that only the more likely
 %                             words can appear in any particular place.
@@ -62,7 +62,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
 %   azureChat Properties:
 %       Temperature          - Temperature of generation.
 %
-%       TopP   - Top probability mass to consider for generation.
+%       TopP                 - Top probability mass to consider for generation.
 %
 %       StopSequences        - Sequences to stop the generation of tokens.
 %
@@ -99,7 +99,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
                 nvp.Tools                    (1,:) {mustBeA(nvp.Tools, "openAIFunction")} = openAIFunction.empty
                 nvp.APIVersion               (1,1) {mustBeAPIVersion} = "2024-02-01"
                 nvp.Temperature                    {llms.utils.mustBeValidTemperature} = 1
-                nvp.TopP             {llms.utils.mustBeValidTopP} = 1
+                nvp.TopP                           {llms.utils.mustBeValidTopP} = 1
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}
                 nvp.ResponseFormat           (1,1) string {mustBeMember(nvp.ResponseFormat,["text","json"])} = "text"
                 nvp.APIKey                         {mustBeNonzeroLengthTextScalar}
