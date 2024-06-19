@@ -193,6 +193,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
             end
             mdls = unique([mdls(:); baseMdls]);
             mdls(strlength(mdls) < 1) = [];
+            mdls(ismissing(mdls)) = [];
         end
     end
 end
