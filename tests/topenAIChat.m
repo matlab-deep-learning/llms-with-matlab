@@ -18,6 +18,12 @@ classdef topenAIChat < matlab.unittest.TestCase
             testCase.verifyWarningFree(@()generate(chat,StringInputs));
         end
 
+        function generateMultipleResponses(testCase)
+            chat = openAIChat;
+            [~,~,response] = generate(chat,"What is a cat?",NumCompletions=3);
+            testCase.verifySize(response.Body.Data.choices,[3,1]);
+        end
+
         function generateAcceptsMessagesAsInput(testCase)
             chat = openAIChat;
             messages = messageHistory;
