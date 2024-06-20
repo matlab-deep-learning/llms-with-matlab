@@ -4,8 +4,8 @@ classdef topenAIMessages < matlab.unittest.TestCase
 %   Copyright 2023-2024 The MathWorks, Inc.
 
 methods(Test)
-	function returnsMessageHistory(testCase)
-		testCase.verifyClass(openAIMessages,"messageHistory");
-	end
+    function returnsMessageHistory(testCase)
+        testCase.verifyClass(openAIMessages,"messageHistory");
+    end
 end
 end
