@@ -16,6 +16,8 @@ Some of the [current LLMs supported on Azure](https://learn.microsoft.com/en-us/
 Set up your [endpoint and deployment and retrieve one of the API keys](https://learn.microsoft.com/en-us/azure/ai-services/openai/chatgpt-quickstart?tabs=command-line%2Cpython-new&pivots=rest-api#retrieve-key-and-endpoint). Create a `.env` file in the project root directory with the following content.
 
 ```
+AZURE_OPENAI_ENDPOINT=<your endpoint>
+AZURE_OPENAI_DEPLOYMENT=<your deployment>
 AZURE_OPENAI_API_KEY=<your key>
 ```
 
@@ -29,11 +31,11 @@ loadenv(".env")
 
 ## Establishing a connection to Chat Completions API using Azure
 
-To connect MATLAB to Chat Completions API via Azure, you will have to create an `azureChat` object. See [the Azure documentation](https://learn.microsoft.com/en-us/azure/ai-services/openai/chatgpt-quickstart) for details on the setup required and where to find your key, endpoint, and deployment name. As explained above, the key should be in the environment variable `AZURE_OPENAI_API_KEY`, or provided as `APIKey=…` in the `azureChat` call below.
+To connect MATLAB to Chat Completions API via Azure, you will have to create an `azureChat` object. See [the Azure documentation](https://learn.microsoft.com/en-us/azure/ai-services/openai/chatgpt-quickstart) for details on the setup required and where to find your key, endpoint, and deployment name. As explained above, the endpoint, deployment, and key should be in the environment variables `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_DEPLOYMENYT`, and `AZURE_OPENAI_API_KEY`, or provided as `Endpoint=…`, `Deployment=…`, and `APIKey=…` in the `azureChat` call below.
 
-In order to create the chat assistant, specify your Azure OpenAI Resource and the LLM you want to use:
+In order to create the chat assistant, use the `azureChat` function, optionally providing a system prompt:
 ```matlab
-chat = azureChat(YOUR_ENDPOINT_NAME, YOUR_DEPLOYMENT_NAME, "You are a helpful AI assistant");
+chat = azureChat("You are a helpful AI assistant");
 ```
 
 The `azureChat` object also allows to specify additional options. Call `help azureChat` for more information.
@@ -60,7 +62,7 @@ systemPrompt = "You are a sentiment analyser. You will look at a sentence and ou
     "His attitude was terribly discouraging to the team." + newline +...
     "negative" + newline + newline;
 
-chat = azureChat(YOUR_ENDPOINT_NAME, YOUR_DEPLOYMENT_NAME, systemPrompt);
+chat = azureChat(systemPrompt);
 
 % Generate a response, passing a new sentence for classification
 txt = generate(chat,"The team is feeling very motivated")
@@ -80,7 +82,7 @@ history = messageHistory;
 Then create the chat assistant:
 
 ```matlab
-chat = azureChat(YOUR_ENDPOINT_NAME, YOUR_DEPLOYMENT_NAME, "You are a helpful AI assistant.");
+chat = azureChat;
 ```
 
 Add a user message to the history and pass it to `generate`:
@@ -108,7 +110,7 @@ Streaming allows you to start receiving the output from the API as it is generat
 ```matlab
 % streaming function
 sf = @(x) fprintf("%s",x);
-chat = azureChat(YOUR_ENDPOINT_NAME, YOUR_DEPLOYMENT_NAME, StreamFun=sf);
+chat = azureChat(StreamFun=sf);
 txt = generate(chat,"What is Model-Based Design and how is it related to Digital Twin?")
 % Should stream the response token by token
 ```
@@ -123,7 +125,7 @@ For example, if you want to use the API for mathematical operations such as `sin
 ```matlab
 f = openAIFunction("sind","Sine of argument in degrees");
 f = addParameter(f,"x",type="number",description="Angle in degrees.");
-chat = azureChat(YOUR_ENDPOINT_NAME,YOUR_DEPLOYMENT_NAME,"You are a helpful assistant.",Tools=f);
+chat = azureChat("You are a helpful assistant.",Tools=f);
 ```
 
 When the model identifies that it could use the defined functions to answer a query, it will return a `tool_calls` request, instead of directly generating the response:
@@ -217,8 +219,7 @@ f = addParameter(f,"patientSymptoms",type="string",description="Symptoms that th
 Note that this function does not need to exist, since it will only be used to extract the Name, Age and Symptoms of the patient and it does not need to be called:
 
 ```matlab
-chat = azureChat(YOUR_ENDPOINT_NAME, YOUR_DEPLOYMENT_NAME, ...
-    "You are helpful assistant that reads patient records and extracts information", ...
+chat = azureChat("You are helpful assistant that reads patient records and extracts information", ...
     Tools=f);
 messages = messageHistory;
 messages = addUserMessage(messages,"Extract the information from the report:" + newline + patientReport);
@@ -258,4 +259,3 @@ ans =
 ```
 
 You can extract the arguments and write the data to a table, for example.
-

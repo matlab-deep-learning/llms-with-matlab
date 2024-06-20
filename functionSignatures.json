@@ -44,16 +44,16 @@
     {
         "inputs":
         [
-            {"name":"endpoint","kind":"positional","type":["string","scalar"]},
-            {"name":"deploymentID","kind":"positional","type":["string","scalar"]},
             {"name":"systemPrompt","kind":"ordered","type":["string","scalar"]},
+            {"name":"Endpoint","kind":"namevalue","type":["string","scalar"]},
+            {"name":"Deployment","kind":"namevalue","type":["string","scalar"]},
+            {"name":"APIKey","kind":"namevalue","type":["string","scalar"]},
             {"name":"Tools","kind":"namevalue","type":"openAIFunction"},
             {"name":"APIVersion","kind":"namevalue","type":"choices=llms.azure.apiVersions"},
             {"name":"Temperature","kind":"namevalue","type":["numeric","scalar",">=0","<=2"]},
             {"name":"TopP","kind":"namevalue","type":["numeric","scalar",">=0","<=1"]},
             {"name":"StopSequences","kind":"namevalue","type":["string","vector"]},
             {"name":"ResponseFormat","kind":"namevalue","type":"choices={'text','json'}"},
-            {"name":"APIKey","kind":"namevalue","type":["string","scalar"]},
             {"name":"PresencePenalty","kind":"namevalue","type":["numeric","scalar","<=2",">=-2"]},
             {"name":"FrequencyPenalty","kind":"namevalue","type":["numeric","scalar","<=2",">=-2"]},
             {"name":"TimeOut","kind":"namevalue","type":["numeric","scalar","real","positive"]},
@@ -108,7 +108,6 @@
         [
             {"name":"this","kind":"required","type":["ollamaChat","scalar"]},
             {"name":"messages","kind":"required","type":[["messageHistory","row"],["string","scalar"]]},
-            {"name":"NumCompletions","kind":"namevalue","type":["numeric","scalar","integer","positive"]},
             {"name":"MaxNumTokens","kind":"namevalue","type":["numeric","scalar","positive"]},
             {"name":"Seed","kind":"namevalue","type":["numeric","integer","scalar"]}
         ],

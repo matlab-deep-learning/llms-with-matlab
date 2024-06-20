@@ -12,7 +12,6 @@ classdef tazureChat < matlab.unittest.TestCase
 
     methods(Test)
         function constructChatWithAllNVP(testCase)
-            endpoint = getenv("AZURE_OPENAI_ENDPOINT");
             deploymentID = "hello";
             functions = openAIFunction("funName");
             temperature = 0;
@@ -23,7 +22,7 @@ classdef tazureChat < matlab.unittest.TestCase
             frequenceP = 2;
             systemPrompt = "This is a system prompt";
             timeout = 3;
-            chat = azureChat(endpoint, deploymentID, systemPrompt, Tools=functions, ...
+            chat = azureChat(systemPrompt, Deployment=deploymentID, Tools=functions, ...
                 Temperature=temperature, TopP=topP, StopSequences=stop, APIKey=apiKey,...
                 FrequencyPenalty=frequenceP, PresencePenalty=presenceP, TimeOut=timeout);
             testCase.verifyEqual(chat.Temperature, temperature);
@@ -35,14 +34,14 @@ classdef tazureChat < matlab.unittest.TestCase
 
         function doGenerate(testCase,StringInputs)
             testCase.assumeTrue(isenv("AZURE_OPENAI_API_KEY"),"end-to-end test requires environment variables AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT.");
-            chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"));
+            chat = azureChat;
             response = testCase.verifyWarningFree(@() generate(chat,StringInputs));
             testCase.verifyClass(response,'string');
             testCase.verifyGreaterThan(strlength(response),0);
         end
 
         function generateMultipleResponses(testCase)
-            chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"));
+            chat = azureChat;
             [~,~,response] = generate(chat,"What is a cat?",NumCompletions=3);
             testCase.verifySize(response.Body.Data.choices,[3,1]);
         end
@@ -50,7 +49,7 @@ classdef tazureChat < matlab.unittest.TestCase
 
         function doReturnErrors(testCase)
             testCase.assumeTrue(isenv("AZURE_OPENAI_API_KEY"),"end-to-end test requires environment variables AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT.");
-            chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"));
+            chat = azureChat;
             % This input is considerably longer than accepted as input for
             % GPT-3.5 (16385 tokens)
             wayTooLong = string(repmat('a ',1,20000));
@@ -59,7 +58,7 @@ classdef tazureChat < matlab.unittest.TestCase
 
         function seedFixesResult(testCase)
             testCase.assumeTrue(isenv("AZURE_OPENAI_API_KEY"),"end-to-end test requires environment variables AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT.");
-            chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"));
+            chat = azureChat;
             response1 = generate(chat,"hi",Seed=1234);
             response2 = generate(chat,"hi",Seed=1234);
             testCase.verifyEqual(response1,response2);
@@ -76,8 +75,7 @@ classdef tazureChat < matlab.unittest.TestCase
                 data = [data, str];
                 seen = data;
             end
-            chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"), ...
-                StreamFun=@sf);
+            chat = azureChat(StreamFun=@sf);
 
             testCase.verifyWarningFree(@()generate(chat, "Hello world."));
             % Checking that persistent data, which is still stored in
@@ -93,8 +91,7 @@ classdef tazureChat < matlab.unittest.TestCase
             f = addParameter(f, "location", type="string", description="The city and country, optionally state. E.g., San Francisco, CA, USA");
             f = addParameter(f, "unit", type="string", enum=["Kelvin","Celsius"], RequiredParameter=false);
 
-            chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"), ...
-                Tools=f);
+            chat = azureChat(Tools=f);
 
             prompt =  "What's the weather like in San Francisco, Tokyo, and Paris?";
             [~, response] = generate(chat, prompt, ToolChoice="getCurrentWeather");
@@ -108,12 +105,12 @@ classdef tazureChat < matlab.unittest.TestCase
         end
 
         function errorsWhenPassingToolChoiceWithEmptyTools(testCase)
-            chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"), APIKey="this-is-not-a-real-key");
+            chat = azureChat(APIKey="this-is-not-a-real-key");
             testCase.verifyError(@()generate(chat,"input", ToolChoice="bla"), "llms:mustSetFunctionsForCall");
         end
 
         function shortErrorForBadEndpoint(testCase)
-            chat = azureChat("https://nobodyhere.whatever/","deployment");
+            chat = azureChat(Endpoint="https://nobodyhere.whatever/");
             caught = false;
             try
                 generate(chat,"input");
@@ -126,17 +123,17 @@ classdef tazureChat < matlab.unittest.TestCase
         end
 
         function invalidInputsConstructor(testCase, InvalidConstructorInput)
-            testCase.verifyError(@()azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"), InvalidConstructorInput.Input{:}), InvalidConstructorInput.Error);
+            testCase.verifyError(@()azureChat(InvalidConstructorInput.Input{:}), InvalidConstructorInput.Error);
         end
 
         function invalidInputsGenerate(testCase, InvalidGenerateInput)
             f = openAIFunction("validfunction");
-            chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"), Tools=f, APIKey="this-is-not-a-real-key");
+            chat = azureChat(Tools=f, APIKey="this-is-not-a-real-key");
             testCase.verifyError(@()generate(chat,InvalidGenerateInput.Input{:}), InvalidGenerateInput.Error);
         end
 
         function invalidSetters(testCase, InvalidValuesSetters)
-            chat = azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT"), APIKey="this-is-not-a-real-key");
+            chat = azureChat(APIKey="this-is-not-a-real-key");
             function assignValueToProperty(property, value)
                 chat.(property) = value;
             end
@@ -151,7 +148,7 @@ classdef tazureChat < matlab.unittest.TestCase
             import matlab.unittest.fixtures.EnvironmentVariableFixture
             testCase.applyFixture(EnvironmentVariableFixture("AZURE_OPENAI_API_KEY","dummy"));
             unsetenv("AZURE_OPENAI_API_KEY");
-            testCase.verifyError(@()azureChat(getenv("AZURE_OPENAI_ENDPOINT"), getenv("AZURE_OPENAI_DEPLOYMENT")), "llms:keyMustBeSpecified");
+            testCase.verifyError(@()azureChat, "llms:keyMustBeSpecified");
         end
     end
 end

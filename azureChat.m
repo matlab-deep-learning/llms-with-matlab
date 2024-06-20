@@ -2,15 +2,26 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
     llms.internal.gptPenalties & llms.internal.hasTools & llms.internal.needsAPIKey
 %azureChat Chat completion API from Azure.
 %
-%   CHAT = azureChat(endpoint, deploymentID) creates an azureChat object with
-%   the endpoint and deployment ID path parameters required by Azure to
-%   establish the connection.
+%   CHAT = azureChat creates an azureChat object, with the parameters needed
+%   to connect to Azure taken from the environment.
 %
-%   CHAT = azureChat(__,systemPrompt) creates an azureChat object with the
+%   CHAT = azureChat(systemPrompt) creates an azureChat object with the
 %   specified system prompt.
 %
 %   CHAT = azureChat(__,Name=Value) specifies additional options
 %   using one or more name-value arguments:
+%
+%   Endpoint                - The endpoint as defined in the Azure OpenAI Services
+%                             interface. Needs to be specified or stored in the
+%                             environment variable AZURE_OPENAI_ENDPOINT.
+%
+%   Deployment              - The deployment as defined in the Azure OpenAI Services
+%                             interface. Needs to be specified or stored in the
+%                             environment variable AZURE_OPENAI_DEPLOYMENT.
+%
+%   APIKey                  - The API key for accessing the Azure OpenAI Chat API.
+%                             Needs to be specified or stored in the
+%                             environment variable AZURE_OPENAI_API_KEY.
 %
 %   Temperature             - Temperature value for controlling the randomness
 %                             of the output. Default value is 1; higher values
@@ -32,8 +43,6 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
 %
 %   ResponseFormat          - The format of response the model returns.
 %                             "text" (default) | "json"
-%
-%   APIKey                  - The API key for accessing the OpenAI Chat API.
 %
 %   PresencePenalty         - Penalty value for using a token in the response
 %                             that has already been used. Default value is 0.
@@ -91,18 +100,18 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
     end
 
     methods
-        function this = azureChat(endpoint, deploymentID, systemPrompt, nvp)
+        function this = azureChat(systemPrompt, nvp)
             arguments
-                endpoint                           {mustBeTextScalar}
-                deploymentID                       {mustBeTextScalar}
                 systemPrompt                       {llms.utils.mustBeTextOrEmpty} = []
+                nvp.Endpoint                       {mustBeNonzeroLengthTextScalar}
+                nvp.Deployment                     {mustBeNonzeroLengthTextScalar}
+                nvp.APIKey                         {mustBeNonzeroLengthTextScalar}
                 nvp.Tools                    (1,:) {mustBeA(nvp.Tools, "openAIFunction")} = openAIFunction.empty
                 nvp.APIVersion               (1,1) {mustBeAPIVersion} = "2024-02-01"
                 nvp.Temperature                    {llms.utils.mustBeValidTemperature} = 1
                 nvp.TopP                           {llms.utils.mustBeValidTopP} = 1
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}
                 nvp.ResponseFormat           (1,1) string {mustBeMember(nvp.ResponseFormat,["text","json"])} = "text"
-                nvp.APIKey                         {mustBeNonzeroLengthTextScalar}
                 nvp.PresencePenalty                {llms.utils.mustBeValidPenalty} = 0
                 nvp.FrequencyPenalty               {llms.utils.mustBeValidPenalty} = 0
                 nvp.TimeOut                  (1,1) {mustBeReal,mustBePositive} = 10
@@ -131,8 +140,9 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
                 end
             end
 
-            this.Endpoint = endpoint;
-            this.DeploymentID = deploymentID;
+            this.Endpoint = getEndpoint(nvp);
+            this.DeploymentID = getDeployment(nvp);
+            this.APIKey = llms.internal.getApiKeyFromNvpOrEnv(nvp,"AZURE_OPENAI_API_KEY");
             this.APIVersion = nvp.APIVersion;
             this.ResponseFormat = nvp.ResponseFormat;
             this.Temperature = nvp.Temperature;
@@ -140,7 +150,6 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
             this.StopSequences = nvp.StopSequences;
             this.PresencePenalty = nvp.PresencePenalty;
             this.FrequencyPenalty = nvp.FrequencyPenalty;
-            this.APIKey = llms.internal.getApiKeyFromNvpOrEnv(nvp,"AZURE_OPENAI_API_KEY");
             this.TimeOut = nvp.TimeOut;
         end
 
@@ -284,4 +293,28 @@ end
 
 function mustBeAPIVersion(model)
     mustBeMember(model,llms.azure.apiVersions);
+end
+
+function endpoint = getEndpoint(nvp)
+    if isfield(nvp, "Endpoint")
+        endpoint = nvp.Endpoint;
+    else
+        if isenv("AZURE_OPENAI_ENDPOINT")
+            endpoint = getenv("AZURE_OPENAI_ENDPOINT");
+        else
+            error("llms:endpointMustBeSpecified", llms.utils.errorMessageCatalog.getMessage("llms:endpointMustBeSpecified"));
+        end
+    end
+end
+
+function deployment = getDeployment(nvp)
+    if isfield(nvp, "Deployment")
+        deployment = nvp.Deployment;
+    else
+        if isenv("AZURE_OPENAI_DEPLOYMENT")
+            deployment = getenv("AZURE_OPENAI_DEPLOYMENT");
+        else
+            error("llms:deploymentMustBeSpecified", llms.utils.errorMessageCatalog.getMessage("llms:deploymentMustBeSpecified"));
+        end
+    end
 end
