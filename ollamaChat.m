@@ -121,14 +121,8 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
             %   [TEXT, MESSAGE, RESPONSE] = generate(__, Name=Value) specifies additional options
             %   using one or more name-value arguments:
             %
-            %       NumCompletions   - Number of completions to generate.
-            %                          Default value is 1.
-            %
             %       MaxNumTokens     - Maximum number of tokens in the generated response.
             %                          Default value is inf.
-            %
-            %       ToolChoice       - Function to execute. 'none', 'auto',
-            %                          or specify the function to call.
             %
             %       Seed             - An integer value to use to obtain
             %                          reproducible responses
@@ -136,7 +130,6 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
             arguments
                 this                    (1,1) ollamaChat
                 messages                {mustBeValidMsgs}
-                nvp.NumCompletions      (1,1) {mustBePositive, mustBeInteger} = 1
                 nvp.MaxNumTokens        (1,1) {mustBePositive} = inf
                 nvp.Seed                {mustBeIntegerOrEmpty(nvp.Seed)} = []
             end
@@ -157,7 +150,6 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
                 Temperature=this.Temperature, ...
                 TopP=this.TopP, TopK=this.TopK,...
                 TailFreeSamplingZ=this.TailFreeSamplingZ,...
-                NumCompletions=nvp.NumCompletions,...
                 StopSequences=this.StopSequences, MaxNumTokens=nvp.MaxNumTokens, ...
                 ResponseFormat=this.ResponseFormat,Seed=nvp.Seed, ...
                 TimeOut=this.TimeOut, StreamFun=this.StreamFun);

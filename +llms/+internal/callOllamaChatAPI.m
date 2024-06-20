@@ -31,7 +31,6 @@ arguments
     nvp.TopP
     nvp.TopK
     nvp.TailFreeSamplingZ
-    nvp.NumCompletions
     nvp.StopSequences
     nvp.MaxNumTokens
     nvp.ResponseFormat
@@ -102,7 +101,6 @@ dict("Temperature") = "temperature";
 dict("TopP") = "top_p";
 dict("TopK") = "top_k";
 dict("TailFreeSamplingZ") = "tfs_z";
-dict("NumCompletions") = "n";
 dict("StopSequences") = "stop";
 dict("MaxNumTokens") = "num_predict";
 end
