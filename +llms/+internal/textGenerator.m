@@ -18,9 +18,6 @@ classdef (Abstract) textGenerator
         %TimeOut    Connection timeout in seconds (default 10 secs)
         TimeOut
 
-        %FunctionNames   Names of the functions that the model can request calls
-        FunctionNames
-
         %SystemPrompt   System prompt.
         SystemPrompt = []
 

@@ -3,6 +3,11 @@ classdef (Abstract) hasTools
 
     % Copyright 2023-2024 The MathWorks, Inc.
 
+    properties (SetAccess=protected)
+        %FunctionNames   Names of the functions that the model can request calls
+        FunctionNames
+    end
+
     properties (Access=protected)
         Tools
         FunctionsStruct
