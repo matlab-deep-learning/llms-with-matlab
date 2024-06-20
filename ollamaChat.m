@@ -53,7 +53,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
 %
 %
 %   ollamaChat Functions:
-%       ollamaChat           - Chat completion API from OpenAI.
+%       ollamaChat           - Chat completion API using Ollama server.
 %       generate             - Generate a response using the ollamaChat instance.
 %
 %   ollamaChat Properties, in addition to the name-value pairs above:
