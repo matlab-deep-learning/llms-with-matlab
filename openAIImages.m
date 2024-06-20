@@ -1,4 +1,4 @@
-classdef openAIImages
+classdef openAIImages < llms.internal.needsAPIKey
 %openAIImages Connect to Images API from OpenAI.
 %
 %   MDL = openAIImages creates an openAIImages object with dall-e-2
@@ -36,10 +36,6 @@ classdef openAIImages
 
         %TimeOut    Connection timeout in seconds (default 10 secs)
         TimeOut
-    end
-
-    properties (Access=private)
-        APIKey
     end
 
     methods
