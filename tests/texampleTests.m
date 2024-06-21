@@ -97,6 +97,10 @@ classdef texampleTests < matlab.unittest.TestCase
             ProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode;
         end
 
+        function testProcessGeneratedTextInRealTimeByUsingOllamaInStreamingMode(~)
+            ProcessGeneratedTextInRealTimeByUsingOllamaInStreamingMode;
+        end
+
         function testRetrievalAugmentedGenerationUsingChatGPTandMATLAB(~)
             RetrievalAugmentedGenerationUsingChatGPTandMATLAB;
         end
