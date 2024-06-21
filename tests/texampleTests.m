@@ -35,41 +35,13 @@ classdef texampleTests < matlab.unittest.TestCase
             AnalyzeScientificPapersUsingFunctionCalls;
         end
 
-        function testProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode(~)
-            ProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode;
-        end
-
-        function testUsingDALLEToGenerateImages(~)
-            UsingDALLEToGenerateImages;
-        end
-
-        function testInformationRetrievalUsingOpenAIDocumentEmbedding(~)
-            InformationRetrievalUsingOpenAIDocumentEmbedding;
-        end
-
-        function testDescribeImagesUsingChatGPT(~)
-            DescribeImagesUsingChatGPT;
-        end
-
-        function testSummarizeLargeDocumentsUsingChatGPTandMATLAB(~)
-            SummarizeLargeDocumentsUsingChatGPTandMATLAB;
+        function testAnalyzeSentimentinTextUsingChatGPTinJSONMode(testCase)
+            testCase.verifyWarning(@AnalyzeSentimentinTextUsingChatGPTinJSONMode,...
+                "llms:warningJsonInstruction");
         end
 
         function testAnalyzeTextDataUsingParallelFunctionCallwithChatGPT(~)
             AnalyzeTextDataUsingParallelFunctionCallwithChatGPT;
-        end
-
-        function testRetrievalAugmentedGenerationUsingChatGPTandMATLAB(~)
-            RetrievalAugmentedGenerationUsingChatGPTandMATLAB;
-        end
-
-        function testUsingDALLEToEditImages(~)
-            UsingDALLEToEditImages;
-        end
-
-        function testAnalyzeSentimentinTextUsingChatGPTinJSONMode(testCase)
-            testCase.verifyWarning(@AnalyzeSentimentinTextUsingChatGPTinJSONMode,...
-                "llms:warningJsonInstruction");
         end
 
         function testCreateSimpleChatBot(testCase,ChatBotExample)
@@ -111,6 +83,34 @@ classdef texampleTests < matlab.unittest.TestCase
 
             testCase.verifyEqual(count,find(prompts=="end",1));
             testCase.verifySize(messages.Messages,[1 2*(count-1)]);
+        end
+
+        function testDescribeImagesUsingChatGPT(~)
+            DescribeImagesUsingChatGPT;
+        end
+
+        function testInformationRetrievalUsingOpenAIDocumentEmbedding(~)
+            InformationRetrievalUsingOpenAIDocumentEmbedding;
+        end
+
+        function testProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode(~)
+            ProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode;
+        end
+
+        function testRetrievalAugmentedGenerationUsingChatGPTandMATLAB(~)
+            RetrievalAugmentedGenerationUsingChatGPTandMATLAB;
+        end
+
+        function testSummarizeLargeDocumentsUsingChatGPTandMATLAB(~)
+            SummarizeLargeDocumentsUsingChatGPTandMATLAB;
+        end
+
+        function testUsingDALLEToEditImages(~)
+            UsingDALLEToEditImages;
+        end
+
+        function testUsingDALLEToGenerateImages(~)
+            UsingDALLEToGenerateImages;
         end
     end
     
