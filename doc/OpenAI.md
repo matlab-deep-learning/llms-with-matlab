@@ -1,6 +1,6 @@
 # OpenAI™
 
-Several function sin this repository connect MATLAB to the [OpenAI™ Chat Completions API](https://platform.openai.com/docs/guides/text-generation/chat-completions-api) (which powers ChatGPT™) and the [OpenAI Images API](https://platform.openai.com/docs/guides/images/image-generation-beta) (which powers DALL·E™).
+Several functions in this repository connect MATLAB to the [OpenAI™ Chat Completions API](https://platform.openai.com/docs/guides/text-generation/chat-completions-api) (which powers ChatGPT™) and the [OpenAI Images API](https://platform.openai.com/docs/guides/images/image-generation-beta) (which powers DALL·E™).
 
 To start using the OpenAI APIs, you first need to obtain OpenAI API keys. You are responsible for any fees OpenAI may charge for the use of their APIs. You should be familiar with the limitations and risks associated with using this technology, and you agree that you shall be solely responsible for full compliance with any terms that may apply to your use of the OpenAI APIs.
 

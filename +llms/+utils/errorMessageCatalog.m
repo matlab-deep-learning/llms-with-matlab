@@ -58,4 +58,5 @@ catalog("llms:pngExpected") = "Argument must be a PNG image.";
 catalog("llms:warningJsonInstruction") = "When using JSON mode, you must also prompt the model to produce JSON yourself via a system or user message.";
 catalog("llms:apiReturnedError") = "Server error: ""{1}""";
 catalog("llms:dimensionsMustBeSmallerThan") = "Dimensions must be less than or equal to {1}.";
+catalog("llms:stream:responseStreamer:InvalidInput") = "Input does not have the expected json format, got ""{1}"".";
 end
