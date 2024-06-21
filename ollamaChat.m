@@ -61,11 +61,6 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
 %
 %       SystemPrompt         - System prompt.
 
-% Ollama model properties not exposed:
-%  repeat_last_n, repeat_penalty           - could not find an example where they made a difference
-%  mirostat, mirostat_eta, mirostat_tau    - looking for the best API design
-
-
 % Copyright 2024 The MathWorks, Inc.
 
     properties

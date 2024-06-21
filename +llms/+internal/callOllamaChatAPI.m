@@ -39,7 +39,7 @@ arguments
     nvp.StreamFun
 end
 
-URL = "http://localhost:11434/api/chat"; % TODO: model parameter
+URL = "http://localhost:11434/api/chat";
 
 % The JSON for StopSequences must have an array, and cannot say "stop": "foo".
 % The easiest way to ensure that is to never pass in a scalar …
