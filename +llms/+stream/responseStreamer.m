@@ -55,10 +55,9 @@ classdef responseStreamer < matlab.net.http.io.BinaryConsumer
                             this.Incomplete = str{i};
                             return;
                         end
-                        errID = 'llms:stream:responseStreamer:InvalidInput';
-                        msg = "Input does not have the expected json format. " + str{i};
-                        ME = MException(errID,msg);
-                        throw(ME)
+                        error("llms:stream:responseStreamer:InvalidInput", ...
+                            llms.utils.errorMessageCatalog.getMessage(...
+                                "llms:stream:responseStreamer:InvalidInput", str{i}));
                     end
                     if isfield(json,'choices')
                         if isempty(json.choices)
