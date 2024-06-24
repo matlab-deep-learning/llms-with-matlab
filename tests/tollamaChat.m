@@ -50,8 +50,13 @@ classdef tollamaChat < matlab.unittest.TestCase
         end
 
         function extremeTfsZ(testCase)
-            % setting tfs_z to z=0 leaves no random choice,
-            % so we expect to get a fixed response.
+            %% This should work, and it does on some computers. On others, Ollama
+            %% receives the parameter, but either Ollama or llama.cpp fails to
+            %% honor it correctly.
+            testCase.assumeTrue(false,"disabled due to Ollama/llama.cpp not honoring parameter reliably");
+
+            % setting tfs_z to z=0 leaves no random choice, but degrades to
+            % greedy sampling, so we expect to get a fixed response.
             chat = ollamaChat("mistral",TailFreeSamplingZ=0);
             prompt = "Sampling with tfs_z=0 returns a definite answer.";
             response1 = generate(chat,prompt);
@@ -70,6 +75,11 @@ classdef tollamaChat < matlab.unittest.TestCase
         end
 
         function seedFixesResult(testCase)
+            %% This should work, and it does on some computers. On others, Ollama
+            %% receives the parameter, but either Ollama or llama.cpp fails to
+            %% honor it correctly.
+            testCase.assumeTrue(false,"disabled due to Ollama/llama.cpp not honoring parameter reliably");
+
             chat = ollamaChat("mistral");
             response1 = generate(chat,"hi",Seed=1234);
             response2 = generate(chat,"hi",Seed=1234);
