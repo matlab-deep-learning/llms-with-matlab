@@ -1,16 +1,16 @@
-function [text, message, response] = callOpenAIChatAPI(messages, functions, nvp)
+function [text, message, response] = callAzureChatAPI(endpoint, deploymentID, messages, functions, nvp)
 % This function is undocumented and will change in a future release
 
-%callOpenAIChatAPI Calls the openAI chat completions API.
+%callAzureChatAPI Calls the openAI chat completions API on Azure.
 %
 %   MESSAGES and FUNCTIONS should be structs matching the json format
 %   required by the OpenAI Chat Completions API.
 %   Ref: https://platform.openai.com/docs/guides/gpt/chat-completions-api
 %
-%   More details on the parameters: https://platform.openai.com/docs/api-reference/chat/create
+%   More details on the parameters: https://learn.microsoft.com/en-us/azure/ai-services/openai/how-to/chatgpt
 %
 %   Example
-%   
+%
 %   % Create messages struct
 %   messages = {struct("role", "system",...
 %       "content", "You are a helpful assistant");
@@ -35,15 +35,17 @@ function [text, message, response] = callOpenAIChatAPI(messages, functions, nvp)
 %   apiKey = "your-api-key-here"
 %
 %   % Send a request
-%   [text, message] = llms.internal.callOpenAIChatAPI(messages, functions, APIKey=apiKey)
+%   [text, message] = llms.internal.callAzureChatAPI(messages, functions, APIKey=apiKey)
 
 %   Copyright 2023-2024 The MathWorks, Inc.
 
 arguments
+    endpoint
+    deploymentID
     messages
     functions
     nvp.ToolChoice
-    nvp.ModelName
+    nvp.APIVersion
     nvp.Temperature
     nvp.TopP
     nvp.NumCompletions
@@ -58,11 +60,11 @@ arguments
     nvp.StreamFun
 end
 
-END_POINT = "https://api.openai.com/v1/chat/completions";
+URL = endpoint + "openai/deployments/" + deploymentID + "/chat/completions?api-version=" + nvp.APIVersion;
 
 parameters = buildParametersCall(messages, functions, nvp);
 
-[response, streamedText] = llms.internal.sendRequest(parameters,nvp.APIKey, END_POINT, nvp.TimeOut, nvp.StreamFun);
+[response, streamedText] = llms.internal.sendRequest(parameters,nvp.APIKey, URL, nvp.TimeOut, nvp.StreamFun);
 
 % If call errors, "choices" will not be part of response.Body.Data, instead
 % we get response.Body.Data.error
@@ -71,20 +73,8 @@ if response.StatusCode=="OK"
     if isempty(nvp.StreamFun)
         message = response.Body.Data.choices(1).message;
     else
-        pat = '{"' + wildcardPattern + '":';
-        if contains(streamedText,pat)
-            s = jsondecode(streamedText);
-            if contains(s.function.arguments,pat)
-                prompt = jsondecode(s.function.arguments);
-                s.function.arguments = prompt;
-            end
-            message = struct("role", "assistant", ...
-                 "content",[], ...
-                 "tool_calls",jsondecode(streamedText));
-        else
-            message = struct("role", "assistant", ...
-                "content", streamedText);
-        end
+        message = struct("role", "assistant", ...
+            "content", streamedText);
     end
     if isfield(message, "tool_choice")
         text = "";
@@ -114,34 +104,18 @@ if ~isempty(nvp.ToolChoice)
     parameters.tool_choice = nvp.ToolChoice;
 end
 
-if strcmp(nvp.ResponseFormat,"json")
-    parameters.response_format = struct('type','json_object');
-end
-
 if ~isempty(nvp.Seed)
     parameters.seed = nvp.Seed;
 end
 
-parameters.model = nvp.ModelName;
-
 dict = mapNVPToParameters;
 
 nvpOptions = keys(dict);
-
 for opt = nvpOptions.'
     if isfield(nvp, opt)
         parameters.(dict(opt)) = nvp.(opt);
     end
 end
-
-if isempty(nvp.StopSequences)
-    parameters = rmfield(parameters,"stop");
-end
-
-if nvp.MaxNumTokens == Inf
-    parameters = rmfield(parameters,"max_tokens");
-end
-
 end
 
 function dict = mapNVPToParameters()
@@ -152,5 +126,5 @@ dict("NumCompletions") = "n";
 dict("StopSequences") = "stop";
 dict("MaxNumTokens") = "max_tokens";
 dict("PresencePenalty") = "presence_penalty";
-dict("FrequencyPenalty ") = "frequency_penalty";
+dict("FrequencyPenalty") = "frequency_penalty";
 end

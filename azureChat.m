@@ -1,17 +1,27 @@
-classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
+classdef(Sealed) azureChat < llms.internal.textGenerator & ...
     llms.internal.gptPenalties & llms.internal.hasTools & llms.internal.needsAPIKey
-%openAIChat Chat completion API from OpenAI.
+%azureChat Chat completion API from Azure.
 %
-%   CHAT = openAIChat(systemPrompt) creates an openAIChat object with the
+%   CHAT = azureChat creates an azureChat object, with the parameters needed
+%   to connect to Azure taken from the environment.
+%
+%   CHAT = azureChat(systemPrompt) creates an azureChat object with the
 %   specified system prompt.
 %
-%   CHAT = openAIChat(systemPrompt,APIKey=key) uses the specified API key
-%
-%   CHAT = openAIChat(systemPrompt,Name=Value) specifies additional options
+%   CHAT = azureChat(__,Name=Value) specifies additional options
 %   using one or more name-value arguments:
 %
-%   ModelName               - Name of the model to use for chat completions.
-%                             The default value is "gpt-3.5-turbo".
+%   Endpoint                - The endpoint as defined in the Azure OpenAI Services
+%                             interface. Needs to be specified or stored in the
+%                             environment variable AZURE_OPENAI_ENDPOINT.
+%
+%   Deployment              - The deployment as defined in the Azure OpenAI Services
+%                             interface. Needs to be specified or stored in the
+%                             environment variable AZURE_OPENAI_DEPLOYMENT.
+%
+%   APIKey                  - The API key for accessing the Azure OpenAI Chat API.
+%                             Needs to be specified or stored in the
+%                             environment variable AZURE_OPENAI_API_KEY.
 %
 %   Temperature             - Temperature value for controlling the randomness
 %                             of the output. Default value is 1; higher values
@@ -26,13 +36,13 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
 %                             words can appear in any particular place.
 %                             This is also known as top-p sampling.
 %
-%   Tools                   - Array of openAIFunction objects representing
-%                             custom functions to be used during chat completions.
-%
 %   StopSequences           - Vector of strings that when encountered, will
 %                             stop the generation of tokens. Default
 %                             value is empty.
 %                             Example: ["The end.", "And that's all she wrote."]
+%
+%   ResponseFormat          - The format of response the model returns.
+%                             "text" (default) | "json"
 %
 %   PresencePenalty         - Penalty value for using a token in the response
 %                             that has already been used. Default value is 0.
@@ -42,21 +52,23 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
 %                             in the output. Default value is 0.
 %                             Higher values reduce repetition of words in the output.
 %
+%   StreamFun               - Function to callback when streaming the result
+%
 %   TimeOut                 - Connection Timeout in seconds. Default value is 10.
 %
-%   StreamFun               - Function to callback when streaming the
-%                             result
+%   Tools                   - A list of tools the model can call.
 %
-%   ResponseFormat          - The format of response the model returns.
-%                             "text" (default) | "json"
+%   API Version             - The API version to use for this model.
+%                             "2024-02-01" (default) | "2023-05-15" | "2024-05-01-preview" | ...
+%                             "2024-04-01-preview" | "2024-03-01-preview"
 %
-%   openAIChat Functions:
-%       openAIChat           - Chat completion API from OpenAI.
-%       generate             - Generate a response using the openAIChat instance.
 %
-%   openAIChat Properties:
-%       ModelName            - Model name.
 %
+%   azureChat Functions:
+%       azureChat            - Chat completion API from OpenAI.
+%       generate             - Generate a response using the azureChat instance.
+%
+%   azureChat Properties:
 %       Temperature          - Temperature of generation.
 %
 %       TopP                 - Top probability mass to consider for generation.
@@ -82,22 +94,24 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
 % Copyright 2023-2024 The MathWorks, Inc.
 
     properties(SetAccess=private)
-        %MODELNAME   Model name.
-        ModelName
+        Endpoint     (1,1) string
+        DeploymentID (1,1) string
+        APIVersion   (1,1) string
     end
 
-
     methods
-        function this = openAIChat(systemPrompt, nvp)
+        function this = azureChat(systemPrompt, nvp)
             arguments
                 systemPrompt                       {llms.utils.mustBeTextOrEmpty} = []
+                nvp.Endpoint                       {mustBeNonzeroLengthTextScalar}
+                nvp.Deployment                     {mustBeNonzeroLengthTextScalar}
+                nvp.APIKey                         {mustBeNonzeroLengthTextScalar}
                 nvp.Tools                    (1,:) {mustBeA(nvp.Tools, "openAIFunction")} = openAIFunction.empty
-                nvp.ModelName                (1,1) string {mustBeModel} = "gpt-3.5-turbo"
+                nvp.APIVersion               (1,1) {mustBeAPIVersion} = "2024-02-01"
                 nvp.Temperature                    {llms.utils.mustBeValidTemperature} = 1
                 nvp.TopP                           {llms.utils.mustBeValidTopP} = 1
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}
                 nvp.ResponseFormat           (1,1) string {mustBeMember(nvp.ResponseFormat,["text","json"])} = "text"
-                nvp.APIKey                         {mustBeNonzeroLengthTextScalar}
                 nvp.PresencePenalty                {llms.utils.mustBeValidPenalty} = 0
                 nvp.FrequencyPenalty               {llms.utils.mustBeValidPenalty} = 0
                 nvp.TimeOut                  (1,1) {mustBeReal,mustBePositive} = 10
@@ -121,28 +135,26 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
 
             if ~isempty(systemPrompt)
                 systemPrompt = string(systemPrompt);
-                if systemPrompt ~= ""
+                if ~(strlength(systemPrompt)==0)
                    this.SystemPrompt = {struct("role", "system", "content", systemPrompt)};
                 end
             end
 
-            this.ModelName = nvp.ModelName;
+            this.Endpoint = getEndpoint(nvp);
+            this.DeploymentID = getDeployment(nvp);
+            this.APIKey = llms.internal.getApiKeyFromNvpOrEnv(nvp,"AZURE_OPENAI_API_KEY");
+            this.APIVersion = nvp.APIVersion;
+            this.ResponseFormat = nvp.ResponseFormat;
             this.Temperature = nvp.Temperature;
             this.TopP = nvp.TopP;
             this.StopSequences = nvp.StopSequences;
-
-            % ResponseFormat is only supported in the latest models only
-            llms.openai.validateResponseFormat(nvp.ResponseFormat, this.ModelName);
-            this.ResponseFormat = nvp.ResponseFormat;
-
             this.PresencePenalty = nvp.PresencePenalty;
             this.FrequencyPenalty = nvp.FrequencyPenalty;
-            this.APIKey = llms.internal.getApiKeyFromNvpOrEnv(nvp,"OPENAI_API_KEY");
             this.TimeOut = nvp.TimeOut;
         end
 
         function [text, message, response] = generate(this, messages, nvp)
-            %generate   Generate a response using the openAIChat instance.
+            %generate   Generate a response using the azureChat instance.
             %
             %   [TEXT, MESSAGE, RESPONSE] = generate(CHAT, MESSAGES) generates a response
             %   with the specified MESSAGES.
@@ -163,19 +175,17 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
             %                          reproducible responses
             %
             % Currently, GPT-4 Turbo with vision does not support the message.name
-            % parameter, functions/tools, response_format parameter, and stop
-            % sequences. It also has a low MaxNumTokens default, which can be overridden.
+            % parameter, functions/tools, response_format parameter, stop
+            % sequences, and max_tokens
 
             arguments
-                this                    (1,1) openAIChat
+                this                    (1,1) azureChat
                 messages                {mustBeValidMsgs}
                 nvp.NumCompletions      (1,1) {mustBePositive, mustBeInteger} = 1
                 nvp.MaxNumTokens        (1,1) {mustBePositive} = inf
                 nvp.ToolChoice          {mustBeValidFunctionCall(this, nvp.ToolChoice)} = []
                 nvp.Seed                {mustBeIntegerOrEmpty(nvp.Seed)} = []
             end
-
-            toolChoice = convertToolChoice(this, nvp.ToolChoice);
 
             messages = convertCharsToStrings(messages);
             if isstring(messages) && isscalar(messages)
@@ -184,19 +194,30 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
                 messagesStruct = messages.Messages;
             end
 
-            llms.openai.validateMessageSupported(messagesStruct{end}, this.ModelName);
-
             if ~isempty(this.SystemPrompt)
                 messagesStruct = horzcat(this.SystemPrompt, messagesStruct);
             end
 
-            [text, message, response] = llms.internal.callOpenAIChatAPI(messagesStruct, this.FunctionsStruct,...
-                ModelName=this.ModelName, ToolChoice=toolChoice, Temperature=this.Temperature, ...
-                TopP=this.TopP, NumCompletions=nvp.NumCompletions,...
-                StopSequences=this.StopSequences, MaxNumTokens=nvp.MaxNumTokens, ...
-                PresencePenalty=this.PresencePenalty, FrequencyPenalty=this.FrequencyPenalty, ...
-                ResponseFormat=this.ResponseFormat,Seed=nvp.Seed, ...
-                APIKey=this.APIKey,TimeOut=this.TimeOut, StreamFun=this.StreamFun);
+            toolChoice = convertToolChoice(this, nvp.ToolChoice);
+            try
+                [text, message, response] = llms.internal.callAzureChatAPI(this.Endpoint, ...
+                    this.DeploymentID, messagesStruct, this.FunctionsStruct, ...
+                    ToolChoice=toolChoice, APIVersion = this.APIVersion, Temperature=this.Temperature, ...
+                    TopP=this.TopP, NumCompletions=nvp.NumCompletions,...
+                    StopSequences=this.StopSequences, MaxNumTokens=nvp.MaxNumTokens, ...
+                    PresencePenalty=this.PresencePenalty, FrequencyPenalty=this.FrequencyPenalty, ...
+                    ResponseFormat=this.ResponseFormat,Seed=nvp.Seed, ...
+                    APIKey=this.APIKey,TimeOut=this.TimeOut, StreamFun=this.StreamFun);
+            catch ME
+                if ismember(ME.identifier,...
+                    ["MATLAB:webservices:UnknownHost","MATLAB:webservices:Timeout"])
+                    % throw(ME)would still print a long stack trace, from
+                    % ME.cause.stack. We cannot change ME.cause, so we
+                    % throw a new error:
+                    error(ME.identifier,ME.message);
+                end
+                rethrow(ME);
+            end
 
             if isfield(response.Body.Data,"error")
                 err = response.Body.Data.error.message;
@@ -223,8 +244,8 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
                 if ~isempty(this.Tools)
                     toolChoice = "auto";
                 end
-            elseif ~ismember(toolChoice,["auto","none"])
-                % if toolChoice is not empty, then it must be "auto", "none" or in the format
+            elseif toolChoice ~= "auto"
+                % if toolChoice is not empty, then it must be in the format
                 % {"type": "function", "function": {"name": "my_function"}}
                 toolChoice = struct("type","function","function",struct("name",toolChoice));
             end
@@ -245,7 +266,7 @@ functionNames = strings(1, numFunctions);
 
 for i = 1:numFunctions
     functionsStruct{i} = struct('type','function', ...
-        'function',encodeStruct(functions(i)));
+        'function',encodeStruct(functions(i))) ;
     functionNames(i) = functions(i).FunctionName;
 end
 end
@@ -270,6 +291,30 @@ function mustBeIntegerOrEmpty(value)
     end
 end
 
-function mustBeModel(model)
-    mustBeMember(model,llms.openai.models);
+function mustBeAPIVersion(model)
+    mustBeMember(model,llms.azure.apiVersions);
+end
+
+function endpoint = getEndpoint(nvp)
+    if isfield(nvp, "Endpoint")
+        endpoint = nvp.Endpoint;
+    else
+        if isenv("AZURE_OPENAI_ENDPOINT")
+            endpoint = getenv("AZURE_OPENAI_ENDPOINT");
+        else
+            error("llms:endpointMustBeSpecified", llms.utils.errorMessageCatalog.getMessage("llms:endpointMustBeSpecified"));
+        end
+    end
+end
+
+function deployment = getDeployment(nvp)
+    if isfield(nvp, "Deployment")
+        deployment = nvp.Deployment;
+    else
+        if isenv("AZURE_OPENAI_DEPLOYMENT")
+            deployment = getenv("AZURE_OPENAI_DEPLOYMENT");
+        else
+            error("llms:deploymentMustBeSpecified", llms.utils.errorMessageCatalog.getMessage("llms:deploymentMustBeSpecified"));
+        end
+    end
 end

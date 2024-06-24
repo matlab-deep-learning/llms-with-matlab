@@ -6,4 +6,3 @@ function tf = isUnique(values)
 %   Copyright 2023 The MathWorks, Inc.
     tf = numel(values)==numel(unique(values));
 end
-
