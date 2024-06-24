@@ -69,6 +69,14 @@ classdef tollamaChat < matlab.unittest.TestCase
             testCase.verifyEqual(response2, extractBefore(response1,"1"));
         end
 
+        function seedFixesResult(testCase)
+            chat = ollamaChat("mistral");
+            response1 = generate(chat,"hi",Seed=1234);
+            response2 = generate(chat,"hi",Seed=1234);
+            testCase.verifyEqual(response1,response2);
+        end
+
+
         function streamFunc(testCase)
             function seen = sf(str)
                 persistent data;
