@@ -21,6 +21,9 @@ jobs:
             # This endpoint blocks until ready
             time curl -i http://localhost:11434
 
+            # For debugging, record Ollama version
+            ollama --version
+
       - name: Pull mistral model
         run: |
             ollama pull mistral
