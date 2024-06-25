@@ -105,6 +105,10 @@ classdef texampleTests < matlab.unittest.TestCase
             RetrievalAugmentedGenerationUsingChatGPTandMATLAB;
         end
 
+        function testRetrievalAugmentedGenerationUsingOllamaAndMATLAB(~)
+            RetrievalAugmentedGenerationUsingOllamaAndMATLAB;
+        end
+
         function testSummarizeLargeDocumentsUsingChatGPTandMATLAB(~)
             SummarizeLargeDocumentsUsingChatGPTandMATLAB;
         end
