@@ -8,6 +8,7 @@ classdef tazureChat < matlab.unittest.TestCase
         InvalidGenerateInput = iGetInvalidGenerateInput;
         InvalidValuesSetters = iGetInvalidValuesSetters;
         StringInputs = struct('string',{"hi"},'char',{'hi'},'cellstr',{{'hi'}});
+        APIVersions = iGetAPIVersions();
     end
 
     methods(Test)
@@ -149,6 +150,19 @@ classdef tazureChat < matlab.unittest.TestCase
             testCase.applyFixture(EnvironmentVariableFixture("AZURE_OPENAI_API_KEY","dummy"));
             unsetenv("AZURE_OPENAI_API_KEY");
             testCase.verifyError(@()azureChat, "llms:keyMustBeSpecified");
+        end
+
+        function canUseAPIVersions(testCase, APIVersions)
+            % Test that we can use different APIVersion value to call 
+            % azureChat.generate
+
+            testCase.assumeTrue(isenv("AZURE_OPENAI_API_KEY"),"end-to-end test requires environment variables AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT.");
+            chat = azureChat("APIVersion", APIVersions);
+
+            response = testCase.verifyWarningFree(@() generate(chat,"How similar is the DNA of a cat and a tiger?"));
+            testCase.verifyClass(response,'string');
+            testCase.verifyGreaterThan(strlength(response),0);
+
         end
     end
 end
@@ -445,4 +459,12 @@ invalidGenerateInput = struct( ...
         "InvalidToolChoiceSize",struct( ...
             "Input",{{ validMessages  "ToolChoice" ["validfunction", "validfunction"] }},...
             "Error","MATLAB:validators:mustBeTextScalar"));
+end
+
+function apiVersions = iGetAPIVersions()
+apiVersions = struct("2024-05-01-preview", "2024-05-01-preview", ...
+    "2024-04-01-preview", "2024-04-01-preview", ...
+    "2024-03-01-preview", "2024-03-01-preview", ...
+    "2024-02-01", "2024-02-01", ...
+    "2023-05-15", "2023-05-15");
 end
