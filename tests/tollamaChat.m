@@ -39,6 +39,13 @@ classdef tollamaChat < matlab.unittest.TestCase
             testCase.verifyGreaterThan(strlength(response),0);
         end
 
+        function doGenerateUsingSystemPrompt(testCase)
+            chat = ollamaChat("mistral","You are a helpful assistant");
+            response = testCase.verifyWarningFree(@() generate(chat,"Hi"));
+            testCase.verifyClass(response,'string');
+            testCase.verifyGreaterThan(strlength(response),0);
+        end
+
         function extremeTopK(testCase)
             % setting top-k to k=1 leaves no random choice,
             % so we expect to get a fixed response.
