@@ -41,6 +41,14 @@ classdef tazureChat < matlab.unittest.TestCase
             testCase.verifyGreaterThan(strlength(response),0);
         end
 
+        function doGenerateUsingSystemPrompt(testCase)
+            testCase.assumeTrue(isenv("AZURE_OPENAI_API_KEY"),"end-to-end test requires environment variables AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT.");
+            chat = azureChat("You are a helpful assistant");
+            response = testCase.verifyWarningFree(@() generate(chat,"Hi"));
+            testCase.verifyClass(response,'string');
+            testCase.verifyGreaterThan(strlength(response),0);
+        end
+
         function generateMultipleResponses(testCase)
             chat = azureChat;
             [~,~,response] = generate(chat,"What is a cat?",NumCompletions=3);
@@ -162,7 +170,26 @@ classdef tazureChat < matlab.unittest.TestCase
             response = testCase.verifyWarningFree(@() generate(chat,"How similar is the DNA of a cat and a tiger?"));
             testCase.verifyClass(response,'string');
             testCase.verifyGreaterThan(strlength(response),0);
+        end
 
+        function endpointNotFound(testCase)
+            % to verify the error, we need to unset the environment variable
+            % AZURE_OPENAI_ENDPOINT, if given. Use a fixture to restore the
+            % value on leaving the test point
+            import matlab.unittest.fixtures.EnvironmentVariableFixture
+            testCase.applyFixture(EnvironmentVariableFixture("AZURE_OPENAI_ENDPOINT","dummy"));
+            unsetenv("AZURE_OPENAI_ENDPOINT");
+            testCase.verifyError(@()azureChat, "llms:endpointMustBeSpecified");
+        end
+
+        function deploymentNotFound(testCase)
+            % to verify the error, we need to unset the environment variable
+            % AZURE_OPENAI_DEPLOYMENT, if given. Use a fixture to restore the
+            % value on leaving the test point
+            import matlab.unittest.fixtures.EnvironmentVariableFixture
+            testCase.applyFixture(EnvironmentVariableFixture("AZURE_OPENAI_DEPLOYMENT","dummy"));
+            unsetenv("AZURE_OPENAI_DEPLOYMENT");
+            testCase.verifyError(@()azureChat, "llms:deploymentMustBeSpecified");
         end
     end
 end
