@@ -189,7 +189,7 @@ classdef tazureChat < matlab.unittest.TestCase
             import matlab.unittest.fixtures.EnvironmentVariableFixture
             testCase.applyFixture(EnvironmentVariableFixture("AZURE_OPENAI_DEPLOYMENT","dummy"));
             unsetenv("AZURE_OPENAI_DEPLOYMENT");
-            testCase.verifyError(@()azureChat, "deploymentMustBeSpecified");
+            testCase.verifyError(@()azureChat, "llms:deploymentMustBeSpecified");
         end
     end
 end
