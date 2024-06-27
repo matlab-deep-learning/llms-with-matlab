@@ -41,6 +41,14 @@ classdef tazureChat < matlab.unittest.TestCase
             testCase.verifyGreaterThan(strlength(response),0);
         end
 
+        function doGenerateUsingSystemPrompt(testCase)
+            testCase.assumeTrue(isenv("AZURE_OPENAI_API_KEY"),"end-to-end test requires environment variables AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT.");
+            chat = azureChat("You are a helpful assistant");
+            response = testCase.verifyWarningFree(@() generate(chat,"Hi"));
+            testCase.verifyClass(response,'string');
+            testCase.verifyGreaterThan(strlength(response),0);
+        end
+
         function generateMultipleResponses(testCase)
             chat = azureChat;
             [~,~,response] = generate(chat,"What is a cat?",NumCompletions=3);
