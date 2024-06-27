@@ -170,7 +170,26 @@ classdef tazureChat < matlab.unittest.TestCase
             response = testCase.verifyWarningFree(@() generate(chat,"How similar is the DNA of a cat and a tiger?"));
             testCase.verifyClass(response,'string');
             testCase.verifyGreaterThan(strlength(response),0);
+        end
 
+        function endpointNotFound(testCase)
+            % to verify the error, we need to unset the environment variable
+            % AZURE_OPENAI_ENDPOINT, if given. Use a fixture to restore the
+            % value on leaving the test point
+            import matlab.unittest.fixtures.EnvironmentVariableFixture
+            testCase.applyFixture(EnvironmentVariableFixture("AZURE_OPENAI_ENDPOINT","dummy"));
+            unsetenv("AZURE_OPENAI_ENDPOINT");
+            testCase.verifyError(@()azureChat, "llms:endpointMustBeSpecified");
+        end
+
+        function deploymentNotFound(testCase)
+            % to verify the error, we need to unset the environment variable
+            % AZURE_OPENAI_DEPLOYMENT, if given. Use a fixture to restore the
+            % value on leaving the test point
+            import matlab.unittest.fixtures.EnvironmentVariableFixture
+            testCase.applyFixture(EnvironmentVariableFixture("AZURE_OPENAI_DEPLOYMENT","dummy"));
+            unsetenv("AZURE_OPENAI_DEPLOYMENT");
+            testCase.verifyError(@()azureChat, "deploymentMustBeSpecified");
         end
     end
 end
