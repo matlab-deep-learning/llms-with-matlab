@@ -157,7 +157,7 @@ classdef tazureChat < matlab.unittest.TestCase
             % azureChat.generate
 
             testCase.assumeTrue(isenv("AZURE_OPENAI_API_KEY"),"end-to-end test requires environment variables AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT.");
-            chat = azureChat("APIVersion", string(APIVersions));
+            chat = azureChat("APIVersion", APIVersions);
 
             response = testCase.verifyWarningFree(@() generate(chat,"How similar is the DNA of a cat and a tiger?"));
             testCase.verifyClass(response,'string');
