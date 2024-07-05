@@ -103,11 +103,11 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
         function this = azureChat(systemPrompt, nvp)
             arguments
                 systemPrompt                       {llms.utils.mustBeTextOrEmpty} = []
-                nvp.Endpoint                       {mustBeNonzeroLengthTextScalar}
-                nvp.Deployment                     {mustBeNonzeroLengthTextScalar}
+                nvp.Endpoint                 (1,1) string {mustBeNonzeroLengthTextScalar}
+                nvp.Deployment               (1,1) string {mustBeNonzeroLengthTextScalar}
                 nvp.APIKey                         {mustBeNonzeroLengthTextScalar}
                 nvp.Tools                    (1,:) {mustBeA(nvp.Tools, "openAIFunction")} = openAIFunction.empty
-                nvp.APIVersion               (1,1) {mustBeAPIVersion} = "2024-02-01"
+                nvp.APIVersion               (1,1) string {mustBeAPIVersion} = "2024-02-01"
                 nvp.Temperature                    {llms.utils.mustBeValidTemperature} = 1
                 nvp.TopP                           {llms.utils.mustBeValidTopP} = 1
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}

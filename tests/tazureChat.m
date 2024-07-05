@@ -8,6 +8,7 @@ classdef tazureChat < matlab.unittest.TestCase
         InvalidGenerateInput = iGetInvalidGenerateInput;
         InvalidValuesSetters = iGetInvalidValuesSetters;
         StringInputs = struct('string',{"hi"},'char',{'hi'},'cellstr',{{'hi'}});
+        APIVersions = iGetAPIVersions();
     end
 
     methods(Test)
@@ -36,6 +37,14 @@ classdef tazureChat < matlab.unittest.TestCase
             testCase.assumeTrue(isenv("AZURE_OPENAI_API_KEY"),"end-to-end test requires environment variables AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT.");
             chat = azureChat;
             response = testCase.verifyWarningFree(@() generate(chat,StringInputs));
+            testCase.verifyClass(response,'string');
+            testCase.verifyGreaterThan(strlength(response),0);
+        end
+
+        function doGenerateUsingSystemPrompt(testCase)
+            testCase.assumeTrue(isenv("AZURE_OPENAI_API_KEY"),"end-to-end test requires environment variables AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT.");
+            chat = azureChat("You are a helpful assistant");
+            response = testCase.verifyWarningFree(@() generate(chat,"Hi"));
             testCase.verifyClass(response,'string');
             testCase.verifyGreaterThan(strlength(response),0);
         end
@@ -149,6 +158,38 @@ classdef tazureChat < matlab.unittest.TestCase
             testCase.applyFixture(EnvironmentVariableFixture("AZURE_OPENAI_API_KEY","dummy"));
             unsetenv("AZURE_OPENAI_API_KEY");
             testCase.verifyError(@()azureChat, "llms:keyMustBeSpecified");
+        end
+
+        function canUseAPIVersions(testCase, APIVersions)
+            % Test that we can use different APIVersion value to call 
+            % azureChat.generate
+
+            testCase.assumeTrue(isenv("AZURE_OPENAI_API_KEY"),"end-to-end test requires environment variables AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT.");
+            chat = azureChat("APIVersion", APIVersions);
+
+            response = testCase.verifyWarningFree(@() generate(chat,"How similar is the DNA of a cat and a tiger?"));
+            testCase.verifyClass(response,'string');
+            testCase.verifyGreaterThan(strlength(response),0);
+        end
+
+        function endpointNotFound(testCase)
+            % to verify the error, we need to unset the environment variable
+            % AZURE_OPENAI_ENDPOINT, if given. Use a fixture to restore the
+            % value on leaving the test point
+            import matlab.unittest.fixtures.EnvironmentVariableFixture
+            testCase.applyFixture(EnvironmentVariableFixture("AZURE_OPENAI_ENDPOINT","dummy"));
+            unsetenv("AZURE_OPENAI_ENDPOINT");
+            testCase.verifyError(@()azureChat, "llms:endpointMustBeSpecified");
+        end
+
+        function deploymentNotFound(testCase)
+            % to verify the error, we need to unset the environment variable
+            % AZURE_OPENAI_DEPLOYMENT, if given. Use a fixture to restore the
+            % value on leaving the test point
+            import matlab.unittest.fixtures.EnvironmentVariableFixture
+            testCase.applyFixture(EnvironmentVariableFixture("AZURE_OPENAI_DEPLOYMENT","dummy"));
+            unsetenv("AZURE_OPENAI_DEPLOYMENT");
+            testCase.verifyError(@()azureChat, "llms:deploymentMustBeSpecified");
         end
     end
 end
@@ -445,4 +486,8 @@ invalidGenerateInput = struct( ...
         "InvalidToolChoiceSize",struct( ...
             "Input",{{ validMessages  "ToolChoice" ["validfunction", "validfunction"] }},...
             "Error","MATLAB:validators:mustBeTextScalar"));
+end
+
+function apiVersions = iGetAPIVersions()
+apiVersions = cellstr(llms.azure.apiVersions);
 end
