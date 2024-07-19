@@ -47,6 +47,11 @@ classdef tollamaChat < matlab.unittest.TestCase
         end
 
         function extremeTopK(testCase)
+            %% This should work, and it does on some computers. On others, Ollama
+            %% receives the parameter, but either Ollama or llama.cpp fails to
+            %% honor it correctly.
+            testCase.assumeTrue(false,"disabled due to Ollama/llama.cpp not honoring parameter reliably");
+
             % setting top-k to k=1 leaves no random choice,
             % so we expect to get a fixed response.
             chat = ollamaChat("mistral",TopK=1);
