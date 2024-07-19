@@ -11,7 +11,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
 %   using one or more name-value arguments:
 %
 %   ModelName               - Name of the model to use for chat completions.
-%                             The default value is "gpt-3.5-turbo".
+%                             The default value is "gpt-4o-mini".
 %
 %   Temperature             - Temperature value for controlling the randomness
 %                             of the output. Default value is 1; higher values
@@ -92,7 +92,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
             arguments
                 systemPrompt                       {llms.utils.mustBeTextOrEmpty} = []
                 nvp.Tools                    (1,:) {mustBeA(nvp.Tools, "openAIFunction")} = openAIFunction.empty
-                nvp.ModelName                (1,1) string {mustBeModel} = "gpt-3.5-turbo"
+                nvp.ModelName                (1,1) string {mustBeModel} = "gpt-4o-mini"
                 nvp.Temperature                    {llms.utils.mustBeValidTemperature} = 1
                 nvp.TopP                           {llms.utils.mustBeValidTopP} = 1
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}

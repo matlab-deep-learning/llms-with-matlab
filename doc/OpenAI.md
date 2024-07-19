@@ -5,6 +5,7 @@ Several functions in this repository connect MATLAB to the [OpenAI™ Chat Compl
 To start using the OpenAI APIs, you first need to obtain OpenAI API keys. You are responsible for any fees OpenAI may charge for the use of their APIs. You should be familiar with the limitations and risks associated with using this technology, and you agree that you shall be solely responsible for full compliance with any terms that may apply to your use of the OpenAI APIs.
 
 Some of the current LLMs supported on OpenAI are:
+- gpt-4o-mini, gpt-4o-mini-2024-07-18
 - gpt-3.5-turbo, gpt-3.5-turbo-1106, gpt-3.5-turbo-0125
 - gpt-4o, gpt-4o-2024-05-13 (GPT-4 Omni)
 - gpt-4-turbo, gpt-4-turbo-2024-04-09 (GPT-4 Turbo with Vision)
