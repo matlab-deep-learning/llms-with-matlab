@@ -14,19 +14,23 @@ jobs:
         run: |
             # Run the background, there is no way to daemonise at the moment
             ollama serve &
+            # Run a second server to test different endpoint
+            OLLAMA_HOST=127.0.0.1:11435 OLLAMA_MODELS=/tmp/ollama/models ollama serve &
 
             # A short pause is required before the HTTP port is opened
             sleep 5
 
             # This endpoint blocks until ready
             time curl -i http://localhost:11434
+            time curl -i http://localhost:11435
 
             # For debugging, record Ollama version
             ollama --version
 
-      - name: Pull mistral model
+      - name: Pull models
         run: |
             ollama pull mistral
+            OLLAMA_HOST=127.0.0.1:11435 ollama pull qwen2:0.5b
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v2
         with:
@@ -39,6 +43,7 @@ jobs:
             AZURE_OPENAI_DEPLOYMENT: ${{ secrets.AZURE_DEPLOYMENT }}
             AZURE_OPENAI_ENDPOINT: ${{ secrets.AZURE_ENDPOINT }}
             AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_KEY }}
+            SECOND_OLLAMA_ENDPOINT: 127.0.0.1:11435
         uses: matlab-actions/run-tests@v2
         with:
           test-results-junit: test-results/results.xml

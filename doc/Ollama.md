@@ -95,3 +95,10 @@ chat = ollamaChat("mistral", StreamFun=sf);
 txt = generate(chat,"What is Model-Based Design and how is it related to Digital Twin?");
 % Should stream the response token by token
 ```
+
+## Establishing a connection to remote LLMs using Ollama
+
+To connect to a remote Ollama server, use the `Endpoint` parameter. Include the server name and port number (Ollama starts on 11434 by default):
+```matlab
+chat = ollamaChat("mistral",Endpoint="ollamaServer:11434");
+```
