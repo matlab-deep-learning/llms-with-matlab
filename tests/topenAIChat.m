@@ -173,6 +173,16 @@ classdef topenAIChat < matlab.unittest.TestCase
             testCase.verifyThat(data,HasField("explanation"));
         end
 
+        function generateWithImages(testCase)
+            chat = openAIChat;
+            image_path = "peppers.png";
+            emptyMessages = messageHistory;
+            messages = addUserMessageWithImages(emptyMessages,"What is in the image?",image_path);
+
+            text = generate(chat,messages);
+            testCase.verifyThat(text,matlab.unittest.constraints.ContainsSubstring("pepper"));
+        end
+
         function invalidInputsGenerate(testCase, InvalidGenerateInput)
             f = openAIFunction("validfunction");
             chat = openAIChat(Tools=f, APIKey="this-is-not-a-real-key");
@@ -189,8 +199,8 @@ classdef topenAIChat < matlab.unittest.TestCase
             testCase.verifyError(@()assignValueToProperty(InvalidValuesSetters.Property,InvalidValuesSetters.Value), InvalidValuesSetters.Error);
         end
 
-        function invalidGenerateInputforModel(testCase)
-            chat = openAIChat(APIKey="this-is-not-a-real-key");
+        function gpt35TurboErrorsForImages(testCase)
+            chat = openAIChat(APIKey="this-is-not-a-real-key",Model="gpt-3.5-turbo");
             image_path = "peppers.png";
             emptyMessages = messageHistory;
             inValidMessages = addUserMessageWithImages(emptyMessages,"What is in the image?",image_path);
