@@ -67,6 +67,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
         Model     (1,1) string
         TopK (1,1) {mustBeReal,mustBePositive} = Inf
         TailFreeSamplingZ (1,1) {mustBeReal} = 1
+        Endpoint (1,1) string = "http://localhost:11434/api/chat" % Add default URL property
     end
 
     methods
@@ -82,6 +83,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
                 nvp.TimeOut                  (1,1) {mustBeReal,mustBePositive} = 120
                 nvp.TailFreeSamplingZ        (1,1) {mustBeReal} = 1
                 nvp.StreamFun                (1,1) {mustBeA(nvp.StreamFun,'function_handle')}
+                nvp.Endpoint                 (1,1) string = "http://localhost:11434/api/chat" % Add Endpoint argument
             end
 
             if isfield(nvp,"StreamFun")
@@ -105,6 +107,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
             this.TailFreeSamplingZ = nvp.TailFreeSamplingZ;
             this.StopSequences = nvp.StopSequences;
             this.TimeOut = nvp.TimeOut;
+            this.Endpoint = nvp.Endpoint;
         end
 
         function [text, message, response] = generate(this, messages, nvp)
@@ -147,7 +150,8 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
                 TailFreeSamplingZ=this.TailFreeSamplingZ,...
                 StopSequences=this.StopSequences, MaxNumTokens=nvp.MaxNumTokens, ...
                 ResponseFormat=this.ResponseFormat,Seed=nvp.Seed, ...
-                TimeOut=this.TimeOut, StreamFun=this.StreamFun);
+                TimeOut=this.TimeOut, StreamFun=this.StreamFun, ...
+                URL=this.Endpoint);
 
             if isfield(response.Body.Data,"error")
                 err = response.Body.Data.error;
