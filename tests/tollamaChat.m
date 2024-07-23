@@ -125,7 +125,9 @@ classdef tollamaChat < matlab.unittest.TestCase
             testCase.verifyWarningFree(@() generate(chat,"dummy"));
             % also make sure "http://" can be included
             chat = ollamaChat("qwen2:0.5b",Endpoint="http://" + getenv("SECOND_OLLAMA_ENDPOINT"));
-            testCase.verifyWarningFree(@() generate(chat,"dummy"));
+            response = generate(chat,"some input");
+            testCase.verifyClass(response,'string');
+            testCase.verifyGreaterThan(strlength(response),0);
         end
 
         function doReturnErrors(testCase)
