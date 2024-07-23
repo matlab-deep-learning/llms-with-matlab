@@ -2,7 +2,7 @@
 
 [![Open in MATLAB Online](https://www.mathworks.com/images/responsive/global/open-in-matlab-online.svg)](https://matlab.mathworks.com/open/github/v1?repo=matlab-deep-learning/llms-with-matlab) [![View Large Language Models (LLMs) with MATLAB on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/163796-large-language-models-llms-with-matlab) 
 
-This repository contains code to connect MATLAB to the [OpenAI™ Chat Completions API](https://platform.openai.com/docs/guides/text-generation/chat-completions-api) (which powers ChatGPT™), OpenAI Images API (which powers DALL·E™), [Azure® OpenAI Service](https://learn.microsoft.com/en-us/azure/ai-services/openai/), and local [Ollama®](https://ollama.com/) models. This allows you to leverage the natural language processing capabilities of large language models directly within your MATLAB environment.
+This repository contains code to connect MATLAB to the [OpenAI™ Chat Completions API](https://platform.openai.com/docs/guides/text-generation/chat-completions-api) (which powers ChatGPT™), OpenAI Images API (which powers DALL·E™), [Azure® OpenAI Service](https://learn.microsoft.com/en-us/azure/ai-services/openai/), and [Ollama®](https://ollama.com/) models. This allows you to leverage the natural language processing capabilities of large language models directly within your MATLAB environment.
 
 ## Requirements
 
@@ -15,7 +15,7 @@ This repository contains code to connect MATLAB to the [OpenAI™ Chat Completio
 
 - For OpenAI connections: An active OpenAI API subscription and API key.
 - For Azure OpenAI Services: An active Azure subscription with OpenAI access, deployment, and API key.
-- For Ollama: A local Ollama installation. Currently, only connections on `localhost` are supported, i.e., Ollama and MATLAB must run on the same machine.
+- For Ollama: An Ollama installation.
 
 ## Setup
 
