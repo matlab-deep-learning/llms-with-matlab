@@ -6,3 +6,5 @@ papers_to_read.csv
 data/*
 examples/data/*
 ._*
+.nfs*
+.DS_Store

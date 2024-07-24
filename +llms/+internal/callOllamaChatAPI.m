@@ -37,9 +37,13 @@ arguments
     nvp.Seed
     nvp.TimeOut
     nvp.StreamFun
+    nvp.Endpoint
 end
 
-URL = "http://localhost:11434/api/chat";
+URL = nvp.Endpoint + "/api/chat";
+if ~startsWith(URL,"http")
+    URL = "http://" + URL;
+end
 
 % The JSON for StopSequences must have an array, and cannot say "stop": "foo".
 % The easiest way to ensure that is to never pass in a scalar …

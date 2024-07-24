@@ -98,7 +98,6 @@ classdef tollamaChat < matlab.unittest.TestCase
             testCase.verifyEqual(response1,response2);
         end
 
-
         function streamFunc(testCase)
             function seen = sf(str)
                 persistent data;
@@ -118,6 +117,19 @@ classdef tollamaChat < matlab.unittest.TestCase
             testCase.verifyGreaterThan(numel(sf("")), 1);
         end
 
+        function reactToEndpoint(testCase)
+            testCase.assumeTrue(isenv("SECOND_OLLAMA_ENDPOINT"),...
+                "Test point assumes a second Ollama server is running " + ...
+                "and $SECOND_OLLAMA_ENDPOINT points to it.");
+            chat = ollamaChat("qwen2:0.5b",Endpoint=getenv("SECOND_OLLAMA_ENDPOINT"));
+            testCase.verifyWarningFree(@() generate(chat,"dummy"));
+            % also make sure "http://" can be included
+            chat = ollamaChat("qwen2:0.5b",Endpoint="http://" + getenv("SECOND_OLLAMA_ENDPOINT"));
+            response = generate(chat,"some input");
+            testCase.verifyClass(response,'string');
+            testCase.verifyGreaterThan(strlength(response),0);
+        end
+
         function doReturnErrors(testCase)
             testCase.assumeFalse( ...
                 any(startsWith(ollamaChat.models,"abcdefghijklmnop")), ...
@@ -125,7 +137,6 @@ classdef tollamaChat < matlab.unittest.TestCase
             chat = ollamaChat("abcdefghijklmnop");
             testCase.verifyError(@() generate(chat,"hi!"), "llms:apiReturnedError");
         end
-
 
         function invalidInputsConstructor(testCase, InvalidConstructorInput)
             testCase.verifyError(@() ollamaChat("mistral", InvalidConstructorInput.Input{:}), InvalidConstructorInput.Error);
