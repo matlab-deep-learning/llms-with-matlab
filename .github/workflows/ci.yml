@@ -1,5 +1,5 @@
 name: Run MATLAB Tests on GitHub-Hosted Runner
-on: pus
+on: push
 jobs:
   test:
     name: Run MATLAB Tests and Generate Artifacts
