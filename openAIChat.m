@@ -119,6 +119,22 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
                 [this.FunctionsStruct, this.FunctionNames] = functionAsStruct(nvp.Tools);
             end
 
+            if isempty(nvp.Tools)
+                this.Tools = [];
+                this.FunctionsStruct = [];
+                this.FunctionNames = [];
+            else
+                this.Tools = nvp.Tools;
+                [this.FunctionsStruct, this.FunctionNames] = functionAsStruct(nvp.Tools);
+            end
+
+            if ~isempty(systemPrompt)
+                systemPrompt = string(systemPrompt);
+                if systemPrompt ~= ""
+                   this.SystemPrompt = {struct("role", "system", "content", systemPrompt)};
+                end
+            end
+
             if ~isempty(systemPrompt)
                 systemPrompt = string(systemPrompt);
                 if systemPrompt ~= ""
