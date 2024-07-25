@@ -115,6 +115,19 @@ txt = generate(chat,"What is Model-Based Design and how is it related to Digital
 % Should stream the response token by token
 ```
 
+## Understanding the content of an image
+
+You can use gpt-4o, gpt-4o-mini, or gpt-4-turbo to experiment with image understanding. 
+```matlab
+chat = azureChat("You are an AI assistant.",Deployment="gpt-4o");
+image_path = "peppers.png";
+messages = messageHistory;
+messages = addUserMessageWithImages(messages,"What is in the image?",image_path);
+[txt,response] = generate(chat,messages,MaxNumTokens=4096);
+txt
+% outputs a description of the image
+```
+
 ## Calling MATLAB functions with the API
 
 Optionally, `Tools=functions` can be used to provide function specifications to the API. The purpose of this is to enable models to generate function arguments which adhere to the provided specifications. 
