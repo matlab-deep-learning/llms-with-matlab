@@ -98,6 +98,16 @@ classdef tollamaChat < matlab.unittest.TestCase
             testCase.verifyEqual(response1,response2);
         end
 
+        function generateWithImages(testCase)
+            chat = ollamaChat("bakllava");
+            image_path = "peppers.png";
+            emptyMessages = messageHistory;
+            messages = addUserMessageWithImages(emptyMessages,"What is in the image?",image_path);
+
+            text = generate(chat,messages);
+            testCase.verifyThat(text,matlab.unittest.constraints.ContainsSubstring("pepper"));
+        end
+
         function streamFunc(testCase)
             function seen = sf(str)
                 persistent data;
