@@ -30,6 +30,7 @@ jobs:
       - name: Pull models
         run: |
             ollama pull mistral
+            ollama pull bakllava
             OLLAMA_HOST=127.0.0.1:11435 ollama pull qwen2:0.5b
       - name: Set up MATLAB
         uses: matlab-actions/setup-matlab@v2
