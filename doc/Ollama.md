@@ -101,7 +101,7 @@ txt = generate(chat,"What is Model-Based Design and how is it related to Digital
 You can use multimodal models like `llava` to experiment with image understanding.
 
 > [!WARNING]  
-> Most models available for Ollama do not support image input. Ollama will silently ignore images for these models, and the model may or may not warn that it cannot see them.
+> Many models available for Ollama allow you to include images in the prompt, even if the model does not support image inputs. In that case, the images are silently removed from the input. This can result in unexpected outputs.
 
 
 ```matlab
