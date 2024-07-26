@@ -98,7 +98,12 @@ txt = generate(chat,"What is Model-Based Design and how is it related to Digital
 
 ## Understanding the content of an image
 
-You can use multimodal models like `llava` to experiment with image understanding. 
+You can use multimodal models like `llava` to experiment with image understanding.
+
+> [!WARNING]  
+> Most models available for Ollama do not support image input. Ollama will silently ignore images for these models, and the model may or may not warn that it cannot see them.
+
+
 ```matlab
 chat = ollamaChat("llava");
 image_path = "peppers.png";
