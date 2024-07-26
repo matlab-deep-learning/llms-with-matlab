@@ -100,7 +100,7 @@ txt = generate(chat,"What is Model-Based Design and how is it related to Digital
 
 You can use multimodal models like `llava` to experiment with image understanding.
 
-> [!WARNING]  
+> [!TIP]  
 > Many models available for Ollama allow you to include images in the prompt, even if the model does not support image inputs. In that case, the images are silently removed from the input. This can result in unexpected outputs.
 
 
