@@ -28,7 +28,7 @@ To connect to the OpenAI API, you need a valid API key. For information on how t
 `chat = openAIChat` creates an `openAIChat` object. Connecting to the OpenAI API requires a valid API key. Either set the environment variable `OPENAI_API_KEY` or specify the `APIKey` name\-value argument.
 
 
-`chat = openAIChat(``systemPrompt``)` creates an `openAIChat` object with the specified system prompt.
+`chat = openAIChat(systemPrompt)` creates an `openAIChat` object with the specified system prompt.
 
 
 `chat = openAIChat(___,APIKey=key)` uses the specified API key. 
