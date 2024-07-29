@@ -34,7 +34,7 @@ To connect to the OpenAI API, you need a valid API key. For information on how t
 `chat = openAIChat(___,APIKey=key)` uses the specified API key. 
 
 
-`chat = openAIChat(___,``Name=Value``)` specifies additional options using one or more name\-value arguments.
+`chat = openAIChat(___,Name=Value)` specifies additional options using one or more name\-value arguments.
 
 ## Input Arguments
 ### `systemPrompt` \- System prompt
