@@ -1,7 +1,7 @@
 
 # Process Generated Text in Real Time by Using Ollama™ in Streaming Mode
 
-To run the code shown on this page, open the MLX file in MATLAB: [mlx-scripts/ProcessGeneratedTextInRealTimeByUsingOllamaInStreamingMode.mlx](mlx-scripts/ProcessGeneratedTextInRealTimeByUsingOllamaInStreamingMode.mlx) 
+To run the code shown on this page, open the MLX file in MATLAB®: [mlx-scripts/ProcessGeneratedTextInRealTimeByUsingOllamaInStreamingMode.mlx](mlx-scripts/ProcessGeneratedTextInRealTimeByUsingOllamaInStreamingMode.mlx) 
 
 This example shows how to process generated text in real time by using Ollama in streaming mode.
 

@@ -1,7 +1,7 @@
 
 # Create Simple ChatBot
 
-To run the code shown on this page, open the MLX file in MATLAB: [mlx-scripts/CreateSimpleOllamaChatBot.mlx](mlx-scripts/CreateSimpleOllamaChatBot.mlx) 
+To run the code shown on this page, open the MLX file in MATLAB®: [mlx-scripts/CreateSimpleOllamaChatBot.mlx](mlx-scripts/CreateSimpleOllamaChatBot.mlx) 
 
 This example shows how to create a simple chatbot using the `ollamaChat` and `messageHistory` functions.
 

@@ -1,7 +1,7 @@
 
 # Using DALL·E™ to generate images
 
-To run the code shown on this page, open the MLX file in MATLAB: [mlx-scripts/UsingDALLEToGenerateImages.mlx](mlx-scripts/UsingDALLEToGenerateImages.mlx) 
+To run the code shown on this page, open the MLX file in MATLAB®: [mlx-scripts/UsingDALLEToGenerateImages.mlx](mlx-scripts/UsingDALLEToGenerateImages.mlx) 
 
 This example shows how to generate images using the `openAIImages` object.
 

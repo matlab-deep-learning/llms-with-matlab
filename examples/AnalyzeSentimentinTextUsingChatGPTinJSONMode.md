@@ -1,7 +1,7 @@
 
 # Analyze Sentiment in Text Using ChatGPT™ in JSON Mode
 
-To run the code shown on this page, open the MLX file in MATLAB: [mlx-scripts/AnalyzeSentimentinTextUsingChatGPTinJSONMode.mlx](mlx-scripts/AnalyzeSentimentinTextUsingChatGPTinJSONMode.mlx) 
+To run the code shown on this page, open the MLX file in MATLAB®: [mlx-scripts/AnalyzeSentimentinTextUsingChatGPTinJSONMode.mlx](mlx-scripts/AnalyzeSentimentinTextUsingChatGPTinJSONMode.mlx) 
 
 This example shows how to use ChatGPT for sentiment analysis and output the results in JSON format. 
 

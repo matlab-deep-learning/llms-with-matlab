@@ -1,7 +1,7 @@
 
 # Retrieval\-Augmented Generation Using Ollama™ and MATLAB
 
-To run the code shown on this page, open the MLX file in MATLAB: [mlx-scripts/RetrievalAugmentedGenerationUsingOllamaAndMATLAB.mlx](mlx-scripts/RetrievalAugmentedGenerationUsingOllamaAndMATLAB.mlx) 
+To run the code shown on this page, open the MLX file in MATLAB®: [mlx-scripts/RetrievalAugmentedGenerationUsingOllamaAndMATLAB.mlx](mlx-scripts/RetrievalAugmentedGenerationUsingOllamaAndMATLAB.mlx) 
 
 This example shows how to use retrieval\-augmented generation to generate answers to queries based on information contained in a document corpus. 
 

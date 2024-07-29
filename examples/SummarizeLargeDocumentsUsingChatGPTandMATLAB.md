@@ -1,7 +1,7 @@
 
 # Summarize Large Documents Using ChatGPT™ and MATLAB®
 
-To run the code shown on this page, open the MLX file in MATLAB: [mlx-scripts/SummarizeLargeDocumentsUsingChatGPTandMATLAB.mlx](mlx-scripts/SummarizeLargeDocumentsUsingChatGPTandMATLAB.mlx) 
+To run the code shown on this page, open the MLX file in MATLAB®: [mlx-scripts/SummarizeLargeDocumentsUsingChatGPTandMATLAB.mlx](mlx-scripts/SummarizeLargeDocumentsUsingChatGPTandMATLAB.mlx) 
 
 This example shows how to use ChatGPT to summarize documents that are too large to be summarized at once.
 

@@ -1,7 +1,7 @@
 
 # Information Retrieval Using OpenAI™ Document Embedding
 
-To run the code shown on this page, open the MLX file in MATLAB: [mlx-scripts/InformationRetrievalUsingOpenAIDocumentEmbedding.mlx](mlx-scripts/InformationRetrievalUsingOpenAIDocumentEmbedding.mlx) 
+To run the code shown on this page, open the MLX file in MATLAB®: [mlx-scripts/InformationRetrievalUsingOpenAIDocumentEmbedding.mlx](mlx-scripts/InformationRetrievalUsingOpenAIDocumentEmbedding.mlx) 
 
 This example shows how to find documents to answer queries using the 'text\-embedding\-3\-small' document embedding model. Embeddings are used to represent documents and queries in a high\-dimensional space, allowing for the efficient retrieval of relevant information based on semantic similarity. 
 

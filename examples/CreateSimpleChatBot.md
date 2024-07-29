@@ -1,7 +1,7 @@
 
 # Create Simple ChatBot
 
-To run the code shown on this page, open the MLX file in MATLAB: [mlx-scripts/CreateSimpleChatBot.mlx](mlx-scripts/CreateSimpleChatBot.mlx) 
+To run the code shown on this page, open the MLX file in MATLAB®: [mlx-scripts/CreateSimpleChatBot.mlx](mlx-scripts/CreateSimpleChatBot.mlx) 
 
 This example shows how to create a simple chatbot using the `openAIChat` and `messageHistory` functions.
 

@@ -1,7 +1,7 @@
 
 # Describe Images Using ChatGPT™
 
-To run the code shown on this page, open the MLX file in MATLAB: [mlx-scripts/DescribeImagesUsingChatGPT.mlx](mlx-scripts/DescribeImagesUsingChatGPT.mlx) 
+To run the code shown on this page, open the MLX file in MATLAB®: [mlx-scripts/DescribeImagesUsingChatGPT.mlx](mlx-scripts/DescribeImagesUsingChatGPT.mlx) 
 
 This example shows how to generate image descriptions using the addUserMessageWithImages function. To run this example, you need a valid API key from a paid OpenAI™ API account, and a history of successful payment.
 

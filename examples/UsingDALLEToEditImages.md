@@ -1,7 +1,7 @@
 
 # Using DALL·E™ to Edit Images
 
-To run the code shown on this page, open the MLX file in MATLAB: [mlx-scripts/UsingDALLEToEditImages.mlx](mlx-scripts/UsingDALLEToEditImages.mlx) 
+To run the code shown on this page, open the MLX file in MATLAB®: [mlx-scripts/UsingDALLEToEditImages.mlx](mlx-scripts/UsingDALLEToEditImages.mlx) 
 
 This example shows how to generate and edit images using the `openAIImages` object.
 

@@ -1,7 +1,7 @@
 
 # Analyze Scientific Papers Using ChatGPT™ Function Calls
 
-To run the code shown on this page, open the MLX file in MATLAB: [mlx-scripts/AnalyzeScientificPapersUsingFunctionCalls.mlx](mlx-scripts/AnalyzeScientificPapersUsingFunctionCalls.mlx) 
+To run the code shown on this page, open the MLX file in MATLAB®: [mlx-scripts/AnalyzeScientificPapersUsingFunctionCalls.mlx](mlx-scripts/AnalyzeScientificPapersUsingFunctionCalls.mlx) 
 
 This example shows how to extract recent scientific papers from ArXiv, summarize them using ChatGPT, and write the results to a CSV file using the `openAIFunction` function.
 

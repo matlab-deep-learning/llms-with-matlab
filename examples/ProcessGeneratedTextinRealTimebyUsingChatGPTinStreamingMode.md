@@ -1,7 +1,7 @@
 
 # Process Generated Text in Real Time by Using ChatGPT™ in Streaming Mode
 
-To run the code shown on this page, open the MLX file in MATLAB: [mlx-scripts/ProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode.mlx](mlx-scripts/ProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode.mlx) 
+To run the code shown on this page, open the MLX file in MATLAB®: [mlx-scripts/ProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode.mlx](mlx-scripts/ProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode.mlx) 
 
 This example shows how to process generated text in real time by using ChatGPT in streaming mode.
 
