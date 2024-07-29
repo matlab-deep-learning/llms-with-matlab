@@ -96,6 +96,24 @@ txt = generate(chat,"What is Model-Based Design and how is it related to Digital
 % Should stream the response token by token
 ```
 
+## Understanding the content of an image
+
+You can use multimodal models like `llava` to experiment with image understanding.
+
+> [!TIP]  
+> Many models available for Ollama allow you to include images in the prompt, even if the model does not support image inputs. In that case, the images are silently removed from the input. This can result in unexpected outputs.
+
+
+```matlab
+chat = ollamaChat("llava");
+image_path = "peppers.png";
+messages = messageHistory;
+messages = addUserMessageWithImages(messages,"What is in the image?",image_path);
+[txt,response] = generate(chat,messages,MaxNumTokens=4096);
+txt
+% outputs a description of the image
+```
+
 ## Establishing a connection to remote LLMs using Ollama
 
 To connect to a remote Ollama server, use the `Endpoint` name-value pair. Include the server name and port number. Ollama starts on 11434 by default.

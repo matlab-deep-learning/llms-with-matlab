@@ -111,32 +111,9 @@ classdef (Sealed) messageHistory
                 nvp.Detail string {mustBeMember(nvp.Detail,["low","high","auto"])} = "auto"
             end
 
-            newMessage = struct("role", "user", "content", []);
-            newMessage.content = {struct("type","text","text",string(content))};
-            for img = images(:).'
-                if startsWith(img,("https://"|"http://"))
-                    s = struct( ...
-                        "type","image_url", ...
-                        "image_url",struct("url",img));
-                else
-                    [~,~,ext] = fileparts(img);
-                    MIMEType = "data:image/" + erase(ext,".") + ";base64,";
-                    % Base64 encode the image using the given MIME type
-                    fid = fopen(img);
-                    im = fread(fid,'*uint8');
-                    fclose(fid);
-                    b64 = matlab.net.base64encode(im);
-                    s = struct( ...
-                        "type","image_url", ...
-                        "image_url",struct("url",MIMEType + b64));
-                end
-
-                s.image_url.detail = nvp.Detail;
-
-                newMessage.content{end+1} = s;
-                this.Messages{end+1} = newMessage;
-            end
-
+            newMessage = struct("role", "user", "content", string(content), ...
+                "images", images, "image_detail", nvp.Detail);
+            this.Messages{end+1} = newMessage;
         end
 
         function this = addToolMessage(this, id, name, content)
