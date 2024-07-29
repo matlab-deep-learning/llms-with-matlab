@@ -5,6 +5,7 @@ startup.m
 papers_to_read.csv
 data/*
 examples/data/*
+examples/mlx-scripts/data/*
 ._*
 .nfs*
 .DS_Store
