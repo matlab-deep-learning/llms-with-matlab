@@ -12,7 +12,7 @@ classdef texampleTests < matlab.unittest.TestCase
     methods (TestClassSetup)
         function setUpAndTearDowns(testCase)
             import matlab.unittest.fixtures.CurrentFolderFixture
-            testCase.applyFixture(CurrentFolderFixture("../examples"));
+            testCase.applyFixture(CurrentFolderFixture("../examples/mlx-scripts"));
 
             openAIEnvVar = "OPENAI_KEY";
             secretKey = getenv(openAIEnvVar);
