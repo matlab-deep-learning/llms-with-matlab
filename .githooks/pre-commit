@@ -27,7 +27,7 @@ if [ -n "$changedMlxFiles" ]; then
             git add ${file%.md}_media/
         fi
         perl -pi -e "\$cnt++ if /^#/; " \
-            -e "\$_ .= \"\nTo run the code shown on this page, open the MLX file in MATLAB: [mlx-scripts/$(basename $file .md).mlx](mlx-scripts/$(basename $file .md).mlx) \n\" if /^#/ && \$cnt==1;" \
+            -e "\$_ .= \"\nTo run the code shown on this page, open the MLX file in MATLAB®: [mlx-scripts/$(basename $file .md).mlx](mlx-scripts/$(basename $file .md).mlx) \n\" if /^#/ && \$cnt==1;" \
             $file
     done
     git add $mdFiles
