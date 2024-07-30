@@ -19,7 +19,7 @@ Connect to OpenAI™ Chat Completion API
 
 ## Description
 
-Connect to the OpenAI™ Chat Completion API to generate text using large language models developed by OpenAI.
+Connect to the OpenAI Chat Completion API to generate text using large language models developed by OpenAI.
 
 
 To connect to the OpenAI API, you need a valid API key. For information on how to obtain an API key, see [https://platform.openai.com/docs/quickstart](https://platform.openai.com/docs/quickstart).
@@ -56,7 +56,7 @@ character vector | string scalar
 OpenAI API key to access OpenAI APIs such as ChatGPT. 
 
 
-Instead of using the `APIKey` name\-value argument, you can also set the environment variable OPEN\_API\_KEY. For more information, see [https://github.com/matlab\-deep\-learning/llms\-with\-matlab/blob/main/doc/OpenAI.md](https://github.com/matlab-deep-learning/llms-with-matlab/blob/main/doc/OpenAI.md).
+Instead of using the `APIKey` name\-value argument, you can also set the environment variable OPEN\_API\_KEY. For more information, see [OpenAI API](../OpenAI.md).
 
 ### `ModelName` \- Model name
 
@@ -66,7 +66,7 @@ Instead of using the `APIKey` name\-value argument, you can also set the environ
 Name of the OpenAI model to use for text or image generation.
 
 
-For a list of currently supported models, see [https://github.com/matlab\-deep\-learning/llms\-with\-matlab/blob/main/doc/OpenAI.md](https://github.com/matlab-deep-learning/llms-with-matlab/blob/main/doc/OpenAI.md).
+For a list of currently supported models, see [OpenAI API](../OpenAI.md).
 
 ### `Temperature` \- Temperature
 
@@ -152,7 +152,7 @@ If you set the response format to `"json"`, then the generated output is a JSON 
 -  `ModelName="gpt-4"` 
 -  `ModelName="gpt-4-0613"` 
 
-To configure the format of the generated JSON file, describe the format using natural language and provide it to the model either in the system prompt or as a user message. For an example, see [Analyze Sentiment in Text Using ChatGPT in JSON Mode](https://github.com/matlab-deep-learning/llms-with-matlab/blob/main/examples/AnalyzeSentimentinTextUsingChatGPTinJSONMode.md). 
+To configure the format of the generated JSON file, describe the format using natural language and provide it to the model either in the system prompt or as a user message. For an example, see [Analyze Sentiment in Text Using ChatGPT in JSON Mode](../../examples/AnalyzeSentimentinTextUsingChatGPTinJSONMode.md). 
 
 # Properties
 ### `SystemPrompt` \- System prompt
@@ -176,7 +176,7 @@ The system prompt is a natural\-language description that provides the framework
 Name of the OpenAI model to use for text or image generation.
 
 
-For a list of currently supported models, see [https://github.com/matlab\-deep\-learning/llms\-with\-matlab/blob/main/doc/OpenAI.md](https://github.com/matlab-deep-learning/llms-with-matlab/blob/main/doc/OpenAI.md).
+For a list of currently supported models, see [OpenAI API](../OpenAI.md).
 
 ### `Temperature` \- Temperature
 
@@ -190,7 +190,7 @@ Temperature value for controlling the randomness of the output. Higher temperatu
 `1` (default) | numeric scalar between `0` and `1`
 
 
-Top probability mass for controlling the diversity of the generated output. Higher top probability mass corresponds to higher diversity.
+Top probability mass for controlling the diversity of the generated output using top-p sampling. Higher top probability mass corresponds to higher diversity.
 
 ### `StopSequences` \- Stop sequences
 
@@ -246,12 +246,19 @@ Format of generated output.
 If the response format is `"text"`, then the generated output is a string.
 
 
-If the response format is `"json"`, then the generated output is a JSON (\*.json) file. This option is not supported for these models:
+If the response format is `"json"`, then the generated output is a string containing JSON encoded data. 
+
+
+To configure the format of the generated JSON file, describe the format using natural language and provide it to the model either in the system prompt or as a user message. The prompt or message describing the format must contain the word `"json"` or `"JSON"`. 
+
+
+For an example, see [Analyze Sentiment in Text Using ChatGPT in JSON Mode](../../examples/AnalyzeSentimentinTextUsingChatGPTinJSONMode.md). 
+
+
+The JSON response format is not supported for these models:
 
 -  `ModelName="gpt-4"` 
 -  `ModelName="gpt-4-0613"` 
-
-To configure the format of the generated JSON file, describe the format using natural language and provide it to the model either in the system prompt or as a user message. For an example, see [Analyze Sentiment in Text Using ChatGPT in JSON Mode](https://github.com/matlab-deep-learning/llms-with-matlab/blob/main/examples/AnalyzeSentimentinTextUsingChatGPTinJSONMode.md). 
 
 ### `FunctionNames` \- Names of OpenAI functions to use during output generation
 
@@ -280,10 +287,9 @@ chat = openAIChat(StreamFun=sf);
 generate(chat,"Why is a raven like a writing desk?")
 ```
 # See Also
--  [Create Simple Chat Bot](https://github.com/matlab-deep-learning/llms-with-matlab/blob/main/examples/CreateSimpleChatBot.md) 
--  [Process Generated Text in Real Time Using ChatGPT in Streaming Mode](https://github.com/matlab-deep-learning/llms-with-matlab/blob/main/examples/ProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode.md) 
--  [Analyze Scientific Papers Using Function Calls](https://github.com/matlab-deep-learning/llms-with-matlab/blob/main/examples/AnalyzeScientificPapersUsingFunctionCalls.md) 
--  [Analyze Sentiment in Text Using ChatGPT in JSON Mode](https://github.com/matlab-deep-learning/llms-with-matlab/blob/main/examples/AnalyzeSentimentinTextUsingChatGPTinJSONMode.md) 
+-  [Create Simple Chat Bot](../../examples/CreateSimpleChatBot.md) 
+-  [Process Generated Text in Real Time Using ChatGPT in Streaming Mode](../../examples/ProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode.md) 
+-  [Analyze Scientific Papers Using Function Calls](../../examples/AnalyzeScientificPapersUsingFunctionCalls.md) 
+-  [Analyze Sentiment in Text Using ChatGPT in JSON Mode](../../examples/AnalyzeSentimentinTextUsingChatGPTinJSONMode.md) 
 
 Copyright 2024 The MathWorks, Inc.
-
