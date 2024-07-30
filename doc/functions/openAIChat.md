@@ -133,6 +133,8 @@ function handle
 
 Specify a custom streaming function to process the generated output token by token as it is being generated, rather than having to wait for the end of the generation. For example, you can use this function to print the output as it is generated.
 
+For an example, see [Process Generated Text in Real Time by Using ChatGPT™ in Streaming Mode](../../examples/ProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode.md)
+
 
 **Example:** `@(token) fprint("%s",token)`
 
