@@ -1,6 +1,6 @@
-# Connecting to Azure® OpenAI Service
+# Connecting to Azure OpenAI Service
 
-This repository contains code to connect MATLAB to the [Azure® OpenAI Service](https://learn.microsoft.com/en-us/azure/ai-services/openai/).
+This repository contains code to connect MATLAB to the [Azure® OpenAI® Service](https://learn.microsoft.com/en-us/azure/ai-services/openai/).
 
 To use Azure OpenAI Services, you need to create a model deployment on your Azure account and obtain one of the keys for it. You are responsible for any fees Azure may charge for the use of their APIs. You should be familiar with the limitations and risks associated with using this technology, and you agree that you shall be solely responsible for full compliance with any terms that may apply to your use of the Azure APIs.
 
@@ -31,7 +31,7 @@ loadenv(".env")
 
 ## Establishing a connection to Chat Completions API using Azure
 
-To connect MATLAB to Chat Completions API via Azure, you will have to create an `azureChat` object. See [the Azure documentation](https://learn.microsoft.com/en-us/azure/ai-services/openai/chatgpt-quickstart) for details on the setup required and where to find your key, endpoint, and deployment name. As explained above, the endpoint, deployment, and key should be in the environment variables `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_DEPLOYMENYT`, and `AZURE_OPENAI_API_KEY`, or provided as `Endpoint=…`, `Deployment=…`, and `APIKey=…` in the `azureChat` call below.
+To connect MATLAB® to Chat Completions API via Azure, you will have to create an `azureChat` object. See [the Azure documentation](https://learn.microsoft.com/en-us/azure/ai-services/openai/chatgpt-quickstart) for details on the setup required and where to find your key, endpoint, and deployment name. As explained above, the endpoint, deployment, and key should be in the environment variables `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_DEPLOYMENYT`, and `AZURE_OPENAI_API_KEY`, or provided as `Endpoint=…`, `Deployment=…`, and `APIKey=…` in the `azureChat` call below.
 
 In order to create the chat assistant, use the `azureChat` function, optionally providing a system prompt:
 ```matlab
