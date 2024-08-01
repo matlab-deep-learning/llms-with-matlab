@@ -17,7 +17,6 @@ Connect to OpenAI™ Chat Completion API
 
 `chat = openAIChat(___,Name=Value)`
 
----
 
 ## Description
 
@@ -41,11 +40,7 @@ To connect to the OpenAI API, you need a valid API key. For information on how t
 
 `chat = openAIChat(___,PropertyName=PropertyValue)` specifies properties that are settable at construction using one or more name\-value arguments.
 
----
-
 ## Input Arguments
-
----
 
 ### `systemPrompt` – System prompt
 
@@ -57,11 +52,7 @@ Specify the system prompt and set the `SystemPrompt` property. The system prompt
 
 **Example**: "You are a helpful assistant who provides answers to user queries in iambic pentameter."
 
----
-
 ## Name\-Value Arguments
-
----
 
 ### `APIKey` – OpenAI API key
 
@@ -84,12 +75,8 @@ Custom functions used by the model to collect or generate additional data.
 
 For an example, see [Analyze Scientific Papers Using ChatGPT Function Calls](../../examples/AnalyzeScientificPapersUsingFunctionCalls.md). 
 
----
-
 ## Properties Settable at Construction
 Optionally specify these properties at construction using name-value arguments. Specify `PropertyName1=PropertyValue1,...,PropertyNameN=PropertyValueN`, where `PropertyName` is the property name and `PropertyValue` is the corresponding value.
-
----
 
 ### `ModelName` – Model name
 
@@ -212,8 +199,6 @@ The JSON response format is not supported for these models:
 
 ## Other Properties
 
----
-
 ### `SystemPrompt` – System prompt
 
 character vector | string scalar
@@ -252,8 +237,6 @@ Names of the custom functions specified in the `Tools` name\-value argument.
 modelName = "gpt-4o-mini";
 chat = openAIChat("You are a helpful assistant awaiting further instructions.",ModelName=modelName);
 ```
-
----
 
 ## Generate and Stream Text
 ```matlab
