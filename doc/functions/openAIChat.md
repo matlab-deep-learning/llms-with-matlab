@@ -1,7 +1,7 @@
 
 # openAIChat
 
-Connect to OpenAI™ Chat Completion API
+Connect to OpenAI® Chat Completion API
 
 # Creation
 ## Syntax
