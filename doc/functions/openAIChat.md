@@ -12,7 +12,7 @@ Connect to OpenAI® Chat Completion API
 `chat = openAIChat(systemPrompt)`
 
 
-`chat = openAIChat(___,ApiKey=key)`
+`chat = openAIChat(___,APIKey=key)`
 
 
 `chat = openAIChat(___,Name=Value)`
@@ -38,9 +38,7 @@ To connect to the OpenAI API, you need a valid API key. For information on how t
 `chat = openAIChat(___,Name=Value)` specifies additional options using one or more name\-value arguments.
 
 
-`chat = openAIChat(___,PropertyName=PropertyValue)` specifies properties that are settable at construction using one or more name\-value arguments.
-
-## Input Arguments
+# Input Arguments
 
 ### `systemPrompt` – System prompt
 
@@ -75,7 +73,7 @@ Custom functions used by the model to collect or generate additional data.
 
 For an example, see [Analyze Scientific Papers Using ChatGPT Function Calls](../../examples/AnalyzeScientificPapersUsingFunctionCalls.md). 
 
-## Properties Settable at Construction
+# Properties Settable at Construction
 Optionally specify these properties at construction using name-value arguments. Specify `PropertyName1=PropertyValue1,...,PropertyNameN=PropertyValueN`, where `PropertyName` is the property name and `PropertyValue` is the corresponding value.
 
 ### `ModelName` – Model name
@@ -110,7 +108,7 @@ Top probability mass for controlling the diversity of the generated output using
 
 ### `StopSequences` – Stop sequences
 
-`""` (default) | string array with between `1` and `4` elements
+`[]` (default) | string array with between `0` and `4` elements
 
 
 Sequences that stop generation of tokens.
@@ -197,7 +195,7 @@ The JSON response format is not supported for these models:
 -  `ModelName="gpt-4-0613"` 
 
 
-## Other Properties
+# Other Properties
 
 ### `SystemPrompt` – System prompt
 
