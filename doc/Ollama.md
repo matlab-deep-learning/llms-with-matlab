@@ -1,6 +1,6 @@
 # Ollama
 
-This repository contains code to connect MATLAB to an [Ollama™](https://ollama.com) server, running large language models (LLMs).
+This repository contains code to connect MATLAB® to an [Ollama™](https://ollama.com) server, running large language models (LLMs).
 
 To use local models with Ollama, you will need to install and start an Ollama server, and “pull” models into it. Please follow the Ollama documentation for details. You should be familiar with the limitations and risks associated with using this technology, and you agree that you shall be solely responsible for full compliance with any terms that may apply to your use of any specific model.
 
