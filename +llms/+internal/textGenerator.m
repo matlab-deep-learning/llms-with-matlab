@@ -28,4 +28,10 @@ classdef (Abstract) textGenerator
     properties (Access=protected)
         StreamFun
     end
+
+    methods
+        function hObj = set.StopSequences(hObj,value)
+            hObj.StopSequences = string(value);
+        end
+    end
 end
