@@ -1,0 +1,4 @@
+# Code owners, to get auto-filled reviewer lists
+
+# To start with, we just assume everyone in the core team is included on all reviews
+* @adulai @ccreutzi @debymf @MiriamScharnke @vpapanasta
