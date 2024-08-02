@@ -99,7 +99,7 @@ classdef tollamaChat < matlab.unittest.TestCase
         end
 
         function generateWithImages(testCase)
-            chat = ollamaChat("bakllava");
+            chat = ollamaChat("moondream");
             image_path = "peppers.png";
             emptyMessages = messageHistory;
             messages = addUserMessageWithImages(emptyMessages,"What is in the image?",image_path);
