@@ -84,7 +84,8 @@ classdef responseStreamer < matlab.net.http.io.BinaryConsumer
                                 end
                                 this.StreamFun('');
                                 this.ResponseText = txt;
-                            else
+                            elseif isfield(json.choices,"delta") && ...
+                                    isfield(json.choices.delta,"content")
                                 txt = json.choices.delta.content;
                                 this.StreamFun(txt);
                                 this.ResponseText = [this.ResponseText txt];

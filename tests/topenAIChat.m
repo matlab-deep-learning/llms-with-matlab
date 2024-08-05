@@ -97,6 +97,14 @@ classdef topenAIChat < matlab.unittest.TestCase
             testCase.verifyError(@()openAIChat(InvalidConstructorInput.Input{:}), InvalidConstructorInput.Error);
         end
 
+        function generateWithStreamFunAndMaxNumTokens(testCase)
+            sf = @(x) fprintf("%s",x);
+            chat = openAIChat(StreamFun=sf);
+            result = generate(chat,"Why is a raven like a writing desk?",MaxNumTokens=5);
+            testCase.verifyClass(result,"string");
+            testCase.verifyLessThan(strlength(result), 100);
+        end
+
         function generateWithToolsAndStreamFunc(testCase)
             import matlab.unittest.constraints.HasField
 
