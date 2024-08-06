@@ -47,7 +47,7 @@ if isfield(nvp, "Dimensions")
 end
 
 
-response = llms.internal.sendRequest(parameters,key, END_POINT, nvp.TimeOut);
+response = llms.internal.sendRequestWrapper(parameters,key, END_POINT, nvp.TimeOut);
 
 if isfield(response.Body.Data, "data")
     emb = [response.Body.Data.data.embedding];

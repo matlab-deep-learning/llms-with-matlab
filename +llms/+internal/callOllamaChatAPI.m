@@ -53,7 +53,7 @@ end
 
 parameters = buildParametersCall(model, messages, nvp);
 
-[response, streamedText] = llms.internal.sendRequest(parameters,[],URL,nvp.TimeOut,nvp.StreamFun);
+[response, streamedText] = llms.internal.sendRequestWrapper(parameters,[],URL,nvp.TimeOut,nvp.StreamFun);
 
 % If call errors, "choices" will not be part of response.Body.Data, instead
 % we get response.Body.Data.error

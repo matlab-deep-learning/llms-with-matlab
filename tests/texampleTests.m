@@ -8,9 +8,25 @@ classdef texampleTests < matlab.unittest.TestCase
         ChatBotExample = {"CreateSimpleChatBot", "CreateSimpleOllamaChatBot"};
     end
 
+    properties
+        TestDir;
+    end
 
     methods (TestClassSetup)
         function setUpAndTearDowns(testCase)
+            % Capture and replay server interactions
+            testCase.TestDir = fileparts(mfilename("fullpath"));
+            import matlab.unittest.fixtures.PathFixture
+            capture = false; % run in capture or replay mode, cf. recordings/README.md
+
+            if capture
+                testCase.applyFixture(PathFixture( ...
+                    fullfile(testCase.TestDir,"private","recording-doubles")));
+            else
+                testCase.applyFixture(PathFixture( ...
+                    fullfile(testCase.TestDir,"private","replaying-doubles")));
+            end
+
             import matlab.unittest.fixtures.CurrentFolderFixture
             testCase.applyFixture(CurrentFolderFixture("../examples/mlx-scripts"));
 
@@ -29,22 +45,39 @@ classdef texampleTests < matlab.unittest.TestCase
             testCase.addTeardown(@() iCloseAll());
         end
     end
-    
+
+    methods
+        function startCapture(testCase,testName)
+            llms.internal.sendRequestWrapper("open", ...
+                fullfile(testCase.TestDir,"recordings",testName));
+        end
+    end
+
+    methods(TestMethodTeardown)
+        function closeCapture(~)
+            llms.internal.sendRequestWrapper("close");
+        end
+    end
+
     methods(Test)
-        function testAnalyzeScientificPapersUsingFunctionCalls(~)
+        function testAnalyzeScientificPapersUsingFunctionCalls(testCase)
+            testCase.startCapture("AnalyzeScientificPapersUsingFunctionCalls");
             AnalyzeScientificPapersUsingFunctionCalls;
         end
 
         function testAnalyzeSentimentinTextUsingChatGPTinJSONMode(testCase)
+            testCase.startCapture("AnalyzeSentimentinTextUsingChatGPTinJSONMode");
             testCase.verifyWarning(@AnalyzeSentimentinTextUsingChatGPTinJSONMode,...
                 "llms:warningJsonInstruction");
         end
 
-        function testAnalyzeTextDataUsingParallelFunctionCallwithChatGPT(~)
+        function testAnalyzeTextDataUsingParallelFunctionCallwithChatGPT(testCase)
+            testCase.startCapture("AnalyzeTextDataUsingParallelFunctionCallwithChatGPT");
             AnalyzeTextDataUsingParallelFunctionCallwithChatGPT;
         end
 
         function testCreateSimpleChatBot(testCase,ChatBotExample)
+            testCase.startCapture(ChatBotExample);
             % set up a fake input command, returning canned user prompts
             count = 0;
             prompts = [
@@ -85,43 +118,51 @@ classdef texampleTests < matlab.unittest.TestCase
             testCase.verifySize(messages.Messages,[1 2*(count-1)]);
         end
 
-        function testDescribeImagesUsingChatGPT(~)
+        function testDescribeImagesUsingChatGPT(testCase)
+            testCase.startCapture("DescribeImagesUsingChatGPT");
             DescribeImagesUsingChatGPT;
         end
 
-        function testInformationRetrievalUsingOpenAIDocumentEmbedding(~)
+        function testInformationRetrievalUsingOpenAIDocumentEmbedding(testCase)
+            testCase.startCapture("InformationRetrievalUsingOpenAIDocumentEmbedding");
             InformationRetrievalUsingOpenAIDocumentEmbedding;
         end
 
-        function testProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode(~)
+        function testProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode(testCase)
+            testCase.startCapture("ProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode");
             ProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode;
         end
 
-        function testProcessGeneratedTextInRealTimeByUsingOllamaInStreamingMode(~)
+        function testProcessGeneratedTextInRealTimeByUsingOllamaInStreamingMode(testCase)
+            testCase.startCapture("ProcessGeneratedTextInRealTimeByUsingOllamaInStreamingMode");
             ProcessGeneratedTextInRealTimeByUsingOllamaInStreamingMode;
         end
 
-        function testRetrievalAugmentedGenerationUsingChatGPTandMATLAB(~)
+        function testRetrievalAugmentedGenerationUsingChatGPTandMATLAB(testCase)
+            testCase.startCapture("RetrievalAugmentedGenerationUsingChatGPTandMATLAB");
             RetrievalAugmentedGenerationUsingChatGPTandMATLAB;
         end
 
-        function testRetrievalAugmentedGenerationUsingOllamaAndMATLAB(~)
+        function testRetrievalAugmentedGenerationUsingOllamaAndMATLAB(testCase)
+            testCase.startCapture("RetrievalAugmentedGenerationUsingOllamaAndMATLAB");
             RetrievalAugmentedGenerationUsingOllamaAndMATLAB;
         end
 
-        function testSummarizeLargeDocumentsUsingChatGPTandMATLAB(~)
+        function testSummarizeLargeDocumentsUsingChatGPTandMATLAB(testCase)
+            testCase.startCapture("SummarizeLargeDocumentsUsingChatGPTandMATLAB");
             SummarizeLargeDocumentsUsingChatGPTandMATLAB;
         end
 
-        function testUsingDALLEToEditImages(~)
+        function testUsingDALLEToEditImages(testCase)
+            testCase.startCapture("UsingDALLEToEditImages");
             UsingDALLEToEditImages;
         end
 
-        function testUsingDALLEToGenerateImages(~)
+        function testUsingDALLEToGenerateImages(testCase)
+            testCase.startCapture("UsingDALLEToGenerateImages");
             UsingDALLEToGenerateImages;
         end
-    end
-    
+    end    
 end
 
 function iCloseAll()
