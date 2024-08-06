@@ -1,7 +1,7 @@
 
 # openAIChat
 
-Connect to OpenAI® Chat Completion API
+Connect to OpenAI® Chat Completion API from MATLAB®
 
 # Creation
 ## Syntax
@@ -19,7 +19,6 @@ Connect to OpenAI® Chat Completion API
 
 
 ## Description
-
 Connect to the OpenAI Chat Completion API to generate text using large language models developed by OpenAI.
 
 
@@ -227,7 +226,7 @@ Names of the custom functions specified in the `Tools` name\-value argument.
 
 # Object Functions
 
-`generate` – Generate text
+`generate` – Generate output from large language models
 
 # Examples
 ## Create OpenAI Chat
