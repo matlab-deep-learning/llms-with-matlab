@@ -99,13 +99,20 @@ classdef tollamaChat < matlab.unittest.TestCase
         end
 
         function generateWithImages(testCase)
+            import matlab.unittest.constraints.ContainsSubstring
             chat = ollamaChat("moondream");
             image_path = "peppers.png";
             emptyMessages = messageHistory;
             messages = addUserMessageWithImages(emptyMessages,"What is in the image?",image_path);
 
-            text = generate(chat,messages);
-            testCase.verifyThat(text,matlab.unittest.constraints.ContainsSubstring("pepper"));
+            % The moondream model is small and unreliable. We are not
+            % testing the model, we are testing that we send images to
+            % Ollama in the right way. So we just ask several times and
+            % are happy when  one of the responses mentions "pepper" or 
+            % "vegetable".
+            text = arrayfun(@(~) generate(chat,messages), 1:5, UniformOutput=false);
+            text = join([text{:}],newline+"-----"+newline);
+            testCase.verifyThat(text,ContainsSubstring("pepper") | ContainsSubstring("vegetable"));
         end
 
         function streamFunc(testCase)
