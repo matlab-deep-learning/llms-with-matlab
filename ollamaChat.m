@@ -136,7 +136,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
             if isstring(messages) && isscalar(messages)
                 messagesStruct = {struct("role", "user", "content", messages)};
             else
-                messagesStruct = messages.Messages;
+                messagesStruct = this.encodeImages(messages.Messages);
             end
 
             if ~isempty(this.SystemPrompt)
@@ -156,6 +156,28 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
             if isfield(response.Body.Data,"error")
                 err = response.Body.Data.error;
                 error("llms:apiReturnedError",llms.utils.errorMessageCatalog.getMessage("llms:apiReturnedError",err));
+            end
+        end
+    end
+
+    methods (Access=private)
+        function messageStruct = encodeImages(~, messageStruct)
+            for k=1:numel(messageStruct)
+                if isfield(messageStruct{k},"images")
+                    images = messageStruct{k}.images;
+                    % detail = messageStruct{k}.image_detail;
+                    messageStruct{k} = rmfield(messageStruct{k},["images","image_detail"]);
+                    imgs = cell(size(images));
+                    for n = 1:numel(images)
+                        img = images(n);
+                        % Base64 encode the image
+                        fid = fopen(img);
+                        im = fread(fid,'*uint8');
+                        fclose(fid);
+                        imgs{n} = matlab.net.base64encode(im);
+                    end
+                    messageStruct{k}.images = imgs;
+                end
             end
         end
     end

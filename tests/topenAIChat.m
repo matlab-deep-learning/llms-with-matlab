@@ -173,7 +173,7 @@ classdef topenAIChat < matlab.unittest.TestCase
             testCase.verifyThat(data,HasField("explanation"));
         end
 
-        function generateWithImages(testCase)
+        function generateWithImage(testCase)
             chat = openAIChat;
             image_path = "peppers.png";
             emptyMessages = messageHistory;
@@ -181,6 +181,17 @@ classdef topenAIChat < matlab.unittest.TestCase
 
             text = generate(chat,messages);
             testCase.verifyThat(text,matlab.unittest.constraints.ContainsSubstring("pepper"));
+        end
+
+        function generateWithMultipleImages(testCase)
+            import matlab.unittest.constraints.ContainsSubstring
+            chat = openAIChat;
+            image_path = "peppers.png";
+            emptyMessages = messageHistory;
+            messages = addUserMessageWithImages(emptyMessages,"Compare these images.",[image_path,image_path]);
+
+            text = generate(chat,messages);
+            testCase.verifyThat(text,ContainsSubstring("same") | ContainsSubstring("identical"));
         end
 
         function invalidInputsGenerate(testCase, InvalidGenerateInput)

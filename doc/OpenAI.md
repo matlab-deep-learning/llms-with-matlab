@@ -1,6 +1,6 @@
-# OpenAI™
+# OpenAI
 
-Several functions in this repository connect MATLAB to the [OpenAI™ Chat Completions API](https://platform.openai.com/docs/guides/text-generation/chat-completions-api) (which powers ChatGPT™) and the [OpenAI Images API](https://platform.openai.com/docs/guides/images/image-generation-beta) (which powers DALL·E™).
+Several functions in this repository connect MATLAB® to the [OpenAI® Chat Completions API](https://platform.openai.com/docs/guides/text-generation/chat-completions-api) (which powers ChatGPT™) and the [OpenAI Images API](https://platform.openai.com/docs/guides/images/image-generation-beta) (which powers DALL·E™).
 
 To start using the OpenAI APIs, you first need to obtain OpenAI API keys. You are responsible for any fees OpenAI may charge for the use of their APIs. You should be familiar with the limitations and risks associated with using this technology, and you agree that you shall be solely responsible for full compliance with any terms that may apply to your use of the OpenAI APIs.
 
@@ -250,14 +250,15 @@ You can extract the arguments and write the data to a table, for example.
 
 ## Understanding the content of an image
 
-You can use gpt-4-turbo to experiment with image understanding. 
+You can use gpt-4o, gpt-4o-mini, or gpt-4-turbo to experiment with image understanding. 
 ```matlab
-chat = openAIChat("You are an AI assistant.", ModelName="gpt-4-turbo");
+chat = openAIChat("You are an AI assistant.");
 image_path = "peppers.png";
 messages = messageHistory;
 messages = addUserMessageWithImages(messages,"What is in the image?",image_path);
 [txt,response] = generate(chat,messages,MaxNumTokens=4096);
-% Should output the description of the image
+txt
+% outputs a description of the image
 ```
 
 ## Obtaining embeddings

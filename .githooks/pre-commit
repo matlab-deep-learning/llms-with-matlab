@@ -1,0 +1,34 @@
+#!/bin/bash
+
+cd $(git rev-parse --show-toplevel)
+pwd
+
+# For all commits of mlx files, create corresponding Markdown (md) files.
+# If the mlx files are in .../mlx-scripts/*.mlx, the corresponding
+# md files will go into .../*.md.
+#
+# This script assumes that the mlx files as currently in the file system
+# are what is being committed, instead of doing a lot of extra work to
+# get them from the stage area.
+#
+# Note that this script will not remove media files. If an mlx has
+# fewer plots at some point in the future, there will be file system
+# cruft. Which doesn't hurt the md display in GitHub or elswehere.
+changedMlxFiles=`git diff --cached --name-only --diff-filter=d '*.mlx'`
+
+if [ -n "$changedMlxFiles" ]; then
+    # Keep the line break here, we replace end-of-line with "' '" to get the quotes right
+    matlab -batch "for file = {'${changedMlxFiles//
+/' '}'}, export(file{1},replace(erase(file{1},'mlx-scripts'),'.mlx','.md')); end"
+    tmp=${changedMlxFiles//mlx-scripts\//}
+    mdFiles=${tmp//.mlx/.md}
+    for file in $mdFiles; do
+        if [ -d ${file%.md}_media ]; then
+            git add ${file%.md}_media/
+        fi
+        perl -pi -e "\$cnt++ if /^#/; " \
+            -e "\$_ .= \"\nTo run the code shown on this page, open the MLX file in MATLAB®: [mlx-scripts/$(basename $file .md).mlx](mlx-scripts/$(basename $file .md).mlx) \n\" if /^#/ && \$cnt==1;" \
+            $file
+    done
+    git add $mdFiles
+fi
