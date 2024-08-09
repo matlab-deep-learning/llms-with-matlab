@@ -12,7 +12,7 @@ Connect to OpenAI® Chat Completion API from MATLAB®
 `chat = openAIChat(systemPrompt)`
 
 
-`chat = openAIChat(___,ApiKey=key)`
+`chat = openAIChat(___,APIKey=key)`
 
 
 `chat = openAIChat(___,Name=Value)`
@@ -28,13 +28,13 @@ To connect to the OpenAI API, you need a valid API key. For information on how t
 `chat = openAIChat` creates an `openAIChat` object. Connecting to the OpenAI API requires a valid API key. Either set the environment variable `OPENAI_API_KEY` or specify the `APIKey` name\-value argument.
 
 
-`chat = openAIChat(``systemPrompt``)` creates an `openAIChat` object with the specified system prompt.
+`chat = openAIChat(systemPrompt)` creates an `openAIChat` object with the specified system prompt.
 
 
-`chat = openAIChat(___,``APIKey``=key)` uses the specified API key. 
+`chat = openAIChat(___,APIKey=key)` uses the specified API key. 
 
 
-`chat = openAIChat(___,``Name=Value``)` specifies additional options using one or more name\-value arguments.
+`chat = openAIChat(___,Name=Value)` specifies additional options using one or more name\-value arguments.
 
 # Input Arguments
 ### `systemPrompt` — System prompt
