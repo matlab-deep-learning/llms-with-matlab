@@ -1,5 +1,5 @@
 
-# openAIChat—
+# openAIChat
 
 Connect to OpenAI® Chat Completion API from MATLAB®
 
@@ -247,4 +247,3 @@ ans = "The phrase "Why is a raven like a writing desk?" comes from Lewis Carroll
 -  [Analyze Sentiment in Text Using ChatGPT in JSON Mode](../../examples/AnalyzeSentimentinTextUsingChatGPTinJSONMode.md) 
 
 *Copyright 2024 The MathWorks, Inc.*
-
