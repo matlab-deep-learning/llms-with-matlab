@@ -1,6 +1,6 @@
 # Ollama
 
-This repository contains code to connect MATLAB to an [Ollama™](https://ollama.com) server, running large language models (LLMs).
+This repository contains code to connect MATLAB® to an [Ollama™](https://ollama.com) server, running large language models (LLMs).
 
 To use local models with Ollama, you will need to install and start an Ollama server, and “pull” models into it. Please follow the Ollama documentation for details. You should be familiar with the limitations and risks associated with using this technology, and you agree that you shall be solely responsible for full compliance with any terms that may apply to your use of any specific model.
 
@@ -94,6 +94,24 @@ sf = @(x) fprintf("%s",x);
 chat = ollamaChat("mistral", StreamFun=sf);
 txt = generate(chat,"What is Model-Based Design and how is it related to Digital Twin?");
 % Should stream the response token by token
+```
+
+## Understanding the content of an image
+
+You can use multimodal models like `llava` to experiment with image understanding.
+
+> [!TIP]  
+> Many models available for Ollama allow you to include images in the prompt, even if the model does not support image inputs. In that case, the images are silently removed from the input. This can result in unexpected outputs.
+
+
+```matlab
+chat = ollamaChat("llava");
+image_path = "peppers.png";
+messages = messageHistory;
+messages = addUserMessageWithImages(messages,"What is in the image?",image_path);
+[txt,response] = generate(chat,messages,MaxNumTokens=4096);
+txt
+% outputs a description of the image
 ```
 
 ## Establishing a connection to remote LLMs using Ollama

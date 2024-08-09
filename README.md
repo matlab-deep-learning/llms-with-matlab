@@ -1,8 +1,8 @@
-# Large Language Models (LLMs) with MATLAB®
+# Large Language Models (LLMs) with MATLAB
 
 [![Open in MATLAB Online](https://www.mathworks.com/images/responsive/global/open-in-matlab-online.svg)](https://matlab.mathworks.com/open/github/v1?repo=matlab-deep-learning/llms-with-matlab) [![View Large Language Models (LLMs) with MATLAB on File Exchange](https://www.mathworks.com/matlabcentral/images/matlab-file-exchange.svg)](https://www.mathworks.com/matlabcentral/fileexchange/163796-large-language-models-llms-with-matlab) 
 
-This repository contains code to connect MATLAB to the [OpenAI™ Chat Completions API](https://platform.openai.com/docs/guides/text-generation/chat-completions-api) (which powers ChatGPT™), OpenAI Images API (which powers DALL·E™), [Azure® OpenAI Service](https://learn.microsoft.com/en-us/azure/ai-services/openai/), and both local and nonlocal [Ollama™](https://ollama.com/) models. This allows you to leverage the natural language processing capabilities of large language models directly within your MATLAB environment.
+This repository contains code to connect MATLAB® to the [OpenAI® Chat Completions API](https://platform.openai.com/docs/guides/text-generation/chat-completions-api) (which powers ChatGPT™), OpenAI Images API (which powers DALL·E™), [Azure® OpenAI Service](https://learn.microsoft.com/en-us/azure/ai-services/openai/), and both local and nonlocal [Ollama™](https://ollama.com/) models. This allows you to leverage the natural language processing capabilities of large language models directly within your MATLAB environment.
 
 ## Requirements
 
@@ -52,16 +52,16 @@ To use this repository with a local installation of MATLAB, first clone the repo
 ## Examples
 To learn how to use this in your workflows, see [Examples](/examples/).
 
-- [ProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode.mlx](/examples/ProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode.mlx): Learn to implement a simple chat that stream the response. 
-- [SummarizeLargeDocumentsUsingChatGPTandMATLAB.mlx](/examples/SummarizeLargeDocumentsUsingChatGPTandMATLAB.mlx): Learn to create concise summaries of long texts with ChatGPT. (Requires Text Analytics Toolbox™)
-- [CreateSimpleChatBot.mlx](/examples/CreateSimpleChatBot.mlx): Build a conversational chatbot capable of handling various dialogue scenarios using ChatGPT. (Requires Text Analytics Toolbox)
-- [AnalyzeScientificPapersUsingFunctionCalls.mlx](/examples/AnalyzeScientificPapersUsingFunctionCalls.mlx): Learn how to create agents capable of executing MATLAB functions. 
-- [AnalyzeTextDataUsingParallelFunctionCallwithChatGPT.mlx](/examples/AnalyzeTextDataUsingParallelFunctionCallwithChatGPT.mlx): Learn how to take advantage of parallel function calling. 
-- [RetrievalAugmentedGenerationUsingChatGPTandMATLAB.mlx](/examples/RetrievalAugmentedGenerationUsingChatGPTandMATLAB.mlx): Learn about retrieval augmented generation with a simple use case. (Requires Text Analytics Toolbox™)
-- [DescribeImagesUsingChatGPT.mlx](/examples/DescribeImagesUsingChatGPT.mlx): Learn how to use GPT-4 Turbo with Vision to understand the content of an image. 
-- [AnalyzeSentimentinTextUsingChatGPTinJSONMode.mlx](/examples/AnalyzeSentimentinTextUsingChatGPTinJSONMode.mlx): Learn how to use JSON mode in chat completions
-- [UsingDALLEToEditImages.mlx](/examples/UsingDALLEToEditImages.mlx): Learn how to generate images
-- [UsingDALLEToGenerateImages.mlx](/examples/UsingDALLEToGenerateImages.mlx): Create variations of images and editimages. 
+- [ProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode.md](/examples/ProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode.md): Learn to implement a simple chat that stream the response. 
+- [SummarizeLargeDocumentsUsingChatGPTandMATLAB.md](/examples/SummarizeLargeDocumentsUsingChatGPTandMATLAB.md): Learn to create concise summaries of long texts with ChatGPT. (Requires Text Analytics Toolbox™)
+- [CreateSimpleChatBot.md](/examples/CreateSimpleChatBot.md): Build a conversational chatbot capable of handling various dialogue scenarios using ChatGPT. (Requires Text Analytics Toolbox)
+- [AnalyzeScientificPapersUsingFunctionCalls.md](/examples/AnalyzeScientificPapersUsingFunctionCalls.md): Learn how to create agents capable of executing MATLAB functions. 
+- [AnalyzeTextDataUsingParallelFunctionCallwithChatGPT.md](/examples/AnalyzeTextDataUsingParallelFunctionCallwithChatGPT.md): Learn how to take advantage of parallel function calling. 
+- [RetrievalAugmentedGenerationUsingChatGPTandMATLAB.md](/examples/RetrievalAugmentedGenerationUsingChatGPTandMATLAB.md): Learn about retrieval augmented generation with a simple use case. (Requires Text Analytics Toolbox™)
+- [DescribeImagesUsingChatGPT.md](/examples/DescribeImagesUsingChatGPT.md): Learn how to use GPT-4 Turbo with Vision to understand the content of an image. 
+- [AnalyzeSentimentinTextUsingChatGPTinJSONMode.md](/examples/AnalyzeSentimentinTextUsingChatGPTinJSONMode.md): Learn how to use JSON mode in chat completions
+- [UsingDALLEToEditImages.md](/examples/UsingDALLEToEditImages.md): Learn how to generate images
+- [UsingDALLEToGenerateImages.md](/examples/UsingDALLEToGenerateImages.md): Create variations of images and editimages. 
 
 ## License
 

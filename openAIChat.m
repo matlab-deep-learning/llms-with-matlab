@@ -181,7 +181,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
             if isstring(messages) && isscalar(messages)
                 messagesStruct = {struct("role", "user", "content", messages)};
             else
-                messagesStruct = messages.Messages;
+                messagesStruct = this.encodeImages(messages.Messages);
             end
 
             llms.openai.validateMessageSupported(messagesStruct{end}, this.ModelName);
@@ -229,6 +229,40 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
                 toolChoice = struct("type","function","function",struct("name",toolChoice));
             end
 
+        end
+
+        function messageStruct = encodeImages(~, messageStruct)
+            for k=1:numel(messageStruct)
+                if isfield(messageStruct{k},"images")
+                    images = messageStruct{k}.images;
+                    detail = messageStruct{k}.image_detail;
+                    messageStruct{k} = rmfield(messageStruct{k},["images","image_detail"]);
+                    messageStruct{k}.content = ...
+                        {struct("type","text","text",messageStruct{k}.content)};
+                    for img = images(:).'
+                        if startsWith(img,("https://"|"http://"))
+                            s = struct( ...
+                                "type","image_url", ...
+                                "image_url",struct("url",img));
+                        else
+                            [~,~,ext] = fileparts(img);
+                            MIMEType = "data:image/" + erase(ext,".") + ";base64,";
+                            % Base64 encode the image using the given MIME type
+                            fid = fopen(img);
+                            im = fread(fid,'*uint8');
+                            fclose(fid);
+                            b64 = matlab.net.base64encode(im);
+                            s = struct( ...
+                                "type","image_url", ...
+                                "image_url",struct("url",MIMEType + b64));
+                        end
+
+                        s.image_url.detail = detail;
+
+                        messageStruct{k}.content{end+1} = s;
+                    end
+                end
+            end
         end
     end
 end

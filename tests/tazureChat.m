@@ -55,6 +55,26 @@ classdef tazureChat < matlab.unittest.TestCase
             testCase.verifySize(response.Body.Data.choices,[3,1]);
         end
 
+        function generateWithImage(testCase)
+            chat = azureChat(Deployment="gpt-4o");
+            image_path = "peppers.png";
+            emptyMessages = messageHistory;
+            messages = addUserMessageWithImages(emptyMessages,"What is in the image?",image_path);
+
+            text = generate(chat,messages);
+            testCase.verifyThat(text,matlab.unittest.constraints.ContainsSubstring("pepper"));
+        end
+
+        function generateWithMultipleImages(testCase)
+            import matlab.unittest.constraints.ContainsSubstring
+            chat = azureChat(Deployment="gpt-4o");
+            image_path = "peppers.png";
+            emptyMessages = messageHistory;
+            messages = addUserMessageWithImages(emptyMessages,"Compare these images.",[image_path,image_path]);
+
+            text = generate(chat,messages);
+            testCase.verifyThat(text,ContainsSubstring("same") | ContainsSubstring("identical"));
+        end
 
         function doReturnErrors(testCase)
             testCase.assumeTrue(isenv("AZURE_OPENAI_API_KEY"),"end-to-end test requires environment variables AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT.");
@@ -63,6 +83,15 @@ classdef tazureChat < matlab.unittest.TestCase
             % GPT-3.5 (16385 tokens)
             wayTooLong = string(repmat('a ',1,20000));
             testCase.verifyError(@() generate(chat,wayTooLong), "llms:apiReturnedError");
+        end
+
+        function generateWithImageErrorsForGpt35(testCase)
+            chat = azureChat;
+            image_path = "peppers.png";
+            emptyMessages = messageHistory;
+            messages = addUserMessageWithImages(emptyMessages,"What is in the image?",image_path);
+
+            testCase.verifyError(@() generate(chat,messages), "llms:apiReturnedError");
         end
 
         function seedFixesResult(testCase)
