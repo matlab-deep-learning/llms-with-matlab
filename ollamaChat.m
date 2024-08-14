@@ -73,7 +73,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
         Model             (1,1) string
         Endpoint          (1,1) string
         TopK              (1,1) {mustBeReal,mustBePositive} = Inf
-        MinP              (1,1) {llms.utils.mustBeValidTopP} = 0
+        MinP              (1,1) {llms.utils.mustBeValidProbability} = 0
         TailFreeSamplingZ (1,1) {mustBeReal} = 1
     end
 
@@ -83,8 +83,8 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
                 modelName                          {mustBeTextScalar}
                 systemPrompt                       {llms.utils.mustBeTextOrEmpty} = []
                 nvp.Temperature                    {llms.utils.mustBeValidTemperature} = 1
-                nvp.TopP                           {llms.utils.mustBeValidTopP} = 1
-                nvp.MinP                           {llms.utils.mustBeValidTopP} = 0
+                nvp.TopP                           {llms.utils.mustBeValidProbability} = 1
+                nvp.MinP                           {llms.utils.mustBeValidProbability} = 0
                 nvp.TopK                     (1,1) {mustBeReal,mustBePositive} = Inf
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}
                 nvp.ResponseFormat           (1,1) string {mustBeMember(nvp.ResponseFormat,["text","json"])} = "text"
