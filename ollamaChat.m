@@ -23,6 +23,12 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
 %                             words can appear in any particular place.
 %                             This is also known as top-p sampling.
 %
+%   MinP                    - Minimum probability ratio for controlling the
+%                             diversity of the output. Default value is 0;
+%                             higher values imply that only the more likely
+%                             words can appear in any particular place.
+%                             This is also known as min-p sampling.
+%
 %   TopK                    - Maximum number of most likely tokens that are
 %                             considered for output. Default is Inf, allowing
 %                             all tokens. Smaller values reduce diversity in
@@ -67,6 +73,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
         Model             (1,1) string
         Endpoint          (1,1) string
         TopK              (1,1) {mustBeReal,mustBePositive} = Inf
+        MinP              (1,1) {llms.utils.mustBeValidTopP} = 0
         TailFreeSamplingZ (1,1) {mustBeReal} = 1
     end
 
@@ -77,6 +84,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
                 systemPrompt                       {llms.utils.mustBeTextOrEmpty} = []
                 nvp.Temperature                    {llms.utils.mustBeValidTemperature} = 1
                 nvp.TopP                           {llms.utils.mustBeValidTopP} = 1
+                nvp.MinP                           {llms.utils.mustBeValidTopP} = 0
                 nvp.TopK                     (1,1) {mustBeReal,mustBePositive} = Inf
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}
                 nvp.ResponseFormat           (1,1) string {mustBeMember(nvp.ResponseFormat,["text","json"])} = "text"
@@ -103,6 +111,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
             this.ResponseFormat = nvp.ResponseFormat;
             this.Temperature = nvp.Temperature;
             this.TopP = nvp.TopP;
+            this.MinP = nvp.MinP;
             this.TopK = nvp.TopK;
             this.TailFreeSamplingZ = nvp.TailFreeSamplingZ;
             this.StopSequences = nvp.StopSequences;
@@ -146,7 +155,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
             [text, message, response] = llms.internal.callOllamaChatAPI(...
                 this.Model, messagesStruct, ...
                 Temperature=this.Temperature, ...
-                TopP=this.TopP, TopK=this.TopK,...
+                TopP=this.TopP, MinP=this.MinP, TopK=this.TopK,...
                 TailFreeSamplingZ=this.TailFreeSamplingZ,...
                 StopSequences=this.StopSequences, MaxNumTokens=nvp.MaxNumTokens, ...
                 ResponseFormat=this.ResponseFormat,Seed=nvp.Seed, ...
