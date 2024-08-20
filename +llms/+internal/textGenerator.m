@@ -8,7 +8,7 @@ classdef (Abstract) textGenerator
         Temperature {llms.utils.mustBeValidTemperature} = 1
 
         %TopP   Top probability mass to consider for generation.
-        TopP {llms.utils.mustBeValidTopP} = 1
+        TopP {llms.utils.mustBeValidProbability} = 1
 
         %StopSequences   Sequences to stop the generation of tokens.
         StopSequences {llms.utils.mustBeValidStop} = {}

@@ -29,6 +29,7 @@ arguments
     messages
     nvp.Temperature
     nvp.TopP
+    nvp.MinP
     nvp.TopK
     nvp.TailFreeSamplingZ
     nvp.StopSequences
@@ -103,6 +104,7 @@ function dict = mapNVPToParameters()
 dict = dictionary();
 dict("Temperature") = "temperature";
 dict("TopP") = "top_p";
+dict("MinP") = "min_p";
 dict("TopK") = "top_k";
 dict("TailFreeSamplingZ") = "tfs_z";
 dict("StopSequences") = "stop";
