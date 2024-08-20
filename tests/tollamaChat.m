@@ -50,7 +50,7 @@ classdef tollamaChat < matlab.unittest.TestCase
             %% This should work, and it does on some computers. On others, Ollama
             %% receives the parameter, but either Ollama or llama.cpp fails to
             %% honor it correctly.
-            % testCase.assumeTrue(false,"disabled due to Ollama/llama.cpp not honoring parameter reliably");
+            testCase.assumeTrue(false,"disabled due to Ollama/llama.cpp not honoring parameter reliably");
 
             % setting top-k to k=1 leaves no random choice,
             % so we expect to get a fixed response.
@@ -65,7 +65,7 @@ classdef tollamaChat < matlab.unittest.TestCase
             %% This should work, and it does on some computers. On others, Ollama
             %% receives the parameter, but either Ollama or llama.cpp fails to
             %% honor it correctly.
-            % testCase.assumeTrue(false,"disabled due to Ollama/llama.cpp not honoring parameter reliably");
+            testCase.assumeTrue(false,"disabled due to Ollama/llama.cpp not honoring parameter reliably");
 
             % setting min-p to p=1 means only tokens with the same logit as
             % the most likely one can be chosen, which will almost certainly
@@ -81,7 +81,7 @@ classdef tollamaChat < matlab.unittest.TestCase
             %% This should work, and it does on some computers. On others, Ollama
             %% receives the parameter, but either Ollama or llama.cpp fails to
             %% honor it correctly.
-            % testCase.assumeTrue(false,"disabled due to Ollama/llama.cpp not honoring parameter reliably");
+            testCase.assumeTrue(false,"disabled due to Ollama/llama.cpp not honoring parameter reliably");
 
             % setting tfs_z to z=0 leaves no random choice, but degrades to
             % greedy sampling, so we expect to get a fixed response.
