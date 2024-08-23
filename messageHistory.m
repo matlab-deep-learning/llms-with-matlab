@@ -213,6 +213,9 @@ classdef (Sealed) messageHistory
                 this (1,1) messageHistory
                 idx (1,1) {mustBeInteger, mustBePositive}
             end
+            if isempty(this.Messages)
+                error("llms:removeFromEmptyHistory",llms.utils.errorMessageCatalog.getMessage("llms:removeFromEmptyHistory"));
+            end
             if idx>numel(this.Messages)
                 error("llms:mustBeValidIndex",llms.utils.errorMessageCatalog.getMessage("llms:mustBeValidIndex", string(numel(this.Messages))));
             end
