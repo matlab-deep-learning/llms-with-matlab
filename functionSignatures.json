@@ -31,7 +31,17 @@
             {"name":"NumCompletions","kind":"namevalue","type":["numeric","scalar","integer","positive"]},
             {"name":"MaxNumTokens","kind":"namevalue","type":["numeric","scalar","positive"]},
             {"name":"ToolChoice","kind":"namevalue","type":"choices=[\"none\",\"auto\",this.FunctionNames]"},
-            {"name":"Seed","kind":"namevalue","type":["numeric","integer","scalar"]}
+            {"name":"Seed","kind":"namevalue","type":["numeric","integer","scalar"]},
+            {"name":"ModelName","kind":"namevalue","type":"choices=llms.openai.models"},
+            {"name":"Temperature","kind":"namevalue","type":["numeric","scalar",">=0","<=2"]},
+            {"name":"TopP","kind":"namevalue","type":["numeric","scalar",">=0","<=1"]},
+            {"name":"StopSequences","kind":"namevalue","type":["string","vector"]},
+            {"name":"ResponseFormat","kind":"namevalue","type":"choices={'text','json'}"},
+            {"name":"APIKey","kind":"namevalue","type":["string","scalar"]},
+            {"name":"PresencePenalty","kind":"namevalue","type":["numeric","scalar","<=2",">=-2"]},
+            {"name":"FrequencyPenalty","kind":"namevalue","type":["numeric","scalar","<=2",">=-2"]},
+            {"name":"TimeOut","kind":"namevalue","type":["numeric","scalar","real","positive"]},
+            {"name":"StreamFun","kind":"namevalue","type":"function_handle"}
         ],
         "outputs":
         [
@@ -73,7 +83,16 @@
             {"name":"NumCompletions","kind":"namevalue","type":["numeric","scalar","integer","positive"]},
             {"name":"MaxNumTokens","kind":"namevalue","type":["numeric","scalar","positive"]},
             {"name":"ToolChoice","kind":"namevalue","type":"choices=[\"none\",\"auto\",this.FunctionNames]"},
-            {"name":"Seed","kind":"namevalue","type":["numeric","integer","scalar"]}
+            {"name":"Seed","kind":"namevalue","type":["numeric","integer","scalar"]},
+            {"name":"APIKey","kind":"namevalue","type":["string","scalar"]},
+            {"name":"Temperature","kind":"namevalue","type":["numeric","scalar",">=0","<=2"]},
+            {"name":"TopP","kind":"namevalue","type":["numeric","scalar",">=0","<=1"]},
+            {"name":"StopSequences","kind":"namevalue","type":["string","vector"]},
+            {"name":"ResponseFormat","kind":"namevalue","type":"choices={'text','json'}"},
+            {"name":"PresencePenalty","kind":"namevalue","type":["numeric","scalar","<=2",">=-2"]},
+            {"name":"FrequencyPenalty","kind":"namevalue","type":["numeric","scalar","<=2",">=-2"]},
+            {"name":"TimeOut","kind":"namevalue","type":["numeric","scalar","real","positive"]},
+            {"name":"StreamFun","kind":"namevalue","type":"function_handle"}
         ],
         "outputs":
         [
@@ -90,12 +109,14 @@
             {"name":"systemPrompt","kind":"ordered","type":["string","scalar"]},
             {"name":"Temperature","kind":"namevalue","type":["numeric","scalar",">=0","<=2"]},
             {"name":"TopP","kind":"namevalue","type":["numeric","scalar",">=0","<=1"]},
+            {"name":"MinP","kind":"namevalue","type":["numeric","scalar",">=0","<=1"]},
             {"name":"TopK","kind":"namevalue","type":["numeric","scalar","integer",">=1"]},
             {"name":"StopSequences","kind":"namevalue","type":["string","vector"]},
             {"name":"ResponseFormat","kind":"namevalue","type":"choices={'text','json'}"},
             {"name":"TailFreeSamplingZ","kind":"namevalue","type":["numeric","scalar","real"]},
             {"name":"TimeOut","kind":"namevalue","type":["numeric","scalar","real","positive"]},
-            {"name":"StreamFun","kind":"namevalue","type":"function_handle"}
+            {"name":"StreamFun","kind":"namevalue","type":"function_handle"},
+            {"name":"Endpoint","kind":"namevalue","type":["string","scalar"]}
         ],
         "outputs":
         [
@@ -109,7 +130,18 @@
             {"name":"this","kind":"required","type":["ollamaChat","scalar"]},
             {"name":"messages","kind":"required","type":[["messageHistory","row"],["string","scalar"]]},
             {"name":"MaxNumTokens","kind":"namevalue","type":["numeric","scalar","positive"]},
-            {"name":"Seed","kind":"namevalue","type":["numeric","integer","scalar"]}
+            {"name":"Seed","kind":"namevalue","type":["numeric","integer","scalar"]},
+            {"name":"Model","kind":"namevalue","type":"choices=ollamaChat.models"},
+            {"name":"Temperature","kind":"namevalue","type":["numeric","scalar",">=0","<=2"]},
+            {"name":"TopP","kind":"namevalue","type":["numeric","scalar",">=0","<=1"]},
+            {"name":"MinP","kind":"namevalue","type":["numeric","scalar",">=0","<=1"]},
+            {"name":"TopK","kind":"namevalue","type":["numeric","scalar","integer",">=1"]},
+            {"name":"StopSequences","kind":"namevalue","type":["string","vector"]},
+            {"name":"ResponseFormat","kind":"namevalue","type":"choices={'text','json'}"},
+            {"name":"TailFreeSamplingZ","kind":"namevalue","type":["numeric","scalar","real"]},
+            {"name":"TimeOut","kind":"namevalue","type":["numeric","scalar","real","positive"]},
+            {"name":"StreamFun","kind":"namevalue","type":"function_handle"},
+            {"name":"Endpoint","kind":"namevalue","type":["string","scalar"]}
         ],
         "outputs":
         [

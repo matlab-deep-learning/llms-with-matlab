@@ -47,7 +47,6 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
 %                             value is empty.
 %                             Example: ["The end.", "And that's all she wrote."]
 %
-%
 %   ResponseFormat          - The format of response the model returns.
 %                             "text" (default) | "json"
 %
@@ -128,17 +127,79 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
             %   [TEXT, MESSAGE, RESPONSE] = generate(__, Name=Value) specifies additional options
             %   using one or more name-value arguments:
             %
-            %       MaxNumTokens     - Maximum number of tokens in the generated response.
-            %                          Default value is inf.
+            %       MaxNumTokens      - Maximum number of tokens in the generated response.
+            %                           Default value is inf.
             %
-            %       Seed             - An integer value to use to obtain
-            %                          reproducible responses
+            %       Seed              - An integer value to use to obtain
+            %                           reproducible responses
+            %
+            %       Model             - Model name (as expected by Ollama server).
+            %                           Default value is CHAT.Model.
+            %
+            %       Temperature       - Temperature value for controlling the randomness
+            %                           of the output. Default value is CHAT.Temperature.
+            %                           Higher values increase the randomness (in some
+            %                           sense, the “creativity”) of outputs, lower
+            %                           values reduce it. Setting Temperature=0 removes
+            %                           randomness from the output altogether.
+            %
+            %       TopP              - Top probability mass value for controlling the
+            %                           diversity of the output. Default value is CHAT.TopP;
+            %                           lower values imply that only the more likely
+            %                           words can appear in any particular place.
+            %                           This is also known as top-p sampling.
+            %
+            %       MinP              - Minimum probability ratio for controlling the
+            %                           diversity of the output. Default value is CHAT.MinP;
+            %                           higher values imply that only the more likely
+            %                           words can appear in any particular place.
+            %                           This is also known as min-p sampling.
+            %
+            %       TopK              - Maximum number of most likely tokens that are
+            %                           considered for output. Default is CHAT.TopK.
+            %                           Smaller values reduce diversity in the output.
+            %
+            %       TailFreeSamplingZ - Reduce the use of less probable tokens, based on
+            %                           the second-order differences of ordered
+            %                           probabilities.
+            %                           Default value is CHAT.TailFreeSamplingZ.
+            %                           Lower values reduce diversity, with
+            %                           some authors recommending values
+            %                           around 0.95. Tail-free sampling is
+            %                           slower than using TopP or TopK.
+            %
+            %       StopSequences     - Vector of strings that when encountered, will
+            %                           stop the generation of tokens. Default
+            %                           value is CHAT.StopSequences.
+            %                           Example: ["The end.", "And that's all she wrote."]
+            %
+            %
+            %       ResponseFormat    - The format of response the model returns.
+            %                           The default value is CHAT.ResponseFormat.
+            %                           "text" (default) | "json"
+            %
+            %       StreamFun         - Function to callback when streaming the
+            %                           result. The default value is CHAT.StreamFun.
+            %
+            %       TimeOut           - Connection Timeout in seconds. Default is CHAT.TimeOut.
+            %
 
             arguments
                 this                    (1,1) ollamaChat
-                messages                {mustBeValidMsgs}
+                messages                      {mustBeValidMsgs}
+                nvp.Model                     {mustBeTextScalar} = this.Model
+                nvp.Temperature               {llms.utils.mustBeValidTemperature} = this.Temperature
+                nvp.TopP                      {llms.utils.mustBeValidProbability} = this.TopP
+                nvp.MinP                      {llms.utils.mustBeValidProbability} = this.MinP
+                nvp.TopK                (1,1) {mustBeReal,mustBePositive} = this.TopK
+                nvp.StopSequences             {llms.utils.mustBeValidStop} = this.StopSequences
+                nvp.ResponseFormat      (1,1) string {mustBeMember(nvp.ResponseFormat,["text","json"])} = this.ResponseFormat
+                nvp.TimeOut             (1,1) {mustBeReal,mustBePositive} = this.TimeOut
+                nvp.TailFreeSamplingZ   (1,1) {mustBeReal} = this.TailFreeSamplingZ
+                nvp.StreamFun           (1,1) {mustBeA(nvp.StreamFun,'function_handle')}
+                nvp.Endpoint            (1,1) string = this.Endpoint
                 nvp.MaxNumTokens        (1,1) {mustBePositive} = inf
-                nvp.Seed                {mustBeIntegerOrEmpty(nvp.Seed)} = []
+                nvp.Seed                      {mustBeIntegerOrEmpty(nvp.Seed)} = []
             end
 
             messages = convertCharsToStrings(messages);
@@ -152,15 +213,21 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
                 messagesStruct = horzcat(this.SystemPrompt, messagesStruct);
             end
 
+            if isfield(nvp,"StreamFun")
+                streamFun = nvp.StreamFun;
+            else
+                streamFun = this.StreamFun;
+            end
+
             [text, message, response] = llms.internal.callOllamaChatAPI(...
-                this.Model, messagesStruct, ...
-                Temperature=this.Temperature, ...
-                TopP=this.TopP, MinP=this.MinP, TopK=this.TopK,...
-                TailFreeSamplingZ=this.TailFreeSamplingZ,...
-                StopSequences=this.StopSequences, MaxNumTokens=nvp.MaxNumTokens, ...
-                ResponseFormat=this.ResponseFormat,Seed=nvp.Seed, ...
-                TimeOut=this.TimeOut, StreamFun=this.StreamFun, ...
-                Endpoint=this.Endpoint);
+                nvp.Model, messagesStruct, ...
+                Temperature=nvp.Temperature, ...
+                TopP=nvp.TopP, MinP=nvp.MinP, TopK=nvp.TopK,...
+                TailFreeSamplingZ=nvp.TailFreeSamplingZ,...
+                StopSequences=nvp.StopSequences, MaxNumTokens=nvp.MaxNumTokens, ...
+                ResponseFormat=nvp.ResponseFormat,Seed=nvp.Seed, ...
+                TimeOut=nvp.TimeOut, StreamFun=streamFun, ...
+                Endpoint=nvp.Endpoint);
 
             if isfield(response.Body.Data,"error")
                 err = response.Body.Data.error;

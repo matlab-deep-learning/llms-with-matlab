@@ -174,6 +174,43 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
             %       Seed             - An integer value to use to obtain
             %                          reproducible responses
             %
+            %       Temperature      - Temperature value for controlling the randomness
+            %                          of the output. The default value is CHAT.Temperature;
+            %                          higher values increase the randomness (in some sense,
+            %                          the “creativity”) of outputs, lower values
+            %                          reduce it. Setting Temperature=0 removes
+            %                          randomness from the output altogether.
+            %
+            %       TopP             - Top probability mass value for controlling the
+            %                          diversity of the output. Default value is CHAT.TopP;
+            %                          lower values imply that only the more likely
+            %                          words can appear in any particular place.
+            %                          This is also known as top-p sampling.
+            %
+            %       StopSequences    - Vector of strings that when encountered, will
+            %                          stop the generation of tokens. Default
+            %                          value is CHAT.StopSequences.
+            %                          Example: ["The end.", "And that's all she wrote."]
+            %
+            %       ResponseFormat   - The format of response the model returns.
+            %                          Default value is CHAT.ResponseFormat.
+            %                          "text" | "json"
+            %
+            %       PresencePenalty  - Penalty value for using a token in the response
+            %                          that has already been used. Default value is 
+            %                          CHAT.PresencePenalty.
+            %                          Higher values reduce repetition of words in the output.
+            %
+            %       FrequencyPenalty - Penalty value for using a token that is frequent
+            %                          in the output. Default value is CHAT.FrequencyPenalty.
+            %                          Higher values reduce repetition of words in the output.
+            %
+            %       StreamFun        - Function to callback when streaming the result.
+            %                          Default value is CHAT.StreamFun.
+            %
+            %       TimeOut          - Connection Timeout in seconds. Default value is CHAT.TimeOut.
+            %
+            %
             % Currently, GPT-4 Turbo with vision does not support the message.name
             % parameter, functions/tools, response_format parameter, stop
             % sequences, and max_tokens
@@ -181,6 +218,15 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
             arguments
                 this                    (1,1) azureChat
                 messages                {mustBeValidMsgs}
+                nvp.Temperature               {llms.utils.mustBeValidTemperature} = this.Temperature
+                nvp.TopP                      {llms.utils.mustBeValidProbability} = this.TopP
+                nvp.StopSequences             {llms.utils.mustBeValidStop} = this.StopSequences
+                nvp.ResponseFormat      (1,1) string {mustBeMember(nvp.ResponseFormat,["text","json"])} = this.ResponseFormat
+                nvp.APIKey                    {mustBeNonzeroLengthTextScalar} = this.APIKey
+                nvp.PresencePenalty           {llms.utils.mustBeValidPenalty} = this.PresencePenalty
+                nvp.FrequencyPenalty          {llms.utils.mustBeValidPenalty} = this.FrequencyPenalty
+                nvp.TimeOut             (1,1) {mustBeReal,mustBePositive} = this.TimeOut
+                nvp.StreamFun           (1,1) {mustBeA(nvp.StreamFun,'function_handle')}
                 nvp.NumCompletions      (1,1) {mustBePositive, mustBeInteger} = 1
                 nvp.MaxNumTokens        (1,1) {mustBePositive} = inf
                 nvp.ToolChoice          {mustBeValidFunctionCall(this, nvp.ToolChoice)} = []
@@ -199,15 +245,22 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
             end
 
             toolChoice = convertToolChoice(this, nvp.ToolChoice);
+
+            if isfield(nvp,"StreamFun")
+                streamFun = nvp.StreamFun;
+            else
+                streamFun = this.StreamFun;
+            end
+
             try
                 [text, message, response] = llms.internal.callAzureChatAPI(this.Endpoint, ...
                     this.DeploymentID, messagesStruct, this.FunctionsStruct, ...
-                    ToolChoice=toolChoice, APIVersion = this.APIVersion, Temperature=this.Temperature, ...
-                    TopP=this.TopP, NumCompletions=nvp.NumCompletions,...
-                    StopSequences=this.StopSequences, MaxNumTokens=nvp.MaxNumTokens, ...
-                    PresencePenalty=this.PresencePenalty, FrequencyPenalty=this.FrequencyPenalty, ...
-                    ResponseFormat=this.ResponseFormat,Seed=nvp.Seed, ...
-                    APIKey=this.APIKey,TimeOut=this.TimeOut, StreamFun=this.StreamFun);
+                    ToolChoice=toolChoice, APIVersion = this.APIVersion, Temperature=nvp.Temperature, ...
+                    TopP=nvp.TopP, NumCompletions=nvp.NumCompletions,...
+                    StopSequences=nvp.StopSequences, MaxNumTokens=nvp.MaxNumTokens, ...
+                    PresencePenalty=nvp.PresencePenalty, FrequencyPenalty=nvp.FrequencyPenalty, ...
+                    ResponseFormat=nvp.ResponseFormat,Seed=nvp.Seed, ...
+                    APIKey=nvp.APIKey,TimeOut=nvp.TimeOut,StreamFun=streamFun);
             catch ME
                 if ismember(ME.identifier,...
                     ["MATLAB:webservices:UnknownHost","MATLAB:webservices:Timeout"])

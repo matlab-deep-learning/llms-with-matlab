@@ -85,7 +85,9 @@ classdef topenAIChat < matlab.unittest.TestCase
 
         function fixedSeedFixesResult(testCase)
             % Seed is "beta" in OpenAI documentation
-            % and not reliable in gpt-4o-mini at this time.
+            % and not reliable at this time.
+            testCase.assumeTrue(false,"disabled since the server is unreliable in honoring the Seed parameter");
+
             chat = openAIChat(ModelName="gpt-3.5-turbo");
 
             result1 = generate(chat,"This is okay", "Seed", 2);
@@ -200,6 +202,13 @@ classdef topenAIChat < matlab.unittest.TestCase
 
             text = generate(chat,messages);
             testCase.verifyThat(text,ContainsSubstring("same") | ContainsSubstring("identical"));
+        end
+
+        function generateOverridesProperties(testCase)
+            import matlab.unittest.constraints.EndsWithSubstring
+            chat = openAIChat;
+            text = generate(chat, "Please count from 1 to 10.", Temperature = 0, StopSequences = "4");
+            testCase.verifyThat(text, EndsWithSubstring("3, "));
         end
 
         function invalidInputsGenerate(testCase, InvalidGenerateInput)

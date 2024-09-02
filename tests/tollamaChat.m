@@ -46,6 +46,13 @@ classdef tollamaChat < matlab.unittest.TestCase
             testCase.verifyGreaterThan(strlength(response),0);
         end
 
+        function generateOverridesProperties(testCase)
+            import matlab.unittest.constraints.EndsWithSubstring
+            chat = ollamaChat("mistral");
+            text = generate(chat, "Please count from 1 to 10.", Temperature = 0, StopSequences = "4");
+            testCase.verifyThat(text, EndsWithSubstring("3, "));
+        end
+
         function extremeTopK(testCase)
             %% This should work, and it does on some computers. On others, Ollama
             %% receives the parameter, but either Ollama or llama.cpp fails to
