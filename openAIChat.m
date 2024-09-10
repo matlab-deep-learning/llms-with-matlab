@@ -209,7 +209,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
             arguments
                 this                    (1,1) openAIChat
                 messages                      {mustBeValidMsgs}
-                nvp.ModelName           (1,1) string {mustBeModel} = "gpt-4o-mini"
+                nvp.ModelName           (1,1) string {mustBeModel} = this.ModelName
                 nvp.Temperature               {llms.utils.mustBeValidTemperature} = this.Temperature
                 nvp.TopP                      {llms.utils.mustBeValidProbability} = this.TopP
                 nvp.StopSequences             {llms.utils.mustBeValidStop} = this.StopSequences
