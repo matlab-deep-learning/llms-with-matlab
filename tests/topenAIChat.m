@@ -9,6 +9,7 @@ classdef topenAIChat < matlab.unittest.TestCase
         InvalidGenerateInput = iGetInvalidGenerateInput();
         InvalidValuesSetters = iGetInvalidValuesSetters();
         StringInputs = struct('string',{"hi"},'char',{'hi'},'cellstr',{{'hi'}});
+        ModelName = cellstr(llms.openai.models);
     end
     
     methods(Test)
@@ -93,6 +94,13 @@ classdef topenAIChat < matlab.unittest.TestCase
             result1 = generate(chat,"This is okay", "Seed", 2);
             result2 = generate(chat,"This is okay", "Seed", 2);
             testCase.verifyEqual(result1,result2);
+        end
+
+        function canUseModel(testCase,ModelName)
+            testCase.verifyClass(generate(...
+                    openAIChat(ModelName=ModelName), ...
+                    "hi",MaxNumTokens=1), ...
+                "string");
         end
 
         function invalidInputsConstructor(testCase, InvalidConstructorInput)

@@ -135,11 +135,11 @@ for opt = nvpOptions.'
 end
 
 if isempty(nvp.StopSequences)
-    parameters = rmfield(parameters,"stop");
+    parameters = rmfield(parameters,dict("StopSequences"));
 end
 
 if nvp.MaxNumTokens == Inf
-    parameters = rmfield(parameters,"max_tokens");
+    parameters = rmfield(parameters,dict("MaxNumTokens"));
 end
 
 end
@@ -150,7 +150,7 @@ dict("Temperature") = "temperature";
 dict("TopP") = "top_p";
 dict("NumCompletions") = "n";
 dict("StopSequences") = "stop";
-dict("MaxNumTokens") = "max_tokens";
+dict("MaxNumTokens") = "max_completion_tokens";
 dict("PresencePenalty") = "presence_penalty";
 dict("FrequencyPenalty ") = "frequency_penalty";
 end
