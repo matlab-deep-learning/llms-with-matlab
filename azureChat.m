@@ -59,8 +59,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
 %   Tools                   - A list of tools the model can call.
 %
 %   API Version             - The API version to use for this model.
-%                             "2024-02-01" (default) | "2023-05-15" | "2024-05-01-preview" | ...
-%                             "2024-04-01-preview" | "2024-03-01-preview"
+%                             "2024-06-01" (default) | "2024-02-01" | "2024-08-01-preview" | "2024-05-01-preview" | ...
 %
 %
 %
@@ -107,7 +106,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
                 nvp.Deployment               (1,1) string {mustBeNonzeroLengthTextScalar}
                 nvp.APIKey                         {mustBeNonzeroLengthTextScalar}
                 nvp.Tools                    (1,:) {mustBeA(nvp.Tools, "openAIFunction")} = openAIFunction.empty
-                nvp.APIVersion               (1,1) string {mustBeAPIVersion} = "2024-02-01"
+                nvp.APIVersion               (1,1) string {mustBeAPIVersion} = "2024-06-01"
                 nvp.Temperature                    {llms.utils.mustBeValidTemperature} = 1
                 nvp.TopP                           {llms.utils.mustBeValidProbability} = 1
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}
