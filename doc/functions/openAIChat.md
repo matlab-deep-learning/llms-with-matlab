@@ -42,8 +42,12 @@ To connect to the OpenAI API, you need a valid API key. For information on how t
 character vector | string scalar
 
 
-Specify the system prompt and set the `SystemPrompt` property. The system prompt is a natural language description that provides the framework in which a large language model generates its responses. The system prompt can include instructions about tone, communications style, language, etc. 
+Specify the system prompt and set the `SystemPrompt` property. The system prompt is a natural language description that provides the framework in which a large language model generates its responses. The system prompt can include instructions about tone, communications style, language, etc.
 
+Specifying a system prompt is not supported for these models:
+
+-  `ModelName="o1-preview"` 
+-  `ModelName="o1-mini"` 
 
 **Example**: `"You are a helpful assistant who provides answers to user queries in iambic pentameter."`
 
@@ -94,10 +98,10 @@ Optionally specify these properties at construction using name\-value arguments.
 
 ### `ModelName` — Model name
 
-`"gpt-4o-mini"` (default) | `"gpt-4"` | `"gpt-3.5-turbo"` | `"dall-e-2"` | ...
+`"gpt-4o-mini"` (default) | `"gpt-4"` | `"o1-mini"` | `"gpt-3.5-turbo"` | ...
 
 
-Name of the OpenAI model to use for text or image generation.
+Name of the OpenAI model to use for text generation.
 
 
 For information about currently supported models, see [OpenAI API](../OpenAI.md).
@@ -197,6 +201,10 @@ The system prompt is a natural\-language description that provides the framework
 
 To set the `SystemPrompt` property at construction, specify the `systemPrompt` input argument.
 
+Specifying a system prompt is not supported for these models:
+
+-  `ModelName="o1-preview"` 
+-  `ModelName="o1-mini"` 
 
 **Example**: `"You are a helpful assistant who provides answers to user queries in iambic pentameter."`
 
