@@ -114,7 +114,7 @@ For more information on how to obtain an Azure endpoint, see [https://learn.micr
 
 ### `APIVersion` — API Version
 
-`"2024-02-01"` (default) | `"2023-05-15"` | `"2024-05-01-preview"` | `"2024-04-01-preview"` | `"2024-03-01-preview"` | ...
+`"2024-06-01"` (default) | `"2024-02-01"` | `"2023-05-15"` | `"2024-05-01-preview"` | `"2024-04-01-preview"` | ...
 
 
 After construction, this property is read\-only.
