@@ -245,7 +245,7 @@ classdef topenAIChat < matlab.unittest.TestCase
         end
 
         function doReturnErrors(testCase)
-            chat = openAIChat;
+            chat = openAIChat(ModelName="gpt-3.5-turbo");
             % This input is considerably longer than accepted as input for
             % GPT-3.5 (16385 tokens)
             wayTooLong = string(repmat('a ',1,20000));
