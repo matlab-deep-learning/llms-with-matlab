@@ -5,7 +5,7 @@ function validateResponseFormat(format,model)
 %   Copyright 2024 The MathWorks, Inc.
 
     if format == "json"
-        if ismember(model,["gpt-4","gpt-4-0613"])
+        if ismember(model,["gpt-4","gpt-4-0613","o1-preview","o1-mini"])
             error("llms:invalidOptionAndValueForModel", ...
                 llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionAndValueForModel", "ResponseFormat", "json", model));
         else
