@@ -105,7 +105,7 @@
     {
         "inputs":
         [
-            {"name":"model","kind":"positional","type":"choices=ollamaChat.models"},
+            {"name":"modelName","kind":"positional","type":"choices=ollamaChat.models"},
             {"name":"systemPrompt","kind":"ordered","type":["string","scalar"]},
             {"name":"Temperature","kind":"namevalue","type":["numeric","scalar",">=0","<=2"]},
             {"name":"TopP","kind":"namevalue","type":["numeric","scalar",">=0","<=1"]},
@@ -131,7 +131,7 @@
             {"name":"messages","kind":"required","type":[["messageHistory","row"],["string","scalar"]]},
             {"name":"MaxNumTokens","kind":"namevalue","type":["numeric","scalar","positive"]},
             {"name":"Seed","kind":"namevalue","type":["numeric","integer","scalar"]},
-            {"name":"Model","kind":"namevalue","type":"choices=ollamaChat.models"},
+            {"name":"ModelName","kind":"namevalue","type":"choices=ollamaChat.models"},
             {"name":"Temperature","kind":"namevalue","type":["numeric","scalar",">=0","<=2"]},
             {"name":"TopP","kind":"namevalue","type":["numeric","scalar",">=0","<=1"]},
             {"name":"MinP","kind":"namevalue","type":["numeric","scalar",">=0","<=1"]},

@@ -236,7 +236,7 @@ classdef topenAIChat < matlab.unittest.TestCase
         end
 
         function gpt35TurboErrorsForImages(testCase)
-            chat = openAIChat(APIKey="this-is-not-a-real-key",Model="gpt-3.5-turbo");
+            chat = openAIChat(APIKey="this-is-not-a-real-key",ModelName="gpt-3.5-turbo");
             image_path = "peppers.png";
             emptyMessages = messageHistory;
             inValidMessages = addUserMessageWithImages(emptyMessages,"What is in the image?",image_path);

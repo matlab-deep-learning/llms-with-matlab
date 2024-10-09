@@ -62,14 +62,14 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
 %       generate             - Generate a response using the ollamaChat instance.
 %
 %   ollamaChat Properties, in addition to the name-value pairs above:
-%       Model                - Model name (as expected by Ollama server).
+%       ModelName            - Model name (as expected by Ollama server).
 %
 %       SystemPrompt         - System prompt.
 
 % Copyright 2024 The MathWorks, Inc.
 
     properties
-        Model             (1,1) string
+        ModelName         (1,1) string
         Endpoint          (1,1) string
         TopK              (1,1) {mustBeReal,mustBePositive} = Inf
         MinP              (1,1) {llms.utils.mustBeValidProbability} = 0
@@ -106,7 +106,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
                 end
             end
 
-            this.Model = modelName;
+            this.ModelName = modelName;
             this.ResponseFormat = nvp.ResponseFormat;
             this.Temperature = nvp.Temperature;
             this.TopP = nvp.TopP;
@@ -133,8 +133,8 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
             %       Seed              - An integer value to use to obtain
             %                           reproducible responses
             %
-            %       Model             - Model name (as expected by Ollama server).
-            %                           Default value is CHAT.Model.
+            %       ModelName         - Model name (as expected by Ollama server).
+            %                           Default value is CHAT.ModelName.
             %
             %       Temperature       - Temperature value for controlling the randomness
             %                           of the output. Default value is CHAT.Temperature.
@@ -187,7 +187,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
             arguments
                 this                    (1,1) ollamaChat
                 messages                      {mustBeValidMsgs}
-                nvp.Model                     {mustBeTextScalar} = this.Model
+                nvp.ModelName                 {mustBeTextScalar} = this.ModelName
                 nvp.Temperature               {llms.utils.mustBeValidTemperature} = this.Temperature
                 nvp.TopP                      {llms.utils.mustBeValidProbability} = this.TopP
                 nvp.MinP                      {llms.utils.mustBeValidProbability} = this.MinP
@@ -220,7 +220,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
             end
 
             [text, message, response] = llms.internal.callOllamaChatAPI(...
-                nvp.Model, messagesStruct, ...
+                nvp.ModelName, messagesStruct, ...
                 Temperature=nvp.Temperature, ...
                 TopP=nvp.TopP, MinP=nvp.MinP, TopK=nvp.TopK,...
                 TailFreeSamplingZ=nvp.TailFreeSamplingZ,...

@@ -36,39 +36,39 @@ classdef topenAIImages < matlab.unittest.TestCase
         end
 
         function promptSizeLimit(testCase)
-            mdl = openAIImages(APIKey="this-is-not-a-real-key", Model="dall-e-2");
+            mdl = openAIImages(APIKey="this-is-not-a-real-key", ModelName="dall-e-2");
             testCase.verifyError(@()generate(mdl, repmat('c', 1, 1001)), "llms:promptLimitCharacter")
             testCase.verifyError(@()edit(mdl, which("peppers.png"), repmat('c', 1, 1001)), "llms:promptLimitCharacter")
-            mdl = openAIImages(APIKey="this-is-not-a-real-key", Model="dall-e-3");
+            mdl = openAIImages(APIKey="this-is-not-a-real-key", ModelName="dall-e-3");
             testCase.verifyError(@()generate(mdl, repmat('c', 1, 4001)), "llms:promptLimitCharacter")
         end
 
 
         function invalidOptionsGenerate(testCase)
-            mdl = openAIImages(APIKey="this-is-not-a-real-key", Model="dall-e-2");
+            mdl = openAIImages(APIKey="this-is-not-a-real-key", ModelName="dall-e-2");
             testCase.verifyError(@()generate(mdl, "cat", Quality="hd"), "llms:invalidOptionForModel")
             testCase.verifyError(@()generate(mdl, "cat", Style="natural"), "llms:invalidOptionForModel")
             testCase.verifyError(@()generate(mdl, "cat", Size="1024x1792"), "MATLAB:validators:mustBeMember")
-            mdl = openAIImages(ApiKey="this-is-not-a-real-key", Model="dall-e-3");
+            mdl = openAIImages(ApiKey="this-is-not-a-real-key", ModelName="dall-e-3");
             testCase.verifyError(@()generate(mdl, "cat", Size="256x256"), "MATLAB:validators:mustBeMember")
             testCase.verifyError(@()generate(mdl, "cat", NumImages=4), "llms:invalidOptionAndValueForModel")
         end
 
         function invalidModelEdit(testCase)
             validImage = string(which("peppers.png"));
-            mdl = openAIImages(APIKey="this-is-not-a-real-key", Model="dall-e-3");
+            mdl = openAIImages(APIKey="this-is-not-a-real-key", ModelName="dall-e-3");
             testCase.verifyError(@()edit(mdl, validImage, "cat"), "llms:functionNotAvailableForModel")
         end
 
         function invalidModelVariation(testCase)
             validImage = string(which("peppers.png"));
-            mdl = openAIImages(APIKey="this-is-not-a-real-key", Model="dall-e-3");
+            mdl = openAIImages(APIKey="this-is-not-a-real-key", ModelName="dall-e-3");
             testCase.verifyError(@()createVariation(mdl, validImage), ...
                 "llms:functionNotAvailableForModel")
         end
 
         function generateWithAllNVP(testCase)
-            mdl = openAIImages(APIKey="this-is-not-a-real-key", Model="dall-e-3");
+            mdl = openAIImages(APIKey="this-is-not-a-real-key", ModelName="dall-e-3");
             testCase.verifyWarningFree(@()generate(mdl, ...
                 "prompt", ...
                 Quality="hd", ...
@@ -79,7 +79,7 @@ classdef topenAIImages < matlab.unittest.TestCase
 
         function editWithAllNVP(testCase)
             validImage = string(which("peppers.png"));
-            mdl = openAIImages(APIKey="this-is-not-a-real-key", Model="dall-e-2");
+            mdl = openAIImages(APIKey="this-is-not-a-real-key", ModelName="dall-e-2");
             testCase.verifyWarningFree(@()edit(mdl, ...
                 validImage,...
                 "prompt", ...
@@ -90,7 +90,7 @@ classdef topenAIImages < matlab.unittest.TestCase
 
         function variationWithAllNVP(testCase)
             validImage = string(which("peppers.png"));
-            mdl = openAIImages(APIKey="this-is-not-a-real-key", Model="dall-e-2");
+            mdl = openAIImages(APIKey="this-is-not-a-real-key", ModelName="dall-e-2");
             testCase.verifyWarningFree(@()createVariation(mdl, ...
                 validImage,...
                 Size="512x512",...
