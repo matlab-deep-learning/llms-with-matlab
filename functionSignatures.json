@@ -56,7 +56,7 @@
         [
             {"name":"systemPrompt","kind":"ordered","type":["string","scalar"]},
             {"name":"Endpoint","kind":"namevalue","type":["string","scalar"]},
-            {"name":"Deployment","kind":"namevalue","type":["string","scalar"]},
+            {"name":"DeploymentID","kind":"namevalue","type":["string","scalar"]},
             {"name":"APIKey","kind":"namevalue","type":["string","scalar"]},
             {"name":"Tools","kind":"namevalue","type":"openAIFunction"},
             {"name":"APIVersion","kind":"namevalue","type":"choices=llms.azure.apiVersions"},

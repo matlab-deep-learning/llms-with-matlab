@@ -15,7 +15,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
 %                             interface. Needs to be specified or stored in the
 %                             environment variable AZURE_OPENAI_ENDPOINT.
 %
-%   Deployment              - The deployment as defined in the Azure OpenAI Services
+%   DeploymentID            - The deployment as defined in the Azure OpenAI Services
 %                             interface. Needs to be specified or stored in the
 %                             environment variable AZURE_OPENAI_DEPLOYMENT.
 %
@@ -103,7 +103,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
             arguments
                 systemPrompt                       {llms.utils.mustBeTextOrEmpty} = []
                 nvp.Endpoint                 (1,1) string {mustBeNonzeroLengthTextScalar}
-                nvp.Deployment               (1,1) string {mustBeNonzeroLengthTextScalar}
+                nvp.DeploymentID             (1,1) string {mustBeNonzeroLengthTextScalar}
                 nvp.APIKey                         {mustBeNonzeroLengthTextScalar}
                 nvp.Tools                    (1,:) {mustBeA(nvp.Tools, "openAIFunction")} = openAIFunction.empty
                 nvp.APIVersion               (1,1) string {mustBeAPIVersion} = "2024-06-01"
@@ -394,8 +394,8 @@ function endpoint = getEndpoint(nvp)
 end
 
 function deployment = getDeployment(nvp)
-    if isfield(nvp, "Deployment")
-        deployment = nvp.Deployment;
+    if isfield(nvp, "DeploymentID")
+        deployment = nvp.DeploymentID;
     else
         if isenv("AZURE_OPENAI_DEPLOYMENT")
             deployment = getenv("AZURE_OPENAI_DEPLOYMENT");

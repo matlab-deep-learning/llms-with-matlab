@@ -23,7 +23,7 @@ classdef tazureChat < matlab.unittest.TestCase
             frequenceP = 2;
             systemPrompt = "This is a system prompt";
             timeout = 3;
-            chat = azureChat(systemPrompt, Deployment=deploymentID, Tools=functions, ...
+            chat = azureChat(systemPrompt, DeploymentID=deploymentID, Tools=functions, ...
                 Temperature=temperature, TopP=topP, StopSequences=stop, APIKey=apiKey,...
                 FrequencyPenalty=frequenceP, PresencePenalty=presenceP, TimeOut=timeout);
             testCase.verifyEqual(chat.Temperature, temperature);
@@ -56,7 +56,7 @@ classdef tazureChat < matlab.unittest.TestCase
         end
 
         function generateWithImage(testCase)
-            chat = azureChat(Deployment="gpt-4o");
+            chat = azureChat(DeploymentID="gpt-4o");
             image_path = "peppers.png";
             emptyMessages = messageHistory;
             messages = addUserMessageWithImages(emptyMessages,"What is in the image?",image_path);
@@ -67,7 +67,7 @@ classdef tazureChat < matlab.unittest.TestCase
 
         function generateWithMultipleImages(testCase)
             import matlab.unittest.constraints.ContainsSubstring
-            chat = azureChat(Deployment="gpt-4o");
+            chat = azureChat(DeploymentID="gpt-4o");
             image_path = "peppers.png";
             emptyMessages = messageHistory;
             messages = addUserMessageWithImages(emptyMessages,"Compare these images.",[image_path,image_path]);

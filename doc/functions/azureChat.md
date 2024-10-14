@@ -59,18 +59,6 @@ For more information on connecting to the Azure OpenAI API, see [Azure OpenAI Se
 For more information on keeping sensitive information out of code, see [Keep Sensitive Information Out of Code](https://www.mathworks.com/help/matlab/import_export/keep-sensitive-information-out-of-code.html).
 
 
-### `Deployment` — Deployment ID
-
-character vector | string scalar
-
-
-Select a deployed model by specifying the corresponding deployment ID. Specifying the deployment ID also sets the `DeploymentID` property.
-
-
-Instead of using the `Deployment` name\-value argument, you can also set the environment variable AZURE\_OPENAI\_DEPLOYMENT. For more information, see [Azure OpenAI Services API](../Azure.md).
-
-
-**Example**: `"my-gpt-35-turbo-deployment"`
 
 ### `Tools` — Functions to call during output generation
 
@@ -111,6 +99,21 @@ Instead of using the `Endpoint` name\-value argument, you can also set the envir
 
 
 For more information on how to obtain an Azure endpoint, see [https://learn.microsoft.com/en\-us/azure/ai\-services/openai/chatgpt\-quickstart?tabs=command\-line%2Cpython\-new&pivots=rest\-api\#set\-up](https://learn.microsoft.com/en-us/azure/ai-services/openai/chatgpt-quickstart?tabs=command-line%2Cpython-new&pivots=rest-api#set-up).
+
+### `DeploymentID` — Deployment ID
+
+character vector | string scalar
+
+
+After construction, this property is read\-only.
+
+
+The deployment ID, also known as deployment name, specifies the Azure OpenAI deployment to use for generation. 
+
+
+Instead of using the `DeploymentID` name\-value argument, you can also set the environment variable AZURE\_OPENAI\_DEPLOYMENT. For more information, see [Azure OpenAI Services API](../Azure.md).
+
+**Example**: `"my-gpt-35-turbo-deployment"`
 
 ### `APIVersion` — API Version
 
@@ -226,19 +229,6 @@ This property is read\-only.
 
 
 Names of the custom functions specified in the `Tools` name\-value argument.
-
-### `DeploymentID` — Deployment ID
-
-character vector | string scalar
-
-
-This property is read\-only.
-
-
-The deployment ID specifies the model to use for generation.
-
-
-Set the `DeploymentID` property at construction either by using the `Deployment` name\-value argument, or by setting the environment variable AZURE\_OPENAI\_DEPLOYMENT. For more information, see [Azure OpenAI Services API](../Azure.md).
 
 # Object Functions
 

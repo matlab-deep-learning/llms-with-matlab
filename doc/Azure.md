@@ -31,7 +31,7 @@ loadenv(".env")
 
 ## Establishing a connection to Chat Completions API using Azure
 
-To connect MATLAB® to Chat Completions API via Azure, you will have to create an `azureChat` object. See [the Azure documentation](https://learn.microsoft.com/en-us/azure/ai-services/openai/chatgpt-quickstart) for details on the setup required and where to find your key, endpoint, and deployment name. As explained above, the endpoint, deployment, and key should be in the environment variables `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_DEPLOYMENYT`, and `AZURE_OPENAI_API_KEY`, or provided as `Endpoint=…`, `Deployment=…`, and `APIKey=…` in the `azureChat` call below.
+To connect MATLAB® to Chat Completions API via Azure, you will have to create an `azureChat` object. See [the Azure documentation](https://learn.microsoft.com/en-us/azure/ai-services/openai/chatgpt-quickstart) for details on the setup required and where to find your key, endpoint, and deployment name. As explained above, the endpoint, deployment, and key should be in the environment variables `AZURE_OPENAI_ENDPOINT`, `AZURE_OPENAI_DEPLOYMENYT`, and `AZURE_OPENAI_API_KEY`, or provided as `Endpoint=…`, `DeploymentID=…`, and `APIKey=…` in the `azureChat` call below.
 
 In order to create the chat assistant, use the `azureChat` function, optionally providing a system prompt:
 ```matlab
@@ -119,7 +119,7 @@ txt = generate(chat,"What is Model-Based Design and how is it related to Digital
 
 You can use gpt-4o, gpt-4o-mini, or gpt-4-turbo to experiment with image understanding. 
 ```matlab
-chat = azureChat("You are an AI assistant.",Deployment="gpt-4o");
+chat = azureChat("You are an AI assistant.",DeploymentID="gpt-4o");
 image_path = "peppers.png";
 messages = messageHistory;
 messages = addUserMessageWithImages(messages,"What is in the image?",image_path);
