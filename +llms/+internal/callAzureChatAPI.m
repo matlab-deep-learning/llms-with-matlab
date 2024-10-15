@@ -104,6 +104,18 @@ if ~isempty(nvp.ToolChoice)
     parameters.tool_choice = nvp.ToolChoice;
 end
 
+if strcmp(nvp.ResponseFormat,"json")
+    parameters.response_format = struct('type','json_object');
+elseif isstruct(nvp.ResponseFormat)
+    parameters.response_format = struct('type','json_schema',...
+        'json_schema', struct('strict', true, 'name', 'computedFromPrototype', ...
+            'schema', llms.internal.jsonSchemaFromPrototype(nvp.ResponseFormat)));
+elseif startsWith(string(nvp.ResponseFormat), asManyOfPattern(whitespacePattern)+"{")
+    parameters.response_format = struct('type','json_schema',...
+        'json_schema', struct('strict', true, 'name', 'providedInCall', ...
+            'schema', llms.internal.verbatimJSON(nvp.ResponseFormat)));
+end
+
 if ~isempty(nvp.Seed)
     parameters.seed = nvp.Seed;
 end

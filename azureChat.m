@@ -42,7 +42,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
 %                             Example: ["The end.", "And that's all she wrote."]
 %
 %   ResponseFormat          - The format of response the model returns.
-%                             "text" (default) | "json"
+%                             "text" (default) | "json" | struct | string with JSON Schema
 %
 %   PresencePenalty         - Penalty value for using a token in the response
 %                             that has already been used. Default value is 0.
@@ -85,7 +85,8 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
 %       FunctionNames        - Names of the functions that the model can
 %                              request calls.
 %
-%       ResponseFormat       - Specifies the response format, "text" or "json".
+%      ResponseFormat        - The format of response the model returns.
+%                              "text" (default) | "json" | struct | string with JSON Schema
 %
 %       TimeOut              - Connection Timeout in seconds.
 %
@@ -110,7 +111,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
                 nvp.Temperature                    {llms.utils.mustBeValidTemperature} = 1
                 nvp.TopP                           {llms.utils.mustBeValidProbability} = 1
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}
-                nvp.ResponseFormat           (1,1) string {mustBeMember(nvp.ResponseFormat,["text","json"])} = "text"
+                nvp.ResponseFormat                 {llms.utils.mustBeResponseFormat} = "text"
                 nvp.PresencePenalty                {llms.utils.mustBeValidPenalty} = 0
                 nvp.FrequencyPenalty               {llms.utils.mustBeValidPenalty} = 0
                 nvp.TimeOut                  (1,1) {mustBeReal,mustBePositive} = 10
@@ -191,9 +192,9 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
             %                          value is CHAT.StopSequences.
             %                          Example: ["The end.", "And that's all she wrote."]
             %
-            %       ResponseFormat   - The format of response the model returns.
+            %       ResponseFormat   - The format of response the call returns.
             %                          Default value is CHAT.ResponseFormat.
-            %                          "text" | "json"
+            %                          "text" | "json" | struct | string with JSON Schema
             %
             %       PresencePenalty  - Penalty value for using a token in the response
             %                          that has already been used. Default value is 
@@ -220,7 +221,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
                 nvp.Temperature               {llms.utils.mustBeValidTemperature} = this.Temperature
                 nvp.TopP                      {llms.utils.mustBeValidProbability} = this.TopP
                 nvp.StopSequences             {llms.utils.mustBeValidStop} = this.StopSequences
-                nvp.ResponseFormat      (1,1) string {mustBeMember(nvp.ResponseFormat,["text","json"])} = this.ResponseFormat
+                nvp.ResponseFormat            {llms.utils.mustBeResponseFormat} = this.ResponseFormat
                 nvp.APIKey                    {mustBeNonzeroLengthTextScalar} = this.APIKey
                 nvp.PresencePenalty           {llms.utils.mustBeValidPenalty} = this.PresencePenalty
                 nvp.FrequencyPenalty          {llms.utils.mustBeValidPenalty} = this.FrequencyPenalty
@@ -243,6 +244,8 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
                 messagesStruct = horzcat(this.SystemPrompt, messagesStruct);
             end
 
+            llms.azure.validateResponseFormat(nvp.ResponseFormat, this, messagesStruct);
+
             toolChoice = convertToolChoice(this, nvp.ToolChoice);
 
             if isfield(nvp,"StreamFun")
@@ -263,18 +266,25 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
             catch ME
                 if ismember(ME.identifier,...
                     ["MATLAB:webservices:UnknownHost","MATLAB:webservices:Timeout"])
-                    % throw(ME)would still print a long stack trace, from
+                    % throw(ME) would still print a long stack trace, from
                     % ME.cause.stack. We cannot change ME.cause, so we
                     % throw a new error:
                     error(ME.identifier,ME.message);
                 end
-                rethrow(ME);
+                throw(ME);
             end
 
             if isfield(response.Body.Data,"error")
                 err = response.Body.Data.error.message;
+                if startsWith(err,"'json_schema' is not one of ['json_object', 'text']")
+                    error("llms:noStructuredOutputForAzureDeployment", ...
+                        llms.utils.errorMessageCatalog.getMessage( ...
+                            "llms:noStructuredOutputForAzureDeployment",this.DeploymentID));
+                end
                 error("llms:apiReturnedError",llms.utils.errorMessageCatalog.getMessage("llms:apiReturnedError",err));
             end
+
+            text = llms.internal.reformatOutput(text,nvp.ResponseFormat);
         end
     end
 

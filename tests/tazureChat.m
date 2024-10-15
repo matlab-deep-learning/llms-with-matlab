@@ -1,14 +1,23 @@
-classdef tazureChat < matlab.unittest.TestCase
+classdef tazureChat < hopenAIChat
 % Tests for azureChat
 
 %   Copyright 2024 The MathWorks, Inc.
 
     properties(TestParameter)
+        ValidConstructorInput = iGetValidConstructorInput();
         InvalidConstructorInput = iGetInvalidConstructorInput;
         InvalidGenerateInput = iGetInvalidGenerateInput;
         InvalidValuesSetters = iGetInvalidValuesSetters;
-        StringInputs = struct('string',{"hi"},'char',{'hi'},'cellstr',{{'hi'}});
         APIVersions = iGetAPIVersions();
+    end
+
+    properties
+        constructor = @azureChat;
+        defaultModel = azureChat;
+        visionModel = azureChat(Deployment="gpt-4o");
+        structuredModel = azureChat("APIVersion","2024-08-01-preview",...
+            "Deployment","gpt-4o-2024-08-06");
+        noStructuredOutputModel = azureChat(APIVersion="2024-08-01-preview");
     end
 
     methods(Test)
@@ -33,14 +42,6 @@ classdef tazureChat < matlab.unittest.TestCase
             testCase.verifyEqual(chat.PresencePenalty, presenceP);
         end
 
-        function doGenerate(testCase,StringInputs)
-            testCase.assumeTrue(isenv("AZURE_OPENAI_API_KEY"),"end-to-end test requires environment variables AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT.");
-            chat = azureChat;
-            response = testCase.verifyWarningFree(@() generate(chat,StringInputs));
-            testCase.verifyClass(response,'string');
-            testCase.verifyGreaterThan(strlength(response),0);
-        end
-
         function doGenerateUsingSystemPrompt(testCase)
             testCase.assumeTrue(isenv("AZURE_OPENAI_API_KEY"),"end-to-end test requires environment variables AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT.");
             chat = azureChat("You are a helpful assistant");
@@ -53,6 +54,21 @@ classdef tazureChat < matlab.unittest.TestCase
             chat = azureChat;
             [~,~,response] = generate(chat,"What is a cat?",NumCompletions=3);
             testCase.verifySize(response.Body.Data.choices,[3,1]);
+        end
+
+        function jsonFormatWithSystemPrompt(testCase)
+            chat = azureChat("Respond in JSON format.","Deployment","gpt-4o-2024-08-06");
+            testCase.verifyClass( ...
+                generate(chat,"create some address",ResponseFormat='json'), ...
+                "string");
+        end
+
+        function responseFormatRequiresNewAPI(testCase)
+            chat = azureChat;
+            testCase.verifyError(@() generate(chat, ...
+                "What is the smallest prime?", ...
+                ResponseFormat=struct("number",1)), ...
+                "llms:structuredOutputRequiresAPI");
         end
 
         function generateWithImage(testCase)
@@ -101,59 +117,6 @@ classdef tazureChat < matlab.unittest.TestCase
             testCase.verifyError(@() generate(chat,messages), "llms:apiReturnedError");
         end
 
-        function seedFixesResult(testCase)
-            testCase.assumeTrue(isenv("AZURE_OPENAI_API_KEY"),"end-to-end test requires environment variables AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT.");
-            chat = azureChat;
-            response1 = generate(chat,"hi",Seed=1234);
-            response2 = generate(chat,"hi",Seed=1234);
-            testCase.verifyEqual(response1,response2);
-        end
-
-        function createAzureChatWithStreamFunc(testCase)
-            testCase.assumeTrue(isenv("AZURE_OPENAI_API_KEY"),"end-to-end test requires environment variables AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT.");
-            function seen = sf(str)
-                persistent data;
-                if isempty(data)
-                    data = strings(1, 0);
-                end
-                % Append streamed text to an empty string array of length 1
-                data = [data, str];
-                seen = data;
-            end
-            chat = azureChat(StreamFun=@sf);
-
-            testCase.verifyWarningFree(@()generate(chat, "Hello world."));
-            % Checking that persistent data, which is still stored in
-            % memory, is greater than 1. This would mean that the stream
-            % function has been called and streamed some text.
-            testCase.verifyGreaterThan(numel(sf("")), 1);
-        end
-
-        function generateWithTools(testCase)
-            import matlab.unittest.constraints.HasField
-
-            f = openAIFunction("getCurrentWeather", "Get the current weather in a given location");
-            f = addParameter(f, "location", type="string", description="The city and country, optionally state. E.g., San Francisco, CA, USA");
-            f = addParameter(f, "unit", type="string", enum=["Kelvin","Celsius"], RequiredParameter=false);
-
-            chat = azureChat(Tools=f);
-
-            prompt =  "What's the weather like in San Francisco, Tokyo, and Paris?";
-            [~, response] = generate(chat, prompt, ToolChoice="getCurrentWeather");
-
-            testCase.assertThat(response, HasField("tool_calls"));
-            testCase.assertEqual(response.tool_calls.type,'function');
-            testCase.assertEqual(response.tool_calls.function.name,'getCurrentWeather');
-            data = testCase.verifyWarningFree( ...
-                @() jsondecode(response.tool_calls.function.arguments));
-            testCase.verifyThat(data,HasField("location"));
-        end
-
-        function errorsWhenPassingToolChoiceWithEmptyTools(testCase)
-            chat = azureChat(APIKey="this-is-not-a-real-key");
-            testCase.verifyError(@()generate(chat,"input", ToolChoice="bla"), "llms:mustSetFunctionsForCall");
-        end
-
         function shortErrorForBadEndpoint(testCase)
             chat = azureChat(Endpoint="https://nobodyhere.whatever/");
             caught = false;
@@ -167,35 +130,6 @@ classdef tazureChat < matlab.unittest.TestCase
             testCase.verifyEmpty(caught.cause);
         end
 
-        function invalidInputsConstructor(testCase, InvalidConstructorInput)
-            testCase.verifyError(@()azureChat(InvalidConstructorInput.Input{:}), InvalidConstructorInput.Error);
-        end
-
-        function invalidInputsGenerate(testCase, InvalidGenerateInput)
-            f = openAIFunction("validfunction");
-            chat = azureChat(Tools=f, APIKey="this-is-not-a-real-key");
-            testCase.verifyError(@()generate(chat,InvalidGenerateInput.Input{:}), InvalidGenerateInput.Error);
-        end
-
-        function invalidSetters(testCase, InvalidValuesSetters)
-            chat = azureChat(APIKey="this-is-not-a-real-key");
-            function assignValueToProperty(property, value)
-                chat.(property) = value;
-            end
-
-            testCase.verifyError(@()assignValueToProperty(InvalidValuesSetters.Property,InvalidValuesSetters.Value), InvalidValuesSetters.Error);
-        end
-
-        function keyNotFound(testCase)
-            % to verify the error, we need to unset the environment variable
-            % AZURE_OPENAI_API_KEY, if given. Use a fixture to restore the
-            % value on leaving the test point:
-            import matlab.unittest.fixtures.EnvironmentVariableFixture
-            testCase.applyFixture(EnvironmentVariableFixture("AZURE_OPENAI_API_KEY","dummy"));
-            unsetenv("AZURE_OPENAI_API_KEY");
-            testCase.verifyError(@()azureChat, "llms:keyMustBeSpecified");
-        end
-
         function canUseAPIVersions(testCase, APIVersions)
             % Test that we can use different APIVersion value to call 
             % azureChat.generate
@@ -207,6 +141,15 @@ classdef tazureChat < matlab.unittest.TestCase
             testCase.verifyClass(response,'string');
             testCase.verifyGreaterThan(strlength(response),0);
         end
+
+        function specialErrorForUnsupportedResponseFormat(testCase)
+            testCase.verifyError(@() generate(...
+                azureChat(APIVersion="2024-08-01-preview"), ...
+                "What is the smallest prime?", ...
+                ResponseFormat=struct("number",1)), ...
+                "llms:noStructuredOutputForAzureDeployment");
+        end
+
 
         function endpointNotFound(testCase)
             % to verify the error, we need to unset the environment variable
@@ -227,7 +170,39 @@ classdef tazureChat < matlab.unittest.TestCase
             unsetenv("AZURE_OPENAI_DEPLOYMENT");
             testCase.verifyError(@()azureChat, "llms:deploymentMustBeSpecified");
         end
+
+        % open TODOs for azureChat
+        function settingToolChoiceWithNone(testCase)
+            testCase.assumeFail("azureChat need different handling of ToolChoice 'none'");
+        end
+
+        function generateWithToolsAndStreamFunc(testCase)
+            testCase.assumeFail("need to make azureChat return tool_call in the same way as openAIChat");
+        end
+
+        function warningJSONResponseFormat(testCase)
+            testCase.assumeFail("TODO for azureChat");
+        end
     end
+end
+
+function validConstructorInput = iGetValidConstructorInput()
+validConstructorInput = struct( ...
+    "Empty", struct( ...
+        "Input",{{}}, ...
+        "ExpectedWarning", '', ...
+        "VerifyProperties", struct( ...
+                "Temperature", {1}, ...
+                "TopP", {1}, ...
+                "StopSequences", {string([])}, ...
+                "PresencePenalty", {0}, ...
+                "FrequencyPenalty", {0}, ...
+                "TimeOut", {10}, ...
+                "FunctionNames", {[]}, ...
+                "SystemPrompt", {[]}, ...
+                "ResponseFormat", {"text"} ...
+            ) ...
+        ));
 end
 
 function invalidValuesSetters = iGetInvalidValuesSetters
@@ -339,11 +314,15 @@ validFunction = openAIFunction("funName");
 invalidConstructorInput = struct( ...
     "InvalidResponseFormatValue", struct( ...
         "Input",{{"ResponseFormat", "foo" }},...
-        "Error", "MATLAB:validators:mustBeMember"), ...
+        "Error", "llms:incorrectResponseFormat"), ...
+    ...
+    "InvalidResponseFormatType", struct( ...
+        "Input",{{"ResponseFormat", 1}},...
+        "Error", "llms:incorrectResponseFormat"), ...
     ...
     "InvalidResponseFormatSize", struct( ...
         "Input",{{"ResponseFormat", ["text" "text"] }},...
-        "Error", "MATLAB:validation:IncompatibleSize"), ...
+        "Error", "MATLAB:validators:mustBeTextScalar"), ...
     ...
     "InvalidStreamFunType", struct( ...
         "Input",{{"StreamFun", "2" }},...

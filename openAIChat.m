@@ -48,7 +48,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
 %                             result
 %
 %   ResponseFormat          - The format of response the model returns.
-%                             "text" (default) | "json"
+%                             "text" (default) | "json" | struct | string with JSON Schema
 %
 %   openAIChat Functions:
 %       openAIChat           - Chat completion API from OpenAI.
@@ -74,7 +74,8 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
 %       FunctionNames        - Names of the functions that the model can
 %                              request calls.
 %
-%       ResponseFormat       - Specifies the response format, "text" or "json".
+%       ResponseFormat      - The format of response the model returns.
+%                              "text" | "json" | struct | string with JSON Schema
 %
 %       TimeOut              - Connection Timeout in seconds.
 %
@@ -96,7 +97,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
                 nvp.Temperature                    {llms.utils.mustBeValidTemperature} = 1
                 nvp.TopP                           {llms.utils.mustBeValidProbability} = 1
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}
-                nvp.ResponseFormat           (1,1) string {mustBeMember(nvp.ResponseFormat,["text","json"])} = "text"
+                nvp.ResponseFormat                 {llms.utils.mustBeResponseFormat} = "text"
                 nvp.APIKey                         {mustBeNonzeroLengthTextScalar}
                 nvp.PresencePenalty                {llms.utils.mustBeValidPenalty} = 0
                 nvp.FrequencyPenalty               {llms.utils.mustBeValidPenalty} = 0
@@ -198,9 +199,9 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
             %       StreamFun        - Function to callback when streaming the
             %                          result. Default value is CHAT.StreamFun.
             %
-            %       ResponseFormat   - The format of response the model returns.
+            %       ResponseFormat   - The format of response the call returns.
             %                          Default value is CHAT.ResponseFormat.
-            %                          "text" | "json"
+            %                          "text" | "json" | struct | string with JSON Schema
             %
             % Currently, GPT-4 Turbo with vision does not support the message.name
             % parameter, functions/tools, response_format parameter, and stop
@@ -213,7 +214,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
                 nvp.Temperature               {llms.utils.mustBeValidTemperature} = this.Temperature
                 nvp.TopP                      {llms.utils.mustBeValidProbability} = this.TopP
                 nvp.StopSequences             {llms.utils.mustBeValidStop} = this.StopSequences
-                nvp.ResponseFormat      (1,1) string {mustBeMember(nvp.ResponseFormat,["text","json"])} = this.ResponseFormat
+                nvp.ResponseFormat            {llms.utils.mustBeResponseFormat} = this.ResponseFormat
                 nvp.APIKey                    {mustBeNonzeroLengthTextScalar} = this.APIKey
                 nvp.PresencePenalty           {llms.utils.mustBeValidPenalty} = this.PresencePenalty
                 nvp.FrequencyPenalty          {llms.utils.mustBeValidPenalty} = this.FrequencyPenalty
@@ -234,11 +235,12 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
                 messagesStruct = this.encodeImages(messages.Messages);
             end
 
-            llms.openai.validateMessageSupported(messagesStruct{end}, this.ModelName);
-
+            llms.openai.validateMessageSupported(messagesStruct{end}, nvp.ModelName);
             if ~isempty(this.SystemPrompt)
                 messagesStruct = horzcat(this.SystemPrompt, messagesStruct);
             end
+
+            llms.openai.validateResponseFormat(nvp.ResponseFormat, nvp.ModelName, messagesStruct);
 
             if isfield(nvp,"StreamFun")
                 streamFun = nvp.StreamFun;
@@ -246,18 +248,24 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
                 streamFun = this.StreamFun;
             end
 
-            [text, message, response] = llms.internal.callOpenAIChatAPI(messagesStruct, this.FunctionsStruct,...
-                ModelName=nvp.ModelName, ToolChoice=toolChoice, Temperature=nvp.Temperature, ...
-                TopP=nvp.TopP, NumCompletions=nvp.NumCompletions,...
-                StopSequences=nvp.StopSequences, MaxNumTokens=nvp.MaxNumTokens, ...
-                PresencePenalty=nvp.PresencePenalty, FrequencyPenalty=nvp.FrequencyPenalty, ...
-                ResponseFormat=nvp.ResponseFormat,Seed=nvp.Seed, ...
-                APIKey=nvp.APIKey,TimeOut=nvp.TimeOut, StreamFun=streamFun);
+            try % just for nicer errors, reducing the stack depth shown
+                [text, message, response] = llms.internal.callOpenAIChatAPI(messagesStruct, this.FunctionsStruct,...
+                    ModelName=nvp.ModelName, ToolChoice=toolChoice, Temperature=nvp.Temperature, ...
+                    TopP=nvp.TopP, NumCompletions=nvp.NumCompletions,...
+                    StopSequences=nvp.StopSequences, MaxNumTokens=nvp.MaxNumTokens, ...
+                    PresencePenalty=nvp.PresencePenalty, FrequencyPenalty=nvp.FrequencyPenalty, ...
+                    ResponseFormat=nvp.ResponseFormat,Seed=nvp.Seed, ...
+                    APIKey=nvp.APIKey,TimeOut=nvp.TimeOut, StreamFun=streamFun);
+            catch e
+                throw(e);
+            end
 
             if isfield(response.Body.Data,"error")
                 err = response.Body.Data.error.message;
                 error("llms:apiReturnedError",llms.utils.errorMessageCatalog.getMessage("llms:apiReturnedError",err));
             end
+
+            text = llms.internal.reformatOutput(text,nvp.ResponseFormat);
         end
     end
 

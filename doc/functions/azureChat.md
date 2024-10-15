@@ -181,19 +181,25 @@ If the server does not respond within the timeout, then the `generate` function 
 
 ### `ResponseFormat` — Response format
 
-`"text"` (default) | `"json"`
+`"text"` (default) | `"json"` | string scalar | structure array
 
 
 After construction, this property is read\-only.
 
 
-Format of generated output.
+Format of the `generatedOutput` output argument of the `generate` function. You can request unformatted output, JSON mode, or structured output.
 
 
-If you set the response format to `"text"`, then the generated output is a string.
+#### Unformatted Output
 
 
-If you set the response format to `"json"`, then the generated output is a string containing JSON encoded data. 
+If you set the response format to `"text"`, then the generated output is an unformatted string. 
+
+
+#### JSON Mode
+
+
+If you set the response format to `"json"`, then the generated output is a formatted string containing JSON encoded data.
 
 
 To configure the format of the generated JSON file, describe the format using natural language and provide it to the model either in the system prompt or as a user message. The prompt or message describing the format must contain the word `"json"` or `"JSON"`.
@@ -201,8 +207,21 @@ To configure the format of the generated JSON file, describe the format using na
 
 The JSON response format is not supported for these models:
 
--  `ModelName="gpt-4"` 
--  `ModelName="gpt-4-0613"` 
+-  `"gpt-4"` 
+-  `"gpt-4-0613"` 
+-  `"o1-preview"` 
+-  `"o1-mini"` 
+
+#### Structured Output
+
+
+To ensure that the model follows the required format, use structured output. To do this, set `ReponseFormat` to:
+
+-  A string scalar containing a valid JSON Schema.
+-  A structure array containing an example that adheres to the required format, for example: `ResponseFormat=struct("Name","Rudolph","NoseColor",[255 0 0])`
+
+Structured output is only supported for models `"gpt-4o-mini"`, `"gpt-4o-mini-2024-07-18"`, `"gpt-4o-2024-08-06"` and later.
+
 # Other Properties
 ### `SystemPrompt` — System prompt
 

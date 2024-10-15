@@ -1,4 +1,4 @@
-classdef topenAIChat < matlab.unittest.TestCase
+classdef topenAIChat < hopenAIChat
 % Tests for openAIChat
 
 %   Copyright 2023-2024 The MathWorks, Inc.
@@ -8,31 +8,19 @@ classdef topenAIChat < matlab.unittest.TestCase
         InvalidConstructorInput = iGetInvalidConstructorInput();
         InvalidGenerateInput = iGetInvalidGenerateInput();
         InvalidValuesSetters = iGetInvalidValuesSetters();
-        StringInputs = struct('string',{"hi"},'char',{'hi'},'cellstr',{{'hi'}});
         ModelName = cellstr(llms.openai.models);
+    end
+
+    properties
+        constructor = @openAIChat;
+        defaultModel = openAIChat;
+        visionModel = openAIChat;
+        structuredModel = openAIChat;
+        noStructuredOutputModel = openAIChat(ModelName="gpt-3.5-turbo");
     end
     
     methods(Test)
         % Test methods
-        function generateAcceptsSingleStringAsInput(testCase,StringInputs)
-            chat = openAIChat;
-            testCase.verifyWarningFree(@()generate(chat,StringInputs));
-        end
-
-        function generateMultipleResponses(testCase)
-            chat = openAIChat;
-            [~,~,response] = generate(chat,"What is a cat?",NumCompletions=3);
-            testCase.verifySize(response.Body.Data.choices,[3,1]);
-        end
-
-        function generateAcceptsMessagesAsInput(testCase)
-            chat = openAIChat;
-            messages = messageHistory;
-            messages = addUserMessage(messages, "This should be okay.");
-
-            testCase.verifyWarningFree(@()generate(chat,messages));
-        end
-
         function constructChatWithAllNVP(testCase)
             functions = openAIFunction("funName");
             modelName = "gpt-4o-mini";
@@ -56,183 +44,11 @@ classdef topenAIChat < matlab.unittest.TestCase
             testCase.verifyEqual(chat.PresencePenalty, presenceP);
         end
 
-        function validConstructorCalls(testCase,ValidConstructorInput)
-            if isempty(ValidConstructorInput.ExpectedWarning)
-                chat = testCase.verifyWarningFree(...
-                    @() openAIChat(ValidConstructorInput.Input{:}));
-            else
-                chat = testCase.verifyWarning(...
-                    @() openAIChat(ValidConstructorInput.Input{:}), ...
-                    ValidConstructorInput.ExpectedWarning);
-            end
-            properties = ValidConstructorInput.VerifyProperties;
-            for prop=string(fieldnames(properties)).'
-                testCase.verifyEqual(chat.(prop),properties.(prop),"Property " + prop);
-            end
-        end
-
-        function errorsWhenPassingToolChoiceWithEmptyTools(testCase)
-            chat = openAIChat(APIKey="this-is-not-a-real-key");
-
-            testCase.verifyError(@()generate(chat,"input", ToolChoice="bla"), "llms:mustSetFunctionsForCall");
-        end
-
-        function settingToolChoiceWithNone(testCase)
-            functions = openAIFunction("funName");
-            chat = openAIChat(Tools=functions);
-
-            testCase.verifyWarningFree(@()generate(chat,"This is okay","ToolChoice","none"));
-        end
-
-        function fixedSeedFixesResult(testCase)
-            % Seed is "beta" in OpenAI documentation
-            % and not reliable at this time.
-            testCase.assumeTrue(false,"disabled since the server is unreliable in honoring the Seed parameter");
-
-            chat = openAIChat(ModelName="gpt-3.5-turbo");
-
-            result1 = generate(chat,"This is okay", "Seed", 2);
-            result2 = generate(chat,"This is okay", "Seed", 2);
-            testCase.verifyEqual(result1,result2);
-        end
-
         function canUseModel(testCase,ModelName)
             testCase.verifyClass(generate(...
                     openAIChat(ModelName=ModelName), ...
                     "hi",MaxNumTokens=1), ...
                 "string");
-        end
-
-        function invalidInputsConstructor(testCase, InvalidConstructorInput)
-            testCase.verifyError(@()openAIChat(InvalidConstructorInput.Input{:}), InvalidConstructorInput.Error);
-        end
-
-        function generateWithStreamFunAndMaxNumTokens(testCase)
-            sf = @(x) fprintf("%s",x);
-            chat = openAIChat(StreamFun=sf);
-            result = generate(chat,"Why is a raven like a writing desk?",MaxNumTokens=5);
-            testCase.verifyClass(result,"string");
-            testCase.verifyLessThan(strlength(result), 100);
-        end
-
-        function generateWithToolsAndStreamFunc(testCase)
-            import matlab.unittest.constraints.HasField
-
-            f = openAIFunction("writePaperDetails", "Function to write paper details to a table.");
-            f = addParameter(f, "name", type="string", description="Name of the paper.");
-            f = addParameter(f, "url", type="string", description="URL containing the paper.");
-            f = addParameter(f, "explanation", type="string", description="Explanation on why the paper is related to the given topic.");
-
-            paperExtractor = openAIChat( ...
-                "You are an expert in extracting information from a paper.", ...
-                APIKey=getenv("OPENAI_KEY"), Tools=f, StreamFun=@(s) s);
-
-            input = join([
-            "    <id>http://arxiv.org/abs/2406.04344v1</id>"
-            "    <updated>2024-06-06T17:59:56Z</updated>"
-            "    <published>2024-06-06T17:59:56Z</published>"
-            "    <title>Verbalized Machine Learning: Revisiting Machine Learning with Language"
-            "  Models</title>"
-            "    <summary>  Motivated by the large progress made by large language models (LLMs), we"
-            "introduce the framework of verbalized machine learning (VML). In contrast to"
-            "conventional machine learning models that are typically optimized over a"
-            "continuous parameter space, VML constrains the parameter space to be"
-            "human-interpretable natural language. Such a constraint leads to a new"
-            "perspective of function approximation, where an LLM with a text prompt can be"
-            "viewed as a function parameterized by the text prompt. Guided by this"
-            "perspective, we revisit classical machine learning problems, such as regression"
-            "and classification, and find that these problems can be solved by an"
-            "LLM-parameterized learner and optimizer. The major advantages of VML include"
-            "(1) easy encoding of inductive bias: prior knowledge about the problem and"
-            "hypothesis class can be encoded in natural language and fed into the"
-            "LLM-parameterized learner; (2) automatic model class selection: the optimizer"
-            "can automatically select a concrete model class based on data and verbalized"
-            "prior knowledge, and it can update the model class during training; and (3)"
-            "interpretable learner updates: the LLM-parameterized optimizer can provide"
-            "explanations for why each learner update is performed. We conduct several"
-            "studies to empirically evaluate the effectiveness of VML, and hope that VML can"
-            "serve as a stepping stone to stronger interpretability and trustworthiness in"
-            "ML."
-            "</summary>"
-            "    <author>"
-            "      <name>Tim Z. Xiao</name>"
-            "    </author>"
-            "    <author>"
-            "      <name>Robert Bamler</name>"
-            "    </author>"
-            "    <author>"
-            "      <name>Bernhard Schölkopf</name>"
-            "    </author>"
-            "    <author>"
-            "      <name>Weiyang Liu</name>"
-            "    </author>"
-            "    <arxiv:comment xmlns:arxiv='http://arxiv.org/schemas/atom'>Technical Report v1 (92 pages, 15 figures)</arxiv:comment>"
-            "    <link href='http://arxiv.org/abs/2406.04344v1' rel='alternate' type='text/html'/>"
-            "    <link title='pdf' href='http://arxiv.org/pdf/2406.04344v1' rel='related' type='application/pdf'/>"
-            "    <arxiv:primary_category xmlns:arxiv='http://arxiv.org/schemas/atom' term='cs.LG' scheme='http://arxiv.org/schemas/atom'/>"
-            "    <category term='cs.LG' scheme='http://arxiv.org/schemas/atom'/>"
-            "    <category term='cs.CL' scheme='http://arxiv.org/schemas/atom'/>"
-            "    <category term='cs.CV' scheme='http://arxiv.org/schemas/atom'/>"
-            ], newline);
-
-            topic = "Large Language Models";
-
-            prompt =  "Given the following paper:" + newline + string(input)+ newline +...
-                "Given the topic: "+ topic + newline + "Write the details to a table.";
-            [~, response] = generate(paperExtractor, prompt);
-
-            testCase.assertThat(response, HasField("tool_calls"));
-            testCase.verifyEqual(response.tool_calls.type,'function');
-            testCase.verifyEqual(response.tool_calls.function.name,'writePaperDetails');
-            data = testCase.verifyWarningFree( ...
-                @() jsondecode(response.tool_calls.function.arguments));
-            testCase.verifyThat(data,HasField("name"));
-            testCase.verifyThat(data,HasField("url"));
-            testCase.verifyThat(data,HasField("explanation"));
-        end
-
-        function generateWithImage(testCase)
-            chat = openAIChat;
-            image_path = "peppers.png";
-            emptyMessages = messageHistory;
-            messages = addUserMessageWithImages(emptyMessages,"What is in the image?",image_path);
-
-            text = generate(chat,messages);
-            testCase.verifyThat(text,matlab.unittest.constraints.ContainsSubstring("pepper"));
-        end
-
-        function generateWithMultipleImages(testCase)
-            import matlab.unittest.constraints.ContainsSubstring
-            chat = openAIChat;
-            image_path = "peppers.png";
-            emptyMessages = messageHistory;
-            messages = addUserMessageWithImages(emptyMessages,"Compare these images.",[image_path,image_path]);
-
-            text = generate(chat,messages);
-            testCase.verifyThat(text,ContainsSubstring("same") | ContainsSubstring("identical"));
-        end
-
-        function generateOverridesProperties(testCase)
-            import matlab.unittest.constraints.EndsWithSubstring
-            chat = openAIChat;
-            text = generate(chat, "Please count from 1 to 10.", Temperature = 0, StopSequences = "4");
-            testCase.verifyThat(text, EndsWithSubstring("3, "));
-        end
-
-        function invalidInputsGenerate(testCase, InvalidGenerateInput)
-            f = openAIFunction("validfunction");
-            chat = openAIChat(Tools=f, APIKey="this-is-not-a-real-key");
-
-            testCase.verifyError(@()generate(chat,InvalidGenerateInput.Input{:}), InvalidGenerateInput.Error);
-        end
-
-        function invalidSetters(testCase, InvalidValuesSetters)
-            chat = openAIChat(APIKey="this-is-not-a-real-key");
-            function assignValueToProperty(property, value)
-                chat.(property) = value;
-            end
-            
-            testCase.verifyError(@()assignValueToProperty(InvalidValuesSetters.Property,InvalidValuesSetters.Value), InvalidValuesSetters.Error);
         end
 
         function gpt35TurboErrorsForImages(testCase)
@@ -244,6 +60,13 @@ classdef topenAIChat < matlab.unittest.TestCase
             testCase.verifyError(@()generate(chat,inValidMessages), "llms:invalidContentTypeForModel")
         end
 
+        function jsonFormatWithSystemPrompt(testCase)
+            chat = openAIChat("Respond in JSON format.");
+            testCase.verifyClass( ...
+                generate(chat,"create some address",ResponseFormat="json"), ...
+                "string");
+        end
+
         function doReturnErrors(testCase)
             chat = openAIChat(ModelName="gpt-3.5-turbo");
             % This input is considerably longer than accepted as input for
@@ -252,58 +75,15 @@ classdef topenAIChat < matlab.unittest.TestCase
             testCase.verifyError(@() generate(chat,wayTooLong), "llms:apiReturnedError");
         end
 
-        function createOpenAIChatWithStreamFunc(testCase)
-            function seen = sf(str)
-                persistent data;
-                if isempty(data)
-                    data = strings(1, 0);
-                end
-                % Append streamed text to an empty string array of length 1
-                data = [data, str];
-                seen = data;
-            end
-            chat = openAIChat(APIKey=getenv("OPENAI_KEY"), StreamFun=@sf);
-
-            testCase.verifyWarningFree(@()generate(chat, "Hello world."));
-            % Checking that persistent data, which is still stored in
-            % memory, is greater than 1. This would mean that the stream
-            % function has been called and streamed some text.
-            testCase.verifyGreaterThan(numel(sf("")), 1);
+        function specialErrorForUnsupportedResponseFormat(testCase)
+            testCase.verifyError(@() generate(testCase.noStructuredOutputModel, ...
+                "What is the smallest prime?", ...
+                ResponseFormat=struct("number",1)), ...
+                "llms:noStructuredOutputForModel");
         end
 
-        function warningJSONResponseFormatGPT35(testCase)
-            chat = @() openAIChat("You are a useful assistant", ...
-                APIKey="this-is-not-a-real-key", ...
-                ResponseFormat="json", ...
-                ModelName="gpt-4o-mini");
 
-            testCase.verifyWarning(@()chat(), "llms:warningJsonInstruction");
-        end
-
-        function createOpenAIChatWithOpenAIKey(testCase)
-            chat = openAIChat("You are a useful assistant", ...
-                APIKey=getenv("OPENAI_KEY"));
-
-            testCase.verifyWarningFree(@()generate(chat, "Hello world."));
-        end
-
-        function createOpenAIChatWithOpenAIKeyLatestModel(testCase)
-            chat = openAIChat("You are a useful assistant", ...
-                APIKey=getenv("OPENAI_KEY"), ModelName="gpt-4o");
-
-            testCase.verifyWarningFree(@()generate(chat, "Hello world."));
-        end
-
-        function keyNotFound(testCase)
-            % to verify the error, we need to unset the environment variable
-            % OPENAI_API_KEY, if given. Use a fixture to restore the
-            % value on leaving the test point:
-            import matlab.unittest.fixtures.EnvironmentVariableFixture
-            testCase.applyFixture(EnvironmentVariableFixture("OPENAI_API_KEY","dummy"));
-            unsetenv("OPENAI_API_KEY");
-            testCase.verifyError(@()openAIChat, "llms:keyMustBeSpecified");
-        end
-    end    
+    end
 end
 
 function invalidValuesSetters = iGetInvalidValuesSetters()
@@ -582,11 +362,15 @@ validFunction = openAIFunction("funName");
 invalidConstructorInput = struct( ...
     "InvalidResponseFormatValue", struct( ...
         "Input",{{"ResponseFormat", "foo" }},...
-        "Error", "MATLAB:validators:mustBeMember"), ...
+        "Error", "llms:incorrectResponseFormat"), ...
+    ...
+    "InvalidResponseFormatType", struct( ...
+        "Input",{{"ResponseFormat", 1}},...
+        "Error", "llms:incorrectResponseFormat"), ...
     ...
     "InvalidResponseFormatSize", struct( ...
         "Input",{{"ResponseFormat", ["text" "text"] }},...
-        "Error", "MATLAB:validation:IncompatibleSize"), ...
+        "Error", "MATLAB:validators:mustBeTextScalar"), ...
     ...
     "InvalidResponseFormatModelCombination", struct( ...
         "Input", {{"APIKey", "this-is-not-a-real-key", "ModelName", "gpt-4", "ResponseFormat", "json"}}, ...
@@ -726,7 +510,10 @@ invalidConstructorInput = struct( ...
     ...
     "InvalidApiKeySize",struct( ...
         "Input",{{ "APIKey" ["abc" "abc"] }},...
-        "Error","MATLAB:validators:mustBeTextScalar"));
+        "Error","MATLAB:validators:mustBeTextScalar"),...
+    "StructuredOutputForWrongModel",struct( ...
+        "Input",{{ "ModelName" "o1-preview" "ResponseFormat" struct("a", 1)}},...
+        "Error","llms:noStructuredOutputForModel"));
 end
 
 function invalidGenerateInput = iGetInvalidGenerateInput()
