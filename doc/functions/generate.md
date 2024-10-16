@@ -95,8 +95,7 @@ The supported name\-value arguments depend on the chat completion API.
 | `TimeOut`   | Supported   | Supported   | Supported    |
 | `StreamFun`   | Supported   | Supported   | Supported    |
 | `ResponseFormat`   | Supported   | Supported   | Supported    |
-| `ModelName`   | Supported   |  |   |
-| `Model`   |  |  | Supported    |
+| `ModelName`   | Supported   |  | Supported  |
 | `PresencePenalty`   | Supported   | Supported   |   |
 | `FrequencyPenalty`   | Supported   | Supported   |   |
 | `NumCompletions`   | Supported   | Supported   |   |
@@ -211,26 +210,12 @@ Structured output is only supported for models `"gpt-4o-mini"`, `"gpt-4o-mini-20
 `model.ModelName` (default) | `"gpt-4o-mini"` | `"gpt-4"` | `"gpt-3.5-turbo"` | `"dall-e-2"` | ...
 
 
-Name of the OpenAI model to use for text generation.
+Name of the OpenAI or Ollama model to use for text generation.
+
+To use an Ollama model, first install it following the instructions at [https://ollama.com/library](https://ollama.com/library).
 
 
-This option is only supported for [`openAIChat`](openAIChat.md) objects.
-
-### `Model` — Model name
-
-`model.Model` (default) | character vector | string scalar
-
-
-Name of the Ollama model to use for text generation. 
-
-
-To use an Ollama model, first install it following the instructions at [https://ollama.com/library.](https://ollama.com/library.)
-
-
-This option is only supported for [`ollamaChat`](ollamaChat.md) objects.
-
-
-**Example:** `"mistral"`
+This option is only supported for [`openAIChat`](openAIChat.md) and [`ollamaChat`](ollamaChat.md) objects.
 
 ### `PresencePenalty` — Presence penalty
 
