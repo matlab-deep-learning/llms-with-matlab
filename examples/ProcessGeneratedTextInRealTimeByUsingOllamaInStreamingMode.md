@@ -117,7 +117,7 @@ generate(chat,history);
 
 1.  Adds the basic HTML structure and the JavaScript that process the data change in MATLAB.
 2. The JavaScript gets a reference to the table and changed data and if the 3rd element in the data is "new", adds a new row.
-3. It populates the new row with two cells and update the cells from the first two elements of the data.
+3. It populates the new row with two cells and updates the cells from the first two elements of the data.
 4. The new row is then appended to the table.
 5. Otherwise, the JavaScript gets reference to the last cell of the last row of the table, and update it with the 2nd element of the data.
 ```matlab

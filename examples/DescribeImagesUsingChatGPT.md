@@ -35,10 +35,10 @@ messages = messageHistory;
 messages = addUserMessageWithImages(messages,"What is in the image?", string(image_url));
 ```
 
-Generate a response. By default, the model returns a very short response. To override it, set `MaxNumTokens` to 4096. 
+Generate a response.
 
 ```matlab
-[txt,~,response] = generate(chat,messages,MaxNumTokens=4096);
+[txt,~,response] = generate(chat,messages);
 if response.StatusCode == "OK"
     wrappedText = wrapText(txt)
 else
@@ -48,10 +48,10 @@ end
 
 ```matlabTextOutput
 wrappedText = 
-    "The image depicts a serene landscape featuring a wooden pathway that runs 
-     through a lush, green marsh or meadow. The path is bordered by tall grass and 
-     some shrubs, with a clear blue sky overhead dotted with clouds. The scene 
-     evokes a sense of tranquility and natural beauty."
+    "The image depicts a scenic outdoor landscape featuring a wooden pathway or 
+     boardwalk extending through a lush green field. The field is filled with tall 
+     grass and bordered by greenery, including trees and shrubbery. Above, the sky 
+     is bright and cloudy, creating a serene and tranquil atmosphere."
 
 ```
 # Helper function

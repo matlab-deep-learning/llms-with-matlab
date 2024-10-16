@@ -30,7 +30,7 @@ Define the expected output JSON Schema.
 jsonSchema = '{"sentiment": "string (positive, negative, neutral)","confidence_score": "number (0-1)"}';
 ```
 
-Define the the system prompt, combining your instructions and the JSON Schema. In order for the model to output JSON, you need to specify that in the prompt, for example, adding *"designed to output to JSON"*  to the prompt.
+Define the system prompt, combining your instructions and the JSON Schema. In order for the model to output JSON, you need to specify that in the prompt, for example, adding *"designed to output to JSON"*  to the prompt.
 
 ```matlab
 systemPrompt = "You are an AI designed to output to JSON. You analyze the sentiment of the provided text and  " + ...

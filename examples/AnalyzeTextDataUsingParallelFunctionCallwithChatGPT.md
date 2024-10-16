@@ -12,7 +12,7 @@ Function calls allow you to describe a function to ChatGPT in a structured way. 
 This example contains four steps:
 
 -  Create an unstructured text document containing fictional customer data. 
--  Create a prompt, asking ChatGPT to extract information about different types customers. 
+-  Create a prompt, asking ChatGPT to extract information about different types of customers. 
 -  Create a function that extracts information about customers. 
 -  Combine the prompt and the function. Use ChatGPT to detect how many function calls are included in the prompt and to generate a JSON object with the function outputs. 
 
@@ -37,7 +37,7 @@ record = ["Customer John Doe, 35 years old. Email: johndoe@email.com";
     "Sofia Russo, 24 years old, email: sofia.russo124@email.com"];
 ```
 
-Define the function that extract data from the customer record.
+Define the function that extracts data from the customer record.
 
 ```matlab
 f = openAIFunction("extractCustomerData", "Extracts data from customer records");
@@ -54,7 +54,7 @@ messages = messageHistory;
 messages = addUserMessage(messages,"Extract data from the record: " + record);
 ```
 
-Create a chat object with a latest model. Only the new models support the parallel function calling.
+Create a chat object. Specify the model to be `"gpt-3.5-turbo"`, which supports parallel function calls.
 
 ```matlab
 model = "gpt-3.5-turbo";
@@ -169,7 +169,7 @@ txt =
 ```
 # Helper functions
 
-Function that searches specific customer based on age range
+Function that searches specific customers based on age range
 
 ```matlab
 function json = searchCustomerData(data, minAge, maxAge)

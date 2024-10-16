@@ -53,7 +53,7 @@ while true
     disp("User: " + query)
 ```
 
-If the you input the stop word, display a farewell message and exit the loop.
+If you input the stop word, display a farewell message and exit the loop.
 
 ```matlab
     if query == stopWord

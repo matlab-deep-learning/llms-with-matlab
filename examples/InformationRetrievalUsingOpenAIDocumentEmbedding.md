@@ -10,7 +10,7 @@ The example consists of four steps:
 
 -  Download and preprocess text from several MATLAB® documentation pages. 
 -  Embed query document and document corpus using the "text\-embedding\-3\-small" document embedding. 
--  Find the most documentation page most relevant to the query using cosine similarity scores. 
+-  Find the documentation page most relevant to the query using cosine similarity scores. 
 -  Generate an answer to the query based on the most relevant documentation page. 
 
 This process is sometimes referred to as Retrieval\-Augmented Generation (RAG), similar to the application found in the example [ExampleRetrievalAugmentedGeneration.mlx](./ExampleRetrievalAugmentedGeneration.mlx).
