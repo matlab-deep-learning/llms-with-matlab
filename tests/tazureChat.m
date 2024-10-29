@@ -109,7 +109,7 @@ classdef tazureChat < hopenAIChat
         end
 
         function generateWithImageErrorsForGpt35(testCase)
-            chat = azureChat;
+            chat = azureChat("DeploymentID","gpt-35-turbo-16k-0613");
             image_path = "peppers.png";
             emptyMessages = messageHistory;
             messages = addUserMessageWithImages(emptyMessages,"What is in the image?",image_path);
@@ -144,7 +144,7 @@ classdef tazureChat < hopenAIChat
 
         function specialErrorForUnsupportedResponseFormat(testCase)
             testCase.verifyError(@() generate(...
-                azureChat(APIVersion="2024-08-01-preview"), ...
+                azureChat(APIVersion="2024-08-01-preview",DeploymentID="gpt-35-turbo-16k-0613"), ...
                 "What is the smallest prime?", ...
                 ResponseFormat=struct("number",1)), ...
                 "llms:noStructuredOutputForAzureDeployment");

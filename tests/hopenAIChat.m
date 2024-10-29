@@ -72,7 +72,7 @@ classdef (Abstract) hopenAIChat < matlab.unittest.TestCase
         function fixedSeedFixesResult(testCase)
             % Seed is "beta" in OpenAI documentation
             % and not reliable at this time.
-            testCase.assumeTrue(false,"disabled since the server is unreliable in honoring the Seed parameter");
+            testCase.assumeFail("disabled since the server is unreliable in honoring the Seed parameter");
 
             result1 = generate(testCase.defaultModel,"This is okay", "Seed", 2);
             result2 = generate(testCase.defaultModel,"This is okay", "Seed", 2);
