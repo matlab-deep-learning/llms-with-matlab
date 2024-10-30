@@ -30,7 +30,7 @@ classdef texampleTests < matlab.unittest.TestCase
             import matlab.unittest.fixtures.CurrentFolderFixture
             testCase.applyFixture(CurrentFolderFixture("../examples/mlx-scripts"));
 
-            openAIEnvVar = "OPENAI_KEY";
+            openAIEnvVar = "OPENAI_API_KEY";
             secretKey = getenv(openAIEnvVar);
             % Create an empty .env file because it is expected by our .mlx
             % example files

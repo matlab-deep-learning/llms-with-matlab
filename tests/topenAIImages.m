@@ -3,18 +3,6 @@ classdef topenAIImages < matlab.unittest.TestCase
 
 %   Copyright 2024 The MathWorks, Inc.
 
-    methods (TestClassSetup)
-        function saveEnvVar(testCase)
-            % Ensures key is not in environment variable for tests
-            openAIEnvVar = "OPENAI_API_KEY";
-            if isenv(openAIEnvVar)
-                key = getenv(openAIEnvVar);
-                testCase.addTeardown(@() setenv(openAIEnvVar, key));
-                unsetenv(openAIEnvVar);
-            end
-        end
-    end
-
     properties(TestParameter)
         InvalidConstructorInput = iGetInvalidConstructorInput;
         InvalidGenerateInput = iGetInvalidGenerateInput;  
@@ -32,6 +20,13 @@ classdef topenAIImages < matlab.unittest.TestCase
         end
 
         function keyNotFound(testCase)
+            % Ensures key is not in environment variable for tests
+            openAIEnvVar = "OPENAI_API_KEY";
+            if isenv(openAIEnvVar)
+                key = getenv(openAIEnvVar);
+                reset = onCleanup(@() setenv(openAIEnvVar, key));
+                unsetenv(openAIEnvVar);
+            end
             testCase.verifyError(@()openAIImages, "llms:keyMustBeSpecified");
         end
 
@@ -131,7 +126,7 @@ classdef topenAIImages < matlab.unittest.TestCase
         end
 
         function testThatImageIsReturned(testCase)
-            mdl = openAIImages(APIKey=getenv("OPENAI_KEY"));
+            mdl = openAIImages;
 
             [images, response] = generate(mdl, ...
                 "Create a 3D avatar of a whimsical sushi on the beach. " + ...

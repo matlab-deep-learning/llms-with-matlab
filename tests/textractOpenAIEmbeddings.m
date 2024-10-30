@@ -3,18 +3,6 @@ classdef textractOpenAIEmbeddings < matlab.unittest.TestCase
 
 %   Copyright 2023-2024 The MathWorks, Inc.
 
-    methods (TestClassSetup)
-        function saveEnvVar(testCase)
-            % Ensures key is not in environment variable for tests
-            openAIEnvVar = "OPENAI_API_KEY";
-            if isenv(openAIEnvVar)
-                key = getenv(openAIEnvVar);
-                unsetenv(openAIEnvVar);
-                testCase.addTeardown(@(x) setenv(openAIEnvVar, x), key);
-            end
-        end
-    end
-
     properties(TestParameter)
         InvalidInput = iGetInvalidInput();
         ValidDimensionsModelCombinations = iGetValidDimensionsModelCombinations();
@@ -29,6 +17,13 @@ classdef textractOpenAIEmbeddings < matlab.unittest.TestCase
         end
 
         function keyNotFound(testCase)
+            % Ensures key is not in environment variable for tests
+            openAIEnvVar = "OPENAI_API_KEY";
+            if isenv(openAIEnvVar)
+                key = getenv(openAIEnvVar);
+                reset = onCleanup(@() setenv(openAIEnvVar, key));
+                unsetenv(openAIEnvVar);
+            end
             testCase.verifyError(@()extractOpenAIEmbeddings("bla"), "llms:keyMustBeSpecified");
         end
 
@@ -40,8 +35,7 @@ classdef textractOpenAIEmbeddings < matlab.unittest.TestCase
         end
 
         function embedStringWithSuccessfulOpenAICall(testCase)
-            testCase.verifyWarningFree(@()extractOpenAIEmbeddings("bla", ...
-                APIKey=getenv("OPENAI_KEY")));
+            testCase.verifyWarningFree(@()extractOpenAIEmbeddings("bla"));
         end
 
         function invalidCombinationOfModelAndDimension(testCase)
