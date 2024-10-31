@@ -122,6 +122,8 @@ classdef tollamaChat < matlab.unittest.TestCase
         end
 
         function generateWithImages(testCase)
+            testCase.assumeFail("CI only assertion failure within Ollama, as of 2024-10-30, Ollama 0.3.14");
+
             import matlab.unittest.constraints.ContainsSubstring
             chat = ollamaChat("moondream");
             image_path = "peppers.png";
