@@ -45,3 +45,5 @@ jobs:
             AZURE_OPENAI_API_KEY: ${{ secrets.AZURE_KEY }}
             SECOND_OLLAMA_ENDPOINT: 127.0.0.1:11435
         uses: matlab-actions/run-tests@v2
+        with:
+          source-folder: .
