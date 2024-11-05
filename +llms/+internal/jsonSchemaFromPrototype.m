@@ -27,7 +27,7 @@ function schema = recursiveSchemaFromPrototype(prototype)
         schema = struct("type","string");
     elseif isinteger(prototype)
         schema = struct("type","integer");
-    elseif isnumeric(prototype)
+    elseif isnumeric(prototype) && ~isa(prototype,'dlarray')
         schema = struct("type","number");
     elseif islogical(prototype)
         schema = struct("type","boolean");
