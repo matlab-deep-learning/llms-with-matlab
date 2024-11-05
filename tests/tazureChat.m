@@ -172,10 +172,6 @@ classdef tazureChat < hopenAIChat
         end
 
         % open TODOs for azureChat
-        function generateWithToolsAndStreamFunc(testCase)
-            testCase.assumeFail("need to make azureChat return tool_call in the same way as openAIChat");
-        end
-
         function warningJSONResponseFormat(testCase)
             testCase.assumeFail("TODO for azureChat");
         end
