@@ -172,10 +172,6 @@ classdef tazureChat < hopenAIChat
         end
 
         % open TODOs for azureChat
-        function settingToolChoiceWithNone(testCase)
-            testCase.assumeFail("azureChat need different handling of ToolChoice 'none'");
-        end
-
         function generateWithToolsAndStreamFunc(testCase)
             testCase.assumeFail("need to make azureChat return tool_call in the same way as openAIChat");
         end

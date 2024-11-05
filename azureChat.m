@@ -289,31 +289,6 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
     end
 
     methods(Hidden)
-        function mustBeValidFunctionCall(this, functionCall)
-            if ~isempty(functionCall)
-                mustBeTextScalar(functionCall);
-                if isempty(this.FunctionNames)
-                    error("llms:mustSetFunctionsForCall", llms.utils.errorMessageCatalog.getMessage("llms:mustSetFunctionsForCall"));
-                end
-                mustBeMember(functionCall, ["none","auto", this.FunctionNames]);
-            end
-        end
-
-        function toolChoice = convertToolChoice(this, toolChoice)
-            % if toolChoice is empty
-            if isempty(toolChoice)
-                % if Tools is not empty, the default is 'auto'.
-                if ~isempty(this.Tools)
-                    toolChoice = "auto";
-                end
-            elseif toolChoice ~= "auto"
-                % if toolChoice is not empty, then it must be in the format
-                % {"type": "function", "function": {"name": "my_function"}}
-                toolChoice = struct("type","function","function",struct("name",toolChoice));
-            end
-
-        end
-
         function messageStruct = encodeImages(~, messageStruct)
             for k=1:numel(messageStruct)
                 if isfield(messageStruct{k},"images")
