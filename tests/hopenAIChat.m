@@ -297,14 +297,6 @@ classdef (Abstract) hopenAIChat < matlab.unittest.TestCase
             testCase.verifyGreaterThan(numel(sf("")), 1);
         end
 
-        function warningJSONResponseFormat(testCase)
-            chat = @() testCase.constructor("You are a useful assistant", ...
-                APIKey="this-is-not-a-real-key", ...
-                ResponseFormat="json");
-
-            testCase.verifyWarning(@()chat(), "llms:warningJsonInstruction");
-        end
-
         function errorJSONResponseFormat(testCase)
             testCase.verifyError( ...
                 @() generate(testCase.structuredModel,"create some address",ResponseFormat="json"), ...

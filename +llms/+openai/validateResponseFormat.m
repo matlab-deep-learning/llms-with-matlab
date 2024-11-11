@@ -18,9 +18,6 @@ function validateResponseFormat(format,model,messages)
                 error("llms:warningJsonInstruction", ...
                     llms.utils.errorMessageCatalog.getMessage("llms:warningJsonInstruction"))
             end
-        else
-            warning("llms:warningJsonInstruction", ...
-                llms.utils.errorMessageCatalog.getMessage("llms:warningJsonInstruction"))
         end
     elseif requestsStructuredOutput(format)
         if ~startsWith(model,"gpt-4o")

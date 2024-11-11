@@ -48,10 +48,6 @@ model = "gpt-3.5-turbo";
 chat = openAIChat(systemPrompt, ModelName=model, ResponseFormat="json");
 ```
 
-```matlabTextOutput
-Warning: When using JSON mode, you must also prompt the model to produce JSON yourself via a system or user message.
-```
-
 Concatenate the prompt and input text and generate an answer with the model.
 
 ```matlab
@@ -67,7 +63,7 @@ Generate a response from the message.
 end
 ```
 
-Extract the data from the JSON ouput. 
+Extract the data from the JSON output. 
 
 ```matlab
 T = struct2table([scores{:}]);
@@ -78,10 +74,10 @@ T = movevars(T,"text","Before","sentiment")
 |:--:|:--:|:--:|:--:|
 |1|"I can't stand homework."|'negative'|0.9500|
 |2|"This sucks. I'm bored."|'negative'|0.9000|
-|3|"I can't wait for Halloween!!!"|'positive'|0.9500|
+|3|"I can't wait for Halloween!!!"|'positive'|1|
 |4|"I am neigher for or against the idea."|'neutral'|1|
 |5|"My cat is adorable ❤️❤️"|'positive'|0.9500|
-|6|"I hate chocolate"|'negative'|0.9000|
+|6|"I hate chocolate"|'negative'|1|
 
 
 *Copyright 2024 The MathWorks, Inc.*

@@ -67,8 +67,7 @@ classdef texampleTests < matlab.unittest.TestCase
 
         function testAnalyzeSentimentinTextUsingChatGPTinJSONMode(testCase)
             testCase.startCapture("AnalyzeSentimentinTextUsingChatGPTinJSONMode");
-            testCase.verifyWarning(@AnalyzeSentimentinTextUsingChatGPTinJSONMode,...
-                "llms:warningJsonInstruction");
+            AnalyzeSentimentinTextUsingChatGPTinJSONMode;
         end
 
         function testAnalyzeTextDataUsingParallelFunctionCallwithChatGPT(testCase)
