@@ -28,6 +28,15 @@ classdef errorMessageCatalog
                 end
             end
         end
+
+        function s = createCatalog()
+            %createCatalog will run the initialization code and return the catalog
+            %   This is only meant to get more correct test coverage reports:
+            %   The test coverage reports do not include the properties initialization
+            %   for Catalog from above, so we have a test seam here to re-run it
+            %   within the framework, where it is reported.
+            s = buildErrorMessageCatalog;
+        end
     end
 end
 
