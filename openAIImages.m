@@ -42,7 +42,7 @@ classdef openAIImages < llms.internal.needsAPIKey
         function this = openAIImages(nvp)
             arguments
                 nvp.ModelName   (1,1) {mustBeMember(nvp.ModelName,["dall-e-2", "dall-e-3"])} = "dall-e-2"
-                nvp.APIKey            {mustBeNonzeroLengthTextScalar}
+                nvp.APIKey            {llms.utils.mustBeNonzeroLengthTextScalar}
                 nvp.TimeOut     (1,1) {mustBeReal,mustBePositive} = 10
             end
 
@@ -82,7 +82,7 @@ classdef openAIImages < llms.internal.needsAPIKey
 
             arguments
                 this                    (1,1) openAIImages
-                prompt                        {mustBeNonzeroLengthTextScalar}
+                prompt                        {llms.utils.mustBeNonzeroLengthTextScalar}
                 nvp.NumImages           (1,1) {mustBePositive, mustBeInteger,...
                                                 mustBeLessThanOrEqual(nvp.NumImages,10)} = 1
                 nvp.Size                (1,1) string {mustBeMember(nvp.Size, ["256x256", "512x512", ...
@@ -172,7 +172,7 @@ classdef openAIImages < llms.internal.needsAPIKey
             arguments
                 this                    (1,1)  openAIImages
                 imagePath                     {mustBeValidFileType(imagePath)}
-                prompt                        {mustBeNonzeroLengthTextScalar}
+                prompt                        {llms.utils.mustBeNonzeroLengthTextScalar}
                 nvp.MaskImagePath             {mustBeValidFileType(nvp.MaskImagePath)}
                 nvp.NumImages           (1,1) {mustBePositive, mustBeInteger,...
                                                 mustBeLessThanOrEqual(nvp.NumImages,10)} = 1
@@ -335,11 +335,6 @@ function mustBeValidFileType(filePath)
             llms.utils.errorMessageCatalog.getMessage("llms:pngExpected"));
     end
     mustBeLessThan(s.bytes,4e+6)
-end
-
-function mustBeNonzeroLengthTextScalar(content)
-mustBeNonzeroLengthText(content)
-mustBeTextScalar(content)
 end
 
 function data = myImread(URI)

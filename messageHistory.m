@@ -41,8 +41,8 @@ classdef (Sealed) messageHistory
 
             arguments
                 this (1,1) messageHistory 
-                name {mustBeNonzeroLengthTextScalar}
-                content {mustBeNonzeroLengthTextScalar}
+                name {llms.utils.mustBeNonzeroLengthTextScalar}
+                content {llms.utils.mustBeNonzeroLengthTextScalar}
             end
 
             newMessage = struct("role", "system", "name", string(name), "content", string(content));
@@ -64,7 +64,7 @@ classdef (Sealed) messageHistory
 
             arguments
                 this (1,1) messageHistory
-                content {mustBeNonzeroLengthTextScalar}
+                content {llms.utils.mustBeNonzeroLengthTextScalar}
             end
 
             newMessage = struct("role", "user", "content", string(content));
@@ -106,7 +106,7 @@ classdef (Sealed) messageHistory
             
             arguments
                 this (1,1) messageHistory
-                content {mustBeNonzeroLengthTextScalar}
+                content {llms.utils.mustBeNonzeroLengthTextScalar}
                 images (1,:) {mustBeNonzeroLengthText}
                 nvp.Detail string {mustBeMember(nvp.Detail,["low","high","auto"])} = "auto"
             end
@@ -133,9 +133,9 @@ classdef (Sealed) messageHistory
 
             arguments
                 this (1,1) messageHistory
-                id {mustBeNonzeroLengthTextScalar}
-                name {mustBeNonzeroLengthTextScalar}
-                content {mustBeNonzeroLengthTextScalar}
+                id {llms.utils.mustBeNonzeroLengthTextScalar}
+                name {llms.utils.mustBeNonzeroLengthTextScalar}
+                content {llms.utils.mustBeNonzeroLengthTextScalar}
 
             end
 
@@ -260,11 +260,6 @@ classdef (Sealed) messageHistory
             end
         end
     end
-end
-
-function mustBeNonzeroLengthTextScalar(content)
-mustBeNonzeroLengthText(content)
-mustBeTextScalar(content)
 end
 
 function validateRegularAssistant(content)

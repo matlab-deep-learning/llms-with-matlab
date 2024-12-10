@@ -103,9 +103,9 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
         function this = azureChat(systemPrompt, nvp)
             arguments
                 systemPrompt                       {llms.utils.mustBeTextOrEmpty} = []
-                nvp.Endpoint                 (1,1) string {mustBeNonzeroLengthTextScalar}
-                nvp.DeploymentID             (1,1) string {mustBeNonzeroLengthTextScalar}
-                nvp.APIKey                         {mustBeNonzeroLengthTextScalar}
+                nvp.Endpoint                 (1,1) string {llms.utils.mustBeNonzeroLengthTextScalar}
+                nvp.DeploymentID             (1,1) string {llms.utils.mustBeNonzeroLengthTextScalar}
+                nvp.APIKey                         {llms.utils.mustBeNonzeroLengthTextScalar}
                 nvp.Tools                    (1,:) {mustBeA(nvp.Tools, "openAIFunction")} = openAIFunction.empty
                 nvp.APIVersion               (1,1) string {mustBeAPIVersion} = "2024-06-01"
                 nvp.Temperature                    {llms.utils.mustBeValidTemperature} = 1
@@ -222,7 +222,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
                 nvp.TopP                      {llms.utils.mustBeValidProbability} = this.TopP
                 nvp.StopSequences             {llms.utils.mustBeValidStop} = this.StopSequences
                 nvp.ResponseFormat            {llms.utils.mustBeResponseFormat} = this.ResponseFormat
-                nvp.APIKey                    {mustBeNonzeroLengthTextScalar} = this.APIKey
+                nvp.APIKey                    {llms.utils.mustBeNonzeroLengthTextScalar} = this.APIKey
                 nvp.PresencePenalty           {llms.utils.mustBeValidPenalty} = this.PresencePenalty
                 nvp.FrequencyPenalty          {llms.utils.mustBeValidPenalty} = this.FrequencyPenalty
                 nvp.TimeOut             (1,1) {mustBeReal,mustBePositive} = this.TimeOut
@@ -323,11 +323,6 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
             end
         end
     end
-end
-
-function mustBeNonzeroLengthTextScalar(content)
-mustBeNonzeroLengthText(content)
-mustBeTextScalar(content)
 end
 
 function [functionsStruct, functionNames] = functionAsStruct(functions)

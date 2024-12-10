@@ -98,7 +98,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
                 nvp.TopP                           {llms.utils.mustBeValidProbability} = 1
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}
                 nvp.ResponseFormat                 {llms.utils.mustBeResponseFormat} = "text"
-                nvp.APIKey                         {mustBeNonzeroLengthTextScalar}
+                nvp.APIKey                         {llms.utils.mustBeNonzeroLengthTextScalar}
                 nvp.PresencePenalty                {llms.utils.mustBeValidPenalty} = 0
                 nvp.FrequencyPenalty               {llms.utils.mustBeValidPenalty} = 0
                 nvp.TimeOut                  (1,1) {mustBeReal,mustBePositive} = 10
@@ -215,7 +215,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
                 nvp.TopP                      {llms.utils.mustBeValidProbability} = this.TopP
                 nvp.StopSequences             {llms.utils.mustBeValidStop} = this.StopSequences
                 nvp.ResponseFormat            {llms.utils.mustBeResponseFormat} = this.ResponseFormat
-                nvp.APIKey                    {mustBeNonzeroLengthTextScalar} = this.APIKey
+                nvp.APIKey                    {llms.utils.mustBeNonzeroLengthTextScalar} = this.APIKey
                 nvp.PresencePenalty           {llms.utils.mustBeValidPenalty} = this.PresencePenalty
                 nvp.FrequencyPenalty          {llms.utils.mustBeValidPenalty} = this.FrequencyPenalty
                 nvp.TimeOut             (1,1) {mustBeReal,mustBePositive} = this.TimeOut
@@ -304,11 +304,6 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
             end
         end
     end
-end
-
-function mustBeNonzeroLengthTextScalar(content)
-mustBeNonzeroLengthText(content)
-mustBeTextScalar(content)
 end
 
 function [functionsStruct, functionNames] = functionAsStruct(functions)
