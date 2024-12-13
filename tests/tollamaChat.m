@@ -1,4 +1,4 @@
-classdef tollamaChat < matlab.unittest.TestCase
+classdef tollamaChat < hstructuredOutput
 % Tests for ollamaChat
 
 %   Copyright 2024 The MathWorks, Inc.
@@ -9,6 +9,10 @@ classdef tollamaChat < matlab.unittest.TestCase
         InvalidValuesSetters = iGetInvalidValuesSetters;
         ValidValuesSetters = iGetValidValuesSetters;
         StringInputs = struct('string',{"hi"},'char',{'hi'},'cellstr',{{'hi'}});
+    end
+
+    properties
+        structuredModel = ollamaChat("mistral");
     end
 
     methods(Test)

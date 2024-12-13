@@ -17,7 +17,6 @@ classdef tazureChat < hopenAIChat
         visionModel = azureChat(Deployment="gpt-4o");
         structuredModel = azureChat("APIVersion","2024-08-01-preview",...
             "Deployment","gpt-4o-2024-08-06");
-        noStructuredOutputModel = azureChat(APIVersion="2024-08-01-preview");
     end
 
     methods(Test)

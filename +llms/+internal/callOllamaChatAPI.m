@@ -84,6 +84,15 @@ parameters.messages = messages;
 parameters.stream = ~isempty(nvp.StreamFun);
 
 options = struct;
+
+if strcmp(nvp.ResponseFormat,"json")
+    parameters.format = struct('type','json_object');
+elseif isstruct(nvp.ResponseFormat)
+    parameters.format = llms.internal.jsonSchemaFromPrototype(nvp.ResponseFormat);
+elseif startsWith(string(nvp.ResponseFormat), asManyOfPattern(whitespacePattern)+"{")
+    parameters.format = llms.internal.verbatimJSON(nvp.ResponseFormat);
+end
+
 if ~isempty(nvp.Seed)
     options.seed = nvp.Seed;
 end

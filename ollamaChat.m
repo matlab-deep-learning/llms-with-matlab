@@ -173,10 +173,9 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
             %                           value is CHAT.StopSequences.
             %                           Example: ["The end.", "And that's all she wrote."]
             %
-            %
-            %       ResponseFormat    - The format of response the model returns.
-            %                           The default value is CHAT.ResponseFormat.
-            %                           "text" (default) | "json"
+            %       ResponseFormat   - The format of response the call returns.
+            %                          Default value is CHAT.ResponseFormat.
+            %                          "text" | "json" | struct | string with JSON Schema
             %
             %       StreamFun         - Function to callback when streaming the
             %                           result. The default value is CHAT.StreamFun.
@@ -193,7 +192,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
                 nvp.MinP                      {llms.utils.mustBeValidProbability} = this.MinP
                 nvp.TopK                (1,1) {mustBeReal,mustBePositive} = this.TopK
                 nvp.StopSequences             {llms.utils.mustBeValidStop} = this.StopSequences
-                nvp.ResponseFormat      (1,1) string {mustBeMember(nvp.ResponseFormat,["text","json"])} = this.ResponseFormat
+                nvp.ResponseFormat            {llms.utils.mustBeResponseFormat} = this.ResponseFormat
                 nvp.TimeOut             (1,1) {mustBeReal,mustBePositive} = this.TimeOut
                 nvp.TailFreeSamplingZ   (1,1) {mustBeReal} = this.TailFreeSamplingZ
                 nvp.StreamFun           (1,1) {mustBeA(nvp.StreamFun,'function_handle')}
@@ -234,9 +233,16 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
             end 
 
             if isfield(response.Body.Data,"error")
+                [versionStr, versionList] = serverVersion(nvp.Endpoint);
+                if llms.utils.requestsStructuredOutput(nvp.ResponseFormat) && ...
+                    ~versionIsAtLeast(versionList, [0,5,0])
+                    error("llms:OllamaStructuredOutputNeeds05",llms.utils.errorMessageCatalog.getMessage("llms:OllamaStructuredOutputNeeds05", versionStr));
+                end
                 err = response.Body.Data.error;
                 error("llms:apiReturnedError",llms.utils.errorMessageCatalog.getMessage("llms:apiReturnedError",err));
             end
+
+            text = llms.internal.reformatOutput(text,nvp.ResponseFormat);
         end
     end
 
@@ -309,4 +315,21 @@ function mustBeIntegerOrEmpty(value)
     if ~isempty(value)
         mustBeInteger(value)
     end
+end
+
+function [versionStr, versionList] = serverVersion(endpoint)
+    URL = endpoint + "/api/version";
+    if ~startsWith(URL,"http")
+        URL = "http://" + URL;
+    end
+    versionStr = webread(URL).version;
+    versionList = split(versionStr,'.');
+    versionList = str2double(versionList);
+end
+
+function tf = versionIsAtLeast(version,minVersion)
+    tf = version(1) > minVersion(1) || ...
+        (version(1) == minVersion(1) && (...
+            version(2) > minVersion(2) || ...
+            (version(2) == minVersion(2) && version(3) >= minVersion(3))));
 end

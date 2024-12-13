@@ -21,7 +21,7 @@ switch class(prototype)
     case "struct"
         prototype = prototype(1);
         if isscalar(data)
-            if isequal(fieldnames(data),fieldnames(prototype))
+            if isequal(sort(fieldnames(data)),sort(fieldnames(prototype)))
                 for field_c = fieldnames(data).'
                     field = field_c{1};
                     data.(field) = alignTypes(data.(field),prototype.(field));

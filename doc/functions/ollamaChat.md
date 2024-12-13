@@ -139,22 +139,39 @@ If the server does not respond within the timeout, then the function throws an e
 
 ### `ResponseFormat` — Response format
 
-`"text"` (default) | `"json"`
+`"text"` (default) | `"json"` | string scalar | structure array
 
 
 After construction, this property is read\-only.
 
 
-Format of generated output.
+Format of the `generatedOutput` output argument of the `generate` function. You can request unformatted output, JSON mode, or structured output.
 
 
-If you set the response format to `"text"`, then the generated output is a string.
+#### Unformatted Output
 
 
-If you set the response format to `"json"`, then the generated output is a string containing JSON encoded data. 
+If you set the response format to `"text"`, then the generated output is an unformatted string. 
+
+
+#### JSON Mode
+
+
+If you set the response format to `"json"`, then the generated output is a formatted string containing JSON encoded data.
 
 
 To configure the format of the generated JSON file, describe the format using natural language and provide it to the model either in the system prompt or as a user message. The prompt or message describing the format must contain the word `"json"` or `"JSON"`.
+
+#### Structured Output
+
+
+This option is only supported for Ollama version 0.5.0 and later.
+
+
+To ensure that the model follows the required format, use structured output. To do this, set `ReponseFormat` to:
+
+-  A string scalar containing a valid JSON Schema.
+-  A structure array containing an example that adheres to the required format, for example: `ResponseFormat=struct("Name","Rudolph","NoseColor",[255 0 0])`
 
 # Other Properties
 ### `SystemPrompt` — System prompt
