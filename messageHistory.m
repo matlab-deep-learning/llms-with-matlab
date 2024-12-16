@@ -211,7 +211,7 @@ classdef (Sealed) messageHistory
 
             arguments
                 this (1,1) messageHistory
-                idx (1,1) {mustBeInteger, mustBePositive}
+                idx (1,1) {mustBeNumeric,mustBeInteger,mustBePositive}
             end
             if isempty(this.Messages)
                 error("llms:removeFromEmptyHistory",llms.utils.errorMessageCatalog.getMessage("llms:removeFromEmptyHistory"));

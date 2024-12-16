@@ -26,8 +26,8 @@ arguments
     text           (1,:) {mustBeNonzeroLengthText}
     nvp.ModelName  (1,1) {mustBeMember(nvp.ModelName,["text-embedding-ada-002", ...
                         "text-embedding-3-large", "text-embedding-3-small"])} = "text-embedding-ada-002"
-    nvp.TimeOut    (1,1) {mustBeReal,mustBePositive} = 10
-    nvp.Dimensions (1,1) {mustBeInteger,mustBePositive}
+    nvp.TimeOut    (1,1) {mustBeNumeric,mustBeReal,mustBePositive} = 10
+    nvp.Dimensions (1,1) {mustBeNumeric,mustBeInteger,mustBePositive}
     nvp.APIKey           {llms.utils.mustBeNonzeroLengthTextScalar}
 end
 
@@ -62,6 +62,7 @@ function mustBeCorrectDimensions(dimensions,modelName)
     dictionary(["text-embedding-3-large", "text-embedding-3-small"], ...
     [3072,1536]);
 
+    mustBeNumeric(dimensions);
     if dimensions>model2dim(modelName)
         error("llms:dimensionsMustBeSmallerThan", ...
             llms.utils.errorMessageCatalog.getMessage("llms:dimensionsMustBeSmallerThan", ...

@@ -71,9 +71,9 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
     properties
         ModelName         (1,1) string
         Endpoint          (1,1) string
-        TopK              (1,1) {mustBeReal,mustBePositive} = Inf
+        TopK              (1,1) {mustBeNumeric,mustBeReal,mustBePositive} = Inf
         MinP              (1,1) {llms.utils.mustBeValidProbability} = 0
-        TailFreeSamplingZ (1,1) {mustBeReal} = 1
+        TailFreeSamplingZ (1,1) {mustBeNumeric,mustBeReal} = 1
     end
 
     methods
@@ -87,8 +87,8 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
                 nvp.TopK                     (1,1) {mustBeReal,mustBePositive} = Inf
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}
                 nvp.ResponseFormat           (1,1) string {mustBeMember(nvp.ResponseFormat,["text","json"])} = "text"
-                nvp.TimeOut                  (1,1) {mustBeReal,mustBePositive} = 120
-                nvp.TailFreeSamplingZ        (1,1) {mustBeReal} = 1
+                nvp.TimeOut                  (1,1) {mustBeNumeric,mustBeReal,mustBePositive} = 120
+                nvp.TailFreeSamplingZ        (1,1) {mustBeNumeric,mustBeReal} = 1
                 nvp.StreamFun                (1,1) {mustBeA(nvp.StreamFun,'function_handle')}
                 nvp.Endpoint                 (1,1) string = "127.0.0.1:11434"
             end
@@ -190,14 +190,14 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
                 nvp.Temperature               {llms.utils.mustBeValidTemperature} = this.Temperature
                 nvp.TopP                      {llms.utils.mustBeValidProbability} = this.TopP
                 nvp.MinP                      {llms.utils.mustBeValidProbability} = this.MinP
-                nvp.TopK                (1,1) {mustBeReal,mustBePositive} = this.TopK
+                nvp.TopK                (1,1) {mustBeNumeric,mustBeReal,mustBePositive} = this.TopK
                 nvp.StopSequences             {llms.utils.mustBeValidStop} = this.StopSequences
                 nvp.ResponseFormat            {llms.utils.mustBeResponseFormat} = this.ResponseFormat
-                nvp.TimeOut             (1,1) {mustBeReal,mustBePositive} = this.TimeOut
-                nvp.TailFreeSamplingZ   (1,1) {mustBeReal} = this.TailFreeSamplingZ
+                nvp.TimeOut             (1,1) {mustBeNumeric,mustBeReal,mustBePositive} = this.TimeOut
+                nvp.TailFreeSamplingZ   (1,1) {mustBeNumeric,mustBeReal} = this.TailFreeSamplingZ
                 nvp.StreamFun           (1,1) {mustBeA(nvp.StreamFun,'function_handle')}
                 nvp.Endpoint            (1,1) string = this.Endpoint
-                nvp.MaxNumTokens        (1,1) {mustBePositive} = inf
+                nvp.MaxNumTokens        (1,1) {mustBeNumeric,mustBePositive} = inf
                 nvp.Seed                      {mustBeIntegerOrEmpty(nvp.Seed)} = []
             end
 
@@ -313,6 +313,7 @@ end
 
 function mustBeIntegerOrEmpty(value)
     if ~isempty(value)
+        mustBeNumeric(value)
         mustBeInteger(value)
     end
 end

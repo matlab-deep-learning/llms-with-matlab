@@ -114,7 +114,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
                 nvp.ResponseFormat                 {llms.utils.mustBeResponseFormat} = "text"
                 nvp.PresencePenalty                {llms.utils.mustBeValidPenalty} = 0
                 nvp.FrequencyPenalty               {llms.utils.mustBeValidPenalty} = 0
-                nvp.TimeOut                  (1,1) {mustBeReal,mustBePositive} = 10
+                nvp.TimeOut                  (1,1) {mustBeNumeric,mustBeReal,mustBePositive} = 10
                 nvp.StreamFun                (1,1) {mustBeA(nvp.StreamFun,'function_handle')}
             end
 
@@ -225,10 +225,10 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
                 nvp.APIKey                    {llms.utils.mustBeNonzeroLengthTextScalar} = this.APIKey
                 nvp.PresencePenalty           {llms.utils.mustBeValidPenalty} = this.PresencePenalty
                 nvp.FrequencyPenalty          {llms.utils.mustBeValidPenalty} = this.FrequencyPenalty
-                nvp.TimeOut             (1,1) {mustBeReal,mustBePositive} = this.TimeOut
+                nvp.TimeOut             (1,1) {mustBeNumeric,mustBeReal,mustBePositive} = this.TimeOut
                 nvp.StreamFun           (1,1) {mustBeA(nvp.StreamFun,'function_handle')}
-                nvp.NumCompletions      (1,1) {mustBePositive, mustBeInteger} = 1
-                nvp.MaxNumTokens        (1,1) {mustBePositive} = inf
+                nvp.NumCompletions      (1,1) {mustBeNumeric,mustBePositive, mustBeInteger} = 1
+                nvp.MaxNumTokens        (1,1) {mustBeNumeric,mustBePositive} = inf
                 nvp.ToolChoice          {mustBeValidFunctionCall(this, nvp.ToolChoice)} = []
                 nvp.Seed                {mustBeIntegerOrEmpty(nvp.Seed)} = []
             end
@@ -353,6 +353,7 @@ end
 
 function mustBeIntegerOrEmpty(value)
     if ~isempty(value)
+        mustBeNumeric(value)
         mustBeInteger(value)
     end
 end
