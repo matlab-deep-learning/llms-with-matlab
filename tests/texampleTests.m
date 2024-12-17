@@ -62,17 +62,17 @@ classdef texampleTests < matlab.unittest.TestCase
     methods(Test)
         function testAnalyzeScientificPapersUsingFunctionCalls(testCase)
             testCase.startCapture("AnalyzeScientificPapersUsingFunctionCalls");
-            AnalyzeScientificPapersUsingFunctionCalls;
+            evalc("AnalyzeScientificPapersUsingFunctionCalls");
         end
 
         function testAnalyzeSentimentinTextUsingChatGPTwithStructuredOutput(testCase)
             testCase.startCapture("AnalyzeSentimentinTextUsingChatGPTwithStructuredOutput");
-            AnalyzeSentimentinTextUsingChatGPTwithStructuredOutput;
+            evalc("AnalyzeSentimentinTextUsingChatGPTwithStructuredOutput");
         end
 
         function testAnalyzeTextDataUsingParallelFunctionCallwithChatGPT(testCase)
             testCase.startCapture("AnalyzeTextDataUsingParallelFunctionCallwithChatGPT");
-            AnalyzeTextDataUsingParallelFunctionCallwithChatGPT;
+            evalc("AnalyzeTextDataUsingParallelFunctionCallwithChatGPT");
         end
 
         function testCreateSimpleChatBot(testCase,ChatBotExample)
@@ -111,7 +111,7 @@ classdef texampleTests < matlab.unittest.TestCase
             numWordsResponse = []; %#ok<NASGU>
 
             % Run the example
-            eval(ChatBotExample);
+            evalc(ChatBotExample);
 
             testCase.verifyEqual(count,find(prompts=="end",1));
             testCase.verifySize(messages.Messages,[1 2*(count-1)]);
@@ -119,47 +119,47 @@ classdef texampleTests < matlab.unittest.TestCase
 
         function testDescribeImagesUsingChatGPT(testCase)
             testCase.startCapture("DescribeImagesUsingChatGPT");
-            DescribeImagesUsingChatGPT;
+            evalc("DescribeImagesUsingChatGPT");
         end
 
         function testInformationRetrievalUsingOpenAIDocumentEmbedding(testCase)
             testCase.startCapture("InformationRetrievalUsingOpenAIDocumentEmbedding");
-            InformationRetrievalUsingOpenAIDocumentEmbedding;
+            evalc("InformationRetrievalUsingOpenAIDocumentEmbedding");
         end
 
         function testProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode(testCase)
             testCase.startCapture("ProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode");
-            ProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode;
+            evalc("ProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode");
         end
 
         function testProcessGeneratedTextInRealTimeByUsingOllamaInStreamingMode(testCase)
             testCase.startCapture("ProcessGeneratedTextInRealTimeByUsingOllamaInStreamingMode");
-            ProcessGeneratedTextInRealTimeByUsingOllamaInStreamingMode;
+            evalc("ProcessGeneratedTextInRealTimeByUsingOllamaInStreamingMode");
         end
 
         function testRetrievalAugmentedGenerationUsingChatGPTandMATLAB(testCase)
             testCase.startCapture("RetrievalAugmentedGenerationUsingChatGPTandMATLAB");
-            RetrievalAugmentedGenerationUsingChatGPTandMATLAB;
+            evalc("RetrievalAugmentedGenerationUsingChatGPTandMATLAB");
         end
 
         function testRetrievalAugmentedGenerationUsingOllamaAndMATLAB(testCase)
             testCase.startCapture("RetrievalAugmentedGenerationUsingOllamaAndMATLAB");
-            RetrievalAugmentedGenerationUsingOllamaAndMATLAB;
+            evalc("RetrievalAugmentedGenerationUsingOllamaAndMATLAB");
         end
 
         function testSummarizeLargeDocumentsUsingChatGPTandMATLAB(testCase)
             testCase.startCapture("SummarizeLargeDocumentsUsingChatGPTandMATLAB");
-            SummarizeLargeDocumentsUsingChatGPTandMATLAB;
+            evalc("SummarizeLargeDocumentsUsingChatGPTandMATLAB");
         end
 
         function testUsingDALLEToEditImages(testCase)
             testCase.startCapture("UsingDALLEToEditImages");
-            UsingDALLEToEditImages;
+            evalc("UsingDALLEToEditImages");
         end
 
         function testUsingDALLEToGenerateImages(testCase)
             testCase.startCapture("UsingDALLEToGenerateImages");
-            UsingDALLEToGenerateImages;
+            evalc("UsingDALLEToGenerateImages");
         end
     end    
 end

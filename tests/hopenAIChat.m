@@ -82,7 +82,7 @@ classdef (Abstract) hopenAIChat < hstructuredOutput
         end
 
         function generateWithStreamFunAndMaxNumTokens(testCase)
-            sf = @(x) fprintf("%s",x);
+            sf = @(x) x;
             chat = testCase.constructor(StreamFun=sf);
             result = generate(chat,"Why is a raven like a writing desk?",MaxNumTokens=5);
             testCase.verifyClass(result,"string");
