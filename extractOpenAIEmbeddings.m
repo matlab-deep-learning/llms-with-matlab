@@ -23,17 +23,18 @@ function [emb, response] = extractOpenAIEmbeddings(text, nvp)
 %   Copyright 2023-2024 The MathWorks, Inc.
 
 arguments
-    text           (1,:) {mustBeNonzeroLengthText}
-    nvp.ModelName  (1,1) {mustBeMember(nvp.ModelName,["text-embedding-ada-002", ...
-                        "text-embedding-3-large", "text-embedding-3-small"])} = "text-embedding-ada-002"
-    nvp.TimeOut    (1,1) {mustBeNumeric,mustBeReal,mustBePositive} = 10
-    nvp.Dimensions (1,1) {mustBeNumeric,mustBeInteger,mustBePositive}
-    nvp.APIKey           {llms.utils.mustBeNonzeroLengthTextScalar}
+    text           (1,:)        {mustBeNonzeroLengthText}
+    nvp.ModelName  (1,1) string {mustBeMember(nvp.ModelName,["text-embedding-ada-002", ...
+                                        "text-embedding-3-large", "text-embedding-3-small"])} = "text-embedding-ada-002"
+    nvp.TimeOut    (1,1)        {mustBeNumeric,mustBeReal,mustBePositive} = 10
+    nvp.Dimensions (1,1)        {mustBeNumeric,mustBeInteger,mustBePositive}
+    nvp.APIKey                  {llms.utils.mustBeNonzeroLengthTextScalar}
 end
 
 END_POINT = "https://api.openai.com/v1/embeddings";
 
 key = llms.internal.getApiKeyFromNvpOrEnv(nvp,"OPENAI_API_KEY");
+text = convertCharsToStrings(text);
 
 parameters = struct("input",text,"model",nvp.ModelName);
 
