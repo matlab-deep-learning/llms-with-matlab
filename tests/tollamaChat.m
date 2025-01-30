@@ -1,7 +1,7 @@
-classdef tollamaChat < hstructuredOutput
+classdef tollamaChat < hstructuredOutput & htoolCalls
 % Tests for ollamaChat
 
-%   Copyright 2024 The MathWorks, Inc.
+%   Copyright 2024-2025 The MathWorks, Inc.
 
     properties(TestParameter)
         InvalidConstructorInput = iGetInvalidConstructorInput;
@@ -12,12 +12,16 @@ classdef tollamaChat < hstructuredOutput
     end
 
     properties
-        structuredModel = ollamaChat("mistral");
+        structuredModel = ollamaChat("mistral-nemo")
+        defaultModel = ollamaChat("mistral-nemo")
+        defaultModelName = "mistral-nemo"
+        % htoolCalls wants to add arguments to the constructor calls
+        constructor = @(varargin) ollamaChat("mistral-nemo", varargin{:})
     end
 
     methods(Test)
         function simpleConstruction(testCase)
-            bot = ollamaChat("mistral");
+            bot = ollamaChat(testCase.defaultModelName);
             testCase.verifyClass(bot,"ollamaChat");
         end
 
@@ -27,7 +31,7 @@ classdef tollamaChat < hstructuredOutput
             stop = ["[END]", "."];
             systemPrompt = "This is a system prompt";
             timeout = 3;
-            model = "mistral";
+            model = testCase.defaultModelName;
             chat = ollamaChat(model, systemPrompt, ...
                 Temperature=temperature, TopP=topP, StopSequences=stop,...
                 TimeOut=timeout);
@@ -37,14 +41,14 @@ classdef tollamaChat < hstructuredOutput
         end
 
         function doGenerate(testCase,StringInputs)
-            chat = ollamaChat("mistral");
+            chat = testCase.defaultModel;
             response = testCase.verifyWarningFree(@() generate(chat,StringInputs));
             testCase.verifyClass(response,'string');
             testCase.verifyGreaterThan(strlength(response),0);
         end
 
         function doGenerateUsingSystemPrompt(testCase)
-            chat = ollamaChat("mistral","You are a helpful assistant");
+            chat = ollamaChat(testCase.defaultModelName,"You are a helpful assistant");
             response = testCase.verifyWarningFree(@() generate(chat,"Hi"));
             testCase.verifyClass(response,'string');
             testCase.verifyGreaterThan(strlength(response),0);
@@ -52,9 +56,92 @@ classdef tollamaChat < hstructuredOutput
 
         function generateOverridesProperties(testCase)
             import matlab.unittest.constraints.EndsWithSubstring
-            chat = ollamaChat("mistral");
+            chat = testCase.defaultModel;
             text = generate(chat, "Please count from 1 to 10.", Temperature = 0, StopSequences = "4");
             testCase.verifyThat(text, EndsWithSubstring("3, "));
+        end
+
+        function generateWithToolsAndStreamFunc(testCase)
+            % The test point in htoolCalls expects a format that is
+            % different from what we get from Ollama. Having that
+            % discrepancy isn't great, but for the moment, let's test what
+            % we have instead.
+            import matlab.unittest.constraints.HasField
+
+            f = openAIFunction("writePaperDetails", "Function to write paper details to a table.");
+            f = addParameter(f, "name", type="string", description="Name of the paper.");
+            f = addParameter(f, "url", type="string", description="URL containing the paper.");
+            f = addParameter(f, "explanation", type="string", description="Explanation on why the paper is related to the given topic.");
+
+            paperExtractor = testCase.constructor( ...
+                "You are an expert in extracting information from a paper.", ...
+                Tools=f, StreamFun=@(s) s);
+
+            input = join([
+            "    <id>http://arxiv.org/abs/2406.04344v1</id>"
+            "    <updated>2024-06-06T17:59:56Z</updated>"
+            "    <published>2024-06-06T17:59:56Z</published>"
+            "    <title>Verbalized Machine Learning: Revisiting Machine Learning with Language"
+            "  Models</title>"
+            "    <summary>  Motivated by the large progress made by large language models (LLMs), we"
+            "introduce the framework of verbalized machine learning (VML). In contrast to"
+            "conventional machine learning models that are typically optimized over a"
+            "continuous parameter space, VML constrains the parameter space to be"
+            "human-interpretable natural language. Such a constraint leads to a new"
+            "perspective of function approximation, where an LLM with a text prompt can be"
+            "viewed as a function parameterized by the text prompt. Guided by this"
+            "perspective, we revisit classical machine learning problems, such as regression"
+            "and classification, and find that these problems can be solved by an"
+            "LLM-parameterized learner and optimizer. The major advantages of VML include"
+            "(1) easy encoding of inductive bias: prior knowledge about the problem and"
+            "hypothesis class can be encoded in natural language and fed into the"
+            "LLM-parameterized learner; (2) automatic model class selection: the optimizer"
+            "can automatically select a concrete model class based on data and verbalized"
+            "prior knowledge, and it can update the model class during training; and (3)"
+            "interpretable learner updates: the LLM-parameterized optimizer can provide"
+            "explanations for why each learner update is performed. We conduct several"
+            "studies to empirically evaluate the effectiveness of VML, and hope that VML can"
+            "serve as a stepping stone to stronger interpretability and trustworthiness in"
+            "ML."
+            "</summary>"
+            "    <author>"
+            "      <name>Tim Z. Xiao</name>"
+            "    </author>"
+            "    <author>"
+            "      <name>Robert Bamler</name>"
+            "    </author>"
+            "    <author>"
+            "      <name>Bernhard Schölkopf</name>"
+            "    </author>"
+            "    <author>"
+            "      <name>Weiyang Liu</name>"
+            "    </author>"
+            "    <arxiv:comment xmlns:arxiv='http://arxiv.org/schemas/atom'>Technical Report v1 (92 pages, 15 figures)</arxiv:comment>"
+            "    <link href='http://arxiv.org/abs/2406.04344v1' rel='alternate' type='text/html'/>"
+            "    <link title='pdf' href='http://arxiv.org/pdf/2406.04344v1' rel='related' type='application/pdf'/>"
+            "    <arxiv:primary_category xmlns:arxiv='http://arxiv.org/schemas/atom' term='cs.LG' scheme='http://arxiv.org/schemas/atom'/>"
+            "    <category term='cs.LG' scheme='http://arxiv.org/schemas/atom'/>"
+            "    <category term='cs.CL' scheme='http://arxiv.org/schemas/atom'/>"
+            "    <category term='cs.CV' scheme='http://arxiv.org/schemas/atom'/>"
+            ], newline);
+
+            topic = "Large Language Models";
+
+            prompt =  "Given the following paper:" + newline + string(input)+ newline +...
+                "Given the topic: "+ topic + newline + "Write the details to a table.";
+            [~, ~, response] = generate(paperExtractor, prompt);
+
+            % if the tool call works, which is not guaranteed to happen, we
+            % will see a cell array here.
+            testCase.assumeClass(response.Body.Data,"cell");
+            response_call = response.Body.Data{1}.message;
+            testCase.assertThat(response_call, HasField("tool_calls"));
+            % Ollama does not have response_call.tool_calls.type == 'function' as returned by OpenAI
+            testCase.verifyEqual(response_call.tool_calls.function.name,'writePaperDetails');
+            % already decoded
+            data = response_call.tool_calls.function.arguments;
+            testCase.verifyEqual(sort(string(fieldnames(data))), ...
+                sort(["name";"url";"explanation"]));
         end
 
         function extremeTopK(testCase)
@@ -65,7 +152,7 @@ classdef tollamaChat < hstructuredOutput
 
             % setting top-k to k=1 leaves no random choice,
             % so we expect to get a fixed response.
-            chat = ollamaChat("mistral",TopK=1);
+            chat = ollamaChat(testCase.defaultModelName,TopK=1);
             prompt = "Top-k sampling with k=1 returns a definite answer.";
             response1 = generate(chat,prompt);
             response2 = generate(chat,prompt);
@@ -81,7 +168,7 @@ classdef tollamaChat < hstructuredOutput
             % setting min-p to p=1 means only tokens with the same logit as
             % the most likely one can be chosen, which will almost certainly
             % only ever be one, so we expect to get a fixed response.
-            chat = ollamaChat("mistral",MinP=1);
+            chat = ollamaChat(testCase.defaultModelName,MinP=1);
             prompt = "Min-p sampling with p=1 returns a definite answer.";
             response1 = generate(chat,prompt);
             response2 = generate(chat,prompt);
@@ -96,7 +183,7 @@ classdef tollamaChat < hstructuredOutput
 
             % setting tfs_z to z=0 leaves no random choice, but degrades to
             % greedy sampling, so we expect to get a fixed response.
-            chat = ollamaChat("mistral",TailFreeSamplingZ=0);
+            chat = ollamaChat(testCase.defaultModelName,TailFreeSamplingZ=0);
             prompt = "Sampling with tfs_z=0 returns a definite answer.";
             response1 = generate(chat,prompt);
             response2 = generate(chat,prompt);
@@ -104,7 +191,7 @@ classdef tollamaChat < hstructuredOutput
         end
 
         function stopSequences(testCase)
-            chat = ollamaChat("mistral",TopK=1);
+            chat = ollamaChat(testCase.defaultModelName,TopK=1);
             prompt = "Top-k sampling with k=1 returns a definite answer.";
             response1 = generate(chat,prompt);
             chat.StopSequences = "1";
@@ -119,7 +206,7 @@ classdef tollamaChat < hstructuredOutput
             %% honor it correctly.
             testCase.assumeFail("disabled due to Ollama/llama.cpp not honoring parameter reliably");
 
-            chat = ollamaChat("mistral");
+            chat = testCase.defaultModel;
             response1 = generate(chat,"hi",Seed=1234);
             response2 = generate(chat,"hi",Seed=1234);
             testCase.verifyEqual(response1,response2);
@@ -154,7 +241,7 @@ classdef tollamaChat < hstructuredOutput
                 data = [data, str];
                 seen = data;
             end
-            chat = ollamaChat("mistral", StreamFun=@sf);
+            chat = ollamaChat(testCase.defaultModelName, StreamFun=@sf);
 
             testCase.verifyWarningFree(@()generate(chat, "Hello world."));
             % Checking that persistent data, which is still stored in
@@ -185,16 +272,16 @@ classdef tollamaChat < hstructuredOutput
         end
 
         function invalidInputsConstructor(testCase, InvalidConstructorInput)
-            testCase.verifyError(@() ollamaChat("mistral", InvalidConstructorInput.Input{:}), InvalidConstructorInput.Error);
+            testCase.verifyError(@() ollamaChat(testCase.defaultModelName, InvalidConstructorInput.Input{:}), InvalidConstructorInput.Error);
         end
 
         function invalidInputsGenerate(testCase, InvalidGenerateInput)
-            chat = ollamaChat("mistral");
+            chat = testCase.defaultModel;
             testCase.verifyError(@() generate(chat,InvalidGenerateInput.Input{:}), InvalidGenerateInput.Error);
         end
 
         function invalidSetters(testCase, InvalidValuesSetters)
-            chat = ollamaChat("mistral");
+            chat = testCase.defaultModel;
             function assignValueToProperty(property, value)
                 chat.(property) = value;
             end
@@ -203,7 +290,7 @@ classdef tollamaChat < hstructuredOutput
         end
 
         function validSetters(testCase, ValidValuesSetters)
-            chat = ollamaChat("mistral");
+            chat = testCase.defaultModel;
             function assignValueToProperty(property, value)
                 chat.(property) = value;
             end
@@ -212,11 +299,11 @@ classdef tollamaChat < hstructuredOutput
         end
 
         function queryModels(testCase)
-            % our test setup has at least mistral loaded
+            % our test setup has at least mistral-nemo loaded
             models = ollamaChat.models;
             testCase.verifyClass(models,"string");
             testCase.verifyThat(models, ...
-                matlab.unittest.constraints.IsSupersetOf("mistral"));
+                matlab.unittest.constraints.IsSupersetOf("mistral-nemo"));
         end
     end
 end

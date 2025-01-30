@@ -6,32 +6,28 @@ To run the code shown on this page, open the MLX file in MATLAB®: [mlx-scripts/
 This example shows how to create a simple chatbot using the `ollamaChat` and `messageHistory` functions.
 
 
-When you run this example, an interactive AI chat starts in the MATLAB® Command Window. To leave the chat, type "end" or press **Ctrl+C**.
+When you run this example, an interactive AI chat starts in the MATLAB® Command Window. To leave the chat, type “end” or press **Ctrl+C**.
 
 -  This example includes three steps: 
 -  Define model parameters, such as the maximum word count, and a stop word. 
 -  Create an ollamaChat object and set up a meta prompt. 
 -  Set up the chat loop. 
 
-To run this example, you need a running Ollama™ installation. To run it unchanged, you need to have Mistral® pulled into that Ollama server.
+To run this example, you need a running Ollama™ installation. To run it unchanged, you need to have Mistral® NeMo pulled into that Ollama server.
 
-```matlab
-loadenv(".env")
-addpath('../..')
-```
 # Setup Model
 
-Set the maximum allowable number of words per chat session and define the keyword that, when entered by the user, ends the chat session.
+Set the maximum number of words per chat session. To enable the user to end the chat early, define a stop word.
 
 ```matlab
 wordLimit = 2000;
 stopWord = "end";
 ```
 
-Create an instance of `ollamaChat` to perform the chat and `messageHistory` to store the conversation history`.`
+Create an instance of `ollamaChat` to perform the chat and `messageHistory` to store the conversation history.
 
 ```matlab
-chat = ollamaChat("mistral");
+chat = ollamaChat("mistral-nemo");
 messages = messageHistory;
 ```
 # Chat loop
@@ -114,103 +110,228 @@ end
 
 ```matlabTextOutput
 User: Please help me with creating a Butterworth bandpass filter in MATLAB.
-AI: Sure, I can help you create a Butterworth bandpass filter in MATLAB. 
-    Here's an example of how you can do it:
+AI: To create a Butterworth bandpass filter in MATLAB, you'll first need 
+    to determine the passband and stopband frequencies, as well as the 
+    desired ripple (passband) and attenuation (stopband). Here's a 
+    step-by-step guide:
     
-1. First, we need to define the low-pass and high-pass cutoff
-    frequencies for our bandpass filter. Let's say we want a bandpass 
-    filter with a lower cutoff frequency of 0.5 Hz and an upper cutoff 
-    frequency of 2 Hz.
+1. **Define your filter parameters:**
     
-    ```matlab
-    lowcut = 0.5; % Lower cutoff frequency (in Hertz)
-    highcut = 2; % Upper cutoff frequency (in Hertz)
-    ```
+    Assume we want a bandpass filter with:
+    - Passband edge frequencies: `Wp = [fL fH]` where `fL` is the 
+    low-frequency cutoff and `fH` is the high-frequency cutoff.
+    - Stopband edge frequencies: `Ws = [f1 f2]` where `f1` and `f2` are 
+    the stopbands close to `fL` and `fH`, respectively (usually 5% higher 
+    than the passband edges).
+    - Desired ripple (passband): `Rp`
+    - Desired attenuation (stopband): `Rs`
     
-    2. Next, we define the order of the filter. The order determines how 
-    steep the transition between pass and stop bands will be. A higher 
-    order means a steeper roll-off but may also introduce more phase 
-    distortion. For this example, let's use an order of 5.
-    
-    ```matlab
-    order = 5; % Order of the filter
-    ```
-    
-    3. Now we can create the bandpass Butterworth filter using the 
-    `butter()` function in MATLAB. This function takes three arguments: 
-    the normalized frequencies (in rad/sec), an 's' vector for the 
-    low-pass and high-pass filters, and the order of the filter.
+    For this example, let's choose:
+    - Sampling frequency (`Fs`) = 44.1 kHz
+    - Passband frequencies (`fL`, `fH`) = [200 Hz, 3000 Hz]
+    - Stopband frequencies (`f1`, `f2`) = [`fL*1.05`, `fH*1.05`]
+    - Ripple (`Rp`) = 1 dB
+    - Attenuation (`Rs`) = 60 dB
     
     ```matlab
-    [num, den] = butter(order, [lowcut/samplingFrequency, 1 - 
-    lowcut/highcut, highcut/samplingFrequency]);
+    Fs = 44100;      % Sampling frequency (Hz)
+    Wp = [200 3000]; % Passband frequencies (Hz)
+    Ws = Wp * 1.05;  % Stopband frequencies (Hz)
+    Rp = 1;          % Ripple (dB)
+    Rs = 60;         % Attenuation (dB)
     ```
     
-    In this line, `samplingFrequency` should be replaced with the 
-    sampling frequency of your data. For example, if you are working with 
-    data sampled at 100 Hz, you would set `samplingFrequency = 100;`.
+    2. **Calculate the filter order (`N`):**
     
-    4. Finally, you can apply the filter to a signal using the `filter()` 
-    function in MATLAB.
+    To calculate the required filter order (`N`), you can use the 
+    `shermanwin`s function:
     
     ```matlab
-    filteredSignal = filter(num, den, inputSignal);
+    [Ns, Np] = shermanwin(Ws/Ws(end), Wp/Wp(end), Rp, Rs);
+    N = ceil((Ns + Np) / 2); % Choose an even order for a Butterworth 
+    filter
     ```
     
-    Replace `inputSignal` with your actual input data.
+    3. **Design the bandpass filter:**
     
-    This should give you a bandpass-filtered version of your signal. You 
-    can adjust the cutoff frequencies and the order of the filter to best 
-    suit your specific needs.
+    Now you can design the butterworth filter using the `butter` 
+    function:
+    
+    ```matlab
+    [N, Wc] = buttord(Wp/Fs, Ws/Fs, Rp, Rs);
+    [b, a] = butter(N, Wc, 'bandpass');
+    ```
+    
+    4. **Plot the filter response:**
+    
+    You can plot the frequency response using the `freqz` function:
+    
+    ```matlab
+    [H, W] = freqz(b, a, 2048, Fs); % Compute frequency response
+    
+    % Plot frequency response (amplitude)
+    figure;
+    plot(W / pi * Fs/2, abs(H));
+    grid on;
+    title('Bandpass Filter Frequency Response');
+    xlabel('Frequency (Hz)');
+    ylabel('Magnitude');
+    ylim([-120 5]);
+    
+    % Plot frequency response (phase)
+    subplot(2, 1, 2);
+    plot(W / pi * Fs/2, unwrap(angle(H)));
+    grid on;
+    title('Bandpass Filter Phase Response');
+    xlabel('Frequency (Hz)');
+    ylabel('Phase (rad)');
+    ```
+    
+    5. **Apply the filter to input signals:**
+    
+    Now you can apply this filter (`b`, `a`) to your input signals using 
+    the `filter` function:
+    
+    ```matlab
+    x = your_input_signal;
+    y = filter(b, a, x);
+    ```
 User: I would like the frequency range to be 144-146 MHz, assuming a sample 
       rate of 2MS/s.
-AI: In that case, here is how you could define the cutoff frequencies:
+AI: To create a Butterworth bandpass filter for an input signal with a 
+    sample rate (`Fs`) of 2 MS/s and a desired passband between 144 MHz 
+    and 146 MHz, follow these steps:
+    
+1. **Define your filter parameters:**
     
     ```matlab
-    lowcut = (144e6)/(2e6); % Lower cutoff frequency (in rad/sec)
-    highcut = (146e6)/(2e6); % Upper cutoff frequency (in rad/sec)
+    Fs = 2e6;      % Sampling frequency (Hz)
+    Wp = [144e6 146e6]; % Passband frequencies (Hz)
+    Ws = Wp * 1.05;    % Stopband frequencies (Hz)
+    Rp = 1;          % Ripple (dB)
+    Rs = 60;         % Attenuation (dB)
     ```
     
-    Now you can proceed with the filter creation as described in my 
-    previous response. Make sure to replace `samplingFrequency` with the 
-    actual sample rate of your data, which in this case is 2e6 Hz.
+    2. **Calculate the filter order (`N`):**
     
     ```matlab
-    [num, den] = butter(order, [lowcut, 1 - lowcut/(highcut), highcut]);
+    [Ns, Np] = shermanwin(Ws/Ws(end), Wp/Wp(end), Rp, Rs);
+    N = ceil((Ns + Np) / 2); % Choose an even order for a Butterworth 
+    filter
     ```
+    
+    3. **Design the bandpass filter:**
+    
+    ```matlab
+    [N, Wc] = buttord(Wp/Fs, Ws/Fs, Rp, Rs);
+    [b, a] = butter(N, Wc, 'bandpass');
+    ```
+    
+    4. **Plot the filter response:**
+    
+    ```matlab
+    [H, W] = freqz(b, a, 2048, Fs); % Compute frequency response
+    
+    % Plot frequency response (amplitude)
+    figure;
+    plot(W / pi * Fs/2, abs(H));
+    grid on;
+    title('Bandpass Filter Frequency Response');
+    xlabel('Frequency (Hz)');
+    ylabel('Magnitude');
+    ylim([-120 5]);
+    
+    % Plot frequency response (phase)
+    subplot(2, 1, 2);
+    plot(W / pi * Fs/2, unwrap(angle(H)));
+    grid on;
+    title('Bandpass Filter Phase Response');
+    xlabel('Frequency (Hz)');
+    ylabel('Phase (rad)');
+    ```
+    
+    5. **Apply the filter to input signals:**
+    
+    You can now apply this filter (`b`, `a`) to your input signals using 
+    the `filter` function:
+    
+    ```matlab
+    x = your_input_signal;
+    y = filter(b, a, x);
+    ```
+    
+    To visualize the passband and stopband frequencies on the plot, you 
+    can add vertical lines at these frequencies:
+    
+    ```matlab
+    hold on;
+    yline(Wp/Fs * Fs/2, 'r--');
+    yline([Ws(1) Ws(end)]/Fs * Fs/2, 'b:');
+    legend('Magnitude Response', 'Passband Edges', 'Stopband Edges');
+    hold off;
+    ```
+    
+    In this case, the filter will attenuate frequencies below 140.8 MHz 
+    and above 156 MHz (Ws*1.05), while passing frequencies between 142.3 
+    MHz (`Wp`) with minimal ripple.
+    
+    Adjust the `Rp` and `Rs` values if you want a different ripple or 
+    attenuation performance for your specific application.
 User: How do I export the parameters to use in GNU Radio?
-AI: To export the Butterworth filter coefficients from MATLAB and use 
-    them in GNU Radio, you can save the numerator and denominator 
-    coefficients as separate text files. Here's how:
+AI: To use the designed filter coefficients (`b`, `a`) in GnuRadio 
+    Companion (GRC), you'll need to follow these steps:
     
-1. Save the numerator coefficients:
+1. **Export filter coefficients:**
     
-    ```matlab
-    filename_num = 'numerator_coefficients.txt';
-    fid_num = fopen(filename_num, 'w');
-    for i = 1 : length(num)
-        fprintf(fid_num, '%g\n', num(i));
-    end
-    fclose(fid_num);
-    ```
-    
-    2. Save the denominator coefficients:
+    MATLAB doesn't have a built-in function to save the filter 
+    coefficients for GnuRadio directly, so we'll save them as 
+    comma-separated values (.csv) files.
     
     ```matlab
-    filename_den = 'denominator_coefficients.txt';
-    fid_den = fopen(filename_den, 'w');
-    for i = 1 : length(den)
-        fprintf(fid_den, '%g\n', den(i));
-    end
-    fclose(fid_den);
+    % Savefilter coefficients
+    dlmwrite('b.csv', b');
+    dlmwrite('a.csv', a');
     ```
     
-    Now you have two text files with the numerator and denominator 
-    coefficients. You can import these coefficient lists in GNU Radio 
-    using Polyphase FIR Filter blocks or any other filter blocks that 
-    allow specifying taps directly. In the GNU Radio GUI, you'll need to 
-    set the number of taps based on the length of the coefficient lists 
-    loaded from the text files.
+    2. **Create a new block in Gnu Radio Companion:**
+    
+    Open GnuRadio Companion (grc), and drag & drop a "Filter - Filter 
+    Design" block from the Analog Blocks section into your main canvas.
+    
+    3. **Configure the Filter Design block:**
+    
+    Double-click on the Filter Design block to open its properties 
+    window:
+    
+    - Set `Filter Type` to `FIR Decimating`.
+    - Set `Design Method` to `Window`.
+    - Set `Order` to the same value you calculated in MATLAB (`N`). Make 
+    sure it's even.
+    - Set `Transition Width` and `Passband Ripple` according to your 
+    desired filter characteristics (you can use the same values as in 
+    MATLAB).
+    - Click on the `CSV...` button next to the `Numerator Coefficients` 
+    field, and load the previously saved `b.csv` file.
+    - Click on the `CSV...` button next to the `Denominator Coefficients` 
+    field, and load the previously saved `a.csv` file.
+    
+    4. **Connect input/output signals:**
+    
+    You can now connect your desired input signal(s) to the Filter Design 
+    block's input port (`in`) and add any additional blocks (e.g., 
+    Throttle, Source, etc.) as needed before connecting them to the 
+    filter block's input port(s).
+    
+    After configuring your diagram, you can generate Python code using 
+    "File" -> "Generate Python", which you can use with Gnu Radio running 
+    from the command line:
+    
+    ```bash
+    grc gnu-radio-application.py
+    ```
+    
+    This way, you can apply your designed filter in GnuRadio Companion 
+    using the export parameters (`b`, `a`) generated from MATLAB.
 User: end
 AI: Closing the chat. Have a great day!
 ```
@@ -234,5 +355,5 @@ function dispWrapped(prefix, text)
 end
 ```
 
-*Copyright 2023\-2024 The MathWorks, Inc.*
+*Copyright 2023\-2025 The MathWorks, Inc.*
 

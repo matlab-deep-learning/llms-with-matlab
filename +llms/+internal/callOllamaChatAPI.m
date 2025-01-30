@@ -1,4 +1,4 @@
-function [text, message, response] = callOllamaChatAPI(model, messages, nvp)
+function [text, message, response] = callOllamaChatAPI(model, messages, functions, nvp)
 % This function is undocumented and will change in a future release
 
 %callOllamaChatAPI Calls the Ollama™ chat completions API.
@@ -22,11 +22,13 @@ function [text, message, response] = callOllamaChatAPI(model, messages, nvp)
 %   % Send a request
 %   [text, message] = llms.internal.callOllamaChatAPI(model, messages)
 
-%   Copyright 2023-2024 The MathWorks, Inc.
+%   Copyright 2023-2025 The MathWorks, Inc.
 
 arguments
     model
     messages
+    functions
+    nvp.ToolChoice
     nvp.Temperature
     nvp.TopP
     nvp.MinP
@@ -52,7 +54,7 @@ if isscalar(nvp.StopSequences)
     nvp.StopSequences = [nvp.StopSequences, nvp.StopSequences];
 end
 
-parameters = buildParametersCall(model, messages, nvp);
+parameters = buildParametersCall(model, messages, functions, nvp);
 
 [response, streamedText] = llms.internal.sendRequestWrapper(parameters,[],URL,nvp.TimeOut,nvp.StreamFun);
 
@@ -61,7 +63,11 @@ parameters = buildParametersCall(model, messages, nvp);
 if response.StatusCode=="OK"
     % Outputs the first generation
     if isempty(nvp.StreamFun)
-        message = response.Body.Data.message;
+        if iscell(response.Body.Data)
+            message = response.Body.Data{1}.message;
+        else
+            message = response.Body.Data.message;
+        end
     else
         message = struct("role", "assistant", ...
             "content", streamedText);
@@ -73,7 +79,7 @@ else
 end
 end
 
-function parameters = buildParametersCall(model, messages, nvp)
+function parameters = buildParametersCall(model, messages, functions, nvp)
 % Builds a struct in the format that is expected by the API, combining
 % MESSAGES, FUNCTIONS and parameters in NVP.
 
@@ -82,6 +88,14 @@ parameters.model = model;
 parameters.messages = messages;
 
 parameters.stream = ~isempty(nvp.StreamFun);
+
+if ~isempty(functions)
+    parameters.tools = functions;
+end
+
+if ~isempty(nvp.ToolChoice)
+    parameters.tool_choice = nvp.ToolChoice;
+end
 
 options = struct;
 

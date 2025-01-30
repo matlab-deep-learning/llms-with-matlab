@@ -14,12 +14,8 @@ The example includes two parts:
 -  First, define and use a custom streaming function to print out generated text directly as the model generates it. 
 -  Then, create an HTML UI Component and define and use a custom streaming function to update the UI Component in real time as the model generates text. 
 
-To run this example, you need a running Ollama server. As written, the example uses the Mistral model.
+To run this example, you need a running Ollama server. As written, the example uses the Mistral® NeMo model.
 
-```matlab
-loadenv(".env")
-addpath('../..')
-```
 # Print Stream Directly to Screen
 
 In this example, the streamed output is printed directly to the screen. 
@@ -36,7 +32,7 @@ end
 Create the chat object with the defined function as a handle. 
 
 ```matlab
-chat = ollamaChat("mistral",StreamFun=@printToken);
+chat = ollamaChat("mistral-nemo",StreamFun=@printToken);
 ```
 
 Generate response to a prompt in streaming mode. 
@@ -47,21 +43,21 @@ generate(chat, prompt, MaxNumTokens=500);
 ```
 
 ```matlabTextOutput
- Model-Based Design (MBD) is an approach to system design, engineering, and modeling that uses graphical models to represent the functionality and behavior of systems. It emphasizes the creation of abstract, high-level models before implementing specific hardware or software components.
+Model-Based Design (MBD) is a software engineering approach that focuses on creating analyzable, understandable, and executable models of systems before physically implementing them. This method allows developers to simulate and validate designs at various levels of abstraction prior to final implementation in hardware or software. Here are some key aspects of Model-Based Design:
 
-The key features of Model-Based Design are:
+1. **Model Creation**: Models can be created using domain-specific languages like Simulink (for control, signal processing, image processing), Stateflow (for flowcharts and state machines), or MATLAB (for numerical computing). These tools provide a graphical interface for building models.
 
-1. Graphical Representation: Instead of writing code, engineers create models using visual diagrams such as flowcharts, block diagrams, or state machines. This makes the system design more intuitive and easier for both experts and non-experts to understand.
+2. **Verification and Validation**: Models can be simulated and tested to verify their correctness and validate their behavior against requirements. Various verification techniques like code coverage analysis can also be applied on the models.
 
-2. Simulation: By simulating a model, engineers can evaluate its performance and functionality without building any physical hardware or writing actual code. This allows for rapid prototyping and iterative improvements during the design phase.
+3. **Automatic Code Generation**: Once a model has been validated, it can be automatically converted into executable code targeting various hardware platforms (like embedded processors, FPGAs) or software environments (like C, C++, Java).
 
-3. Code Generation: Once the model is validated through simulation and testing, it can be automatically converted into code ready for deployment on a variety of hardware platforms. This reduces development time and increases productivity by minimizing manual coding tasks.
+4. **Round-Trip Engineering**: In this approach, changes made to the generated code can propagate back to the original model, allowing for iterative development and refinement.
 
-4. Model Reuse and Reusability: Models can be reused across different systems and applications, saving time and effort in the design process. Additionally, modular models can be combined to create larger, more complex systems.
+5. **Collaboration among Teams**: Model-Based Design enables collaboration among different engineering teams by providing a common design environment that captures the system's behavior accurately. This helps in reducing misinterpretations and speeds up development processes.
 
-5. System Integration: MBD helps streamline system integration by providing a clear interface between subsystems and components. This makes it easier to integrate third-party libraries or software tools into a project.
+The benefits of Model-Based Design include improved productivity, earlier detection of errors, better requirement traceability, and enhanced communication among team members.
 
-Model-Based Design is widely used in control systems design, embedded systems, and hardware-software co-design across various industries such as automotive, aerospace, and telecommunications. It facilitates faster development cycles, improved system performance, reduced debugging time, and increased reliability.
+Industries where Model-Based Design is commonly used include automotive (control systems), aerospace (Avionics systems), consumer electronics (image processing algorithms), communications (signal processing), and more.
 ```
 # Print Stream to HTML UI Component
 
@@ -84,7 +80,7 @@ resetTable(h);
 Create the chat object with the function handle, which requires the `uihtml` object created earlier. 
 
 ```matlab
-chat = ollamaChat("mistral",StreamFun=@(x) addChat(h,"assistant",x));
+chat = ollamaChat("mistral-nemo",StreamFun=@(x) addChat(h,"assistant",x));
 ```
 
 Add the user prompt to the table in the HTML UI component. Use messageHistory to keep a running history of the exchange.

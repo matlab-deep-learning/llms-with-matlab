@@ -12,12 +12,8 @@ The example contains three steps:
 -  Find documents relevant to a query using keyword search. 
 -  Generate a response using Ollama based on the both the query and the most relevant source document. 
 
-This example requires Text Analytics Toolbox™ and a running Ollama service. As written, it requires the Mistral model to be installed in that Ollama instance.
+This example requires Text Analytics Toolbox™ and a running Ollama service. As written, it requires the Mistral® NeMo model to be installed in that Ollama instance.
 
-```matlab
-loadenv(".env")
-addpath('../..')
-```
 # Download and Preprocess Documents
 
 Specify the URLs of the reports.
@@ -62,10 +58,10 @@ Split the text data into paragraphs with the helper function `preprocessDocument
 documents = preprocessDocuments(str);
 ```
 
-Initialize the chatbot with the model name (Mistral) and the a generic system prompt. Due to the long input created below, responses may take a long time on older machines; increase the accepted timeout.
+Initialize the chatbot with the model name (Mistral NeMo) and a generic system prompt. Due to the long input created below, responses may take a long time on older machines; increase the accepted timeout.
 
 ```matlab
-chat = ollamaChat("mistral", ...
+chat = ollamaChat("mistral-nemo", ...
     "You are a helpful assistant. You will get a " + ...
     "context for each question, but only use the information " + ...
     "in the context if that makes sense to answer the question. " + ...
@@ -123,27 +119,26 @@ wrapText(response)
 
 ```matlabTextOutput
 ans = 
-    " Technical criteria that can be used to streamline new approvals for 
-     grid-friendly DPV include:
+    "Based on the provided context, several technical criteria can be used to 
+     streamline new approvals for grid-friendly DPV (Distributed Photovoltaics). 
+     These include:
      
-1. Adopting a grid code that reflects expected future growth of distributed
-     energy resources, and updating it as necessary to balance deployment with the 
-     technical requirements of distribution.
-     2. Specifying advanced inverter functions today to reduce the need to change 
-     systems in the future, making them easy to implement.
-     3. Implementing prudent screening criteria for DPV installations that meet 
-     certain specifications, which can streamline technical approvals. Such criteria 
-     often rely on hosting capacity calculations to estimate the point where DPV 
-     would induce technical impacts on system operations.
-     4. Considering the value of ambitious investment options to accommodate 
-     long-term developments and prioritizing the most cost-effective solutions in 
-     assessing interventions for grid-friendly DPV. Costs can vary from one power 
-     system to another, so case-by-case appraisal is important.
-     5. Using metrics relevant to the impacts of DPV on low-voltage distribution 
-     grids, such as DPV capacity penetration relative to minimum feeder daytime 
-     load, to improve the use of technical screening criteria. Examples include 
-     regulations that limit DPV installation size to a given percentage of the 
-     customer's peak load, or countries with no limits on feeder penetration."
+1. **Inverter Programming:** Ensuring inverters have appropriate programming to
+     provide valuable services such as reactive power control for voltage management 
+     or active power curtailment for congestion management.
+     2. **Capacity Building:** Timely capacity building of personnel to manage high 
+     shares of DPV is crucial. This includes training staff on grid integration, 
+     operation, and maintenance issues related to DPV.
+     3. **Grid Code Adherence:** Adhering to a grid code that reflects expected 
+     future growth of distributed energy resources. This ensures technical rules 
+     keep pace with installed DPV capacity.
+     4. **Prudent Screening Criteria:** Using prudent screening criteria for systems 
+     that meet certain specifications. For example, metrics like DPV capacity 
+     penetration relative to minimum feeder daytime load can be considered.
+     
+     By applying these criteria and using case-by-case appraisal, new approvals for 
+     grid-friendly DPV installations can potentially be streamlined while 
+     maintaining grid reliability and stability."
 
 ```
 # Helper Functions

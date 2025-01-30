@@ -1,4 +1,5 @@
-classdef (Sealed) ollamaChat < llms.internal.textGenerator
+classdef (Sealed) ollamaChat < llms.internal.textGenerator & ...
+    llms.internal.hasTools 
 %ollamaChat Chat completion API from Ollama™.
 %
 %   CHAT = ollamaChat(modelName) creates an ollamaChat object for the given model.
@@ -55,6 +56,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
 %
 %   TimeOut                 - Connection Timeout in seconds. Default is 120.
 %
+%   Tools                   - A list of tools the model can call.
 %
 %
 %   ollamaChat Functions:
@@ -66,7 +68,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
 %
 %       SystemPrompt         - System prompt.
 
-% Copyright 2024 The MathWorks, Inc.
+% Copyright 2024-2025 The MathWorks, Inc.
 
     properties
         ModelName         (1,1) string
@@ -82,6 +84,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
                 modelName                          {mustBeTextScalar}
                 systemPrompt                       {llms.utils.mustBeTextOrEmpty} = []
                 nvp.Temperature                    {llms.utils.mustBeValidTemperature} = 1
+                nvp.Tools                    (1,:) {mustBeA(nvp.Tools, "openAIFunction")} = openAIFunction.empty
                 nvp.TopP                           {llms.utils.mustBeValidProbability} = 1
                 nvp.MinP                           {llms.utils.mustBeValidProbability} = 0
                 nvp.TopK                     (1,1) {mustBeReal,mustBePositive} = Inf
@@ -97,6 +100,15 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
                 this.StreamFun = nvp.StreamFun;
             else
                 this.StreamFun = [];
+            end
+
+            if isempty(nvp.Tools)
+                this.Tools = [];
+                this.FunctionsStruct = [];
+                this.FunctionNames = [];
+            else
+                this.Tools = nvp.Tools;
+                [this.FunctionsStruct, this.FunctionNames] = functionAsStruct(nvp.Tools);
             end
 
             if ~isempty(systemPrompt)
@@ -142,6 +154,9 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
             %                           sense, the “creativity”) of outputs, lower
             %                           values reduce it. Setting Temperature=0 removes
             %                           randomness from the output altogether.
+            %
+            %       ToolChoice       - Function to execute. 'none', 'auto',
+            %                          or specify the function to call.
             %
             %       TopP              - Top probability mass value for controlling the
             %                           diversity of the output. Default value is CHAT.TopP;
@@ -198,6 +213,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
                 nvp.StreamFun           (1,1) {mustBeA(nvp.StreamFun,'function_handle')}
                 nvp.Endpoint            (1,1) string = this.Endpoint
                 nvp.MaxNumTokens        (1,1) {mustBeNumeric,mustBePositive} = inf
+                nvp.ToolChoice          {mustBeValidFunctionCall(this, nvp.ToolChoice)} = []
                 nvp.Seed                      {mustBeIntegerOrEmpty(nvp.Seed)} = []
             end
 
@@ -212,6 +228,8 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
                 messagesStruct = horzcat(this.SystemPrompt, messagesStruct);
             end
 
+            toolChoice = convertToolChoice(this, nvp.ToolChoice);
+
             if isfield(nvp,"StreamFun")
                 streamFun = nvp.StreamFun;
             else
@@ -220,8 +238,8 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
 
             try % just for nicer errors, reducing the stack depth shown
                 [text, message, response] = llms.internal.callOllamaChatAPI(...
-                    nvp.ModelName, messagesStruct, ...
-                    Temperature=nvp.Temperature, ...
+                    nvp.ModelName, messagesStruct, this.FunctionsStruct, ...
+                    Temperature=nvp.Temperature, ToolChoice=toolChoice, ...
                     TopP=nvp.TopP, MinP=nvp.MinP, TopK=nvp.TopK,...
                     TailFreeSamplingZ=nvp.TailFreeSamplingZ,...
                     StopSequences=nvp.StopSequences, MaxNumTokens=nvp.MaxNumTokens, ...
@@ -295,6 +313,18 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator
             mdls(ismissing(mdls)) = [];
         end
     end
+end
+
+function [functionsStruct, functionNames] = functionAsStruct(functions)
+numFunctions = numel(functions);
+functionsStruct = cell(1, numFunctions);
+functionNames = strings(1, numFunctions);
+
+for i = 1:numFunctions
+    functionsStruct{i} = struct('type','function', ...
+        'function',encodeStruct(functions(i))) ;
+    functionNames(i) = functions(i).FunctionName;
+end
 end
 
 function mustBeValidMsgs(value)

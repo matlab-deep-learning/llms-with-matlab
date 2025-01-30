@@ -1,7 +1,7 @@
 classdef texampleTests < matlab.unittest.TestCase
 % Smoke level tests for the example .mlx files
 
-%   Copyright 2024 The MathWorks, Inc.
+%   Copyright 2024-2025 The MathWorks, Inc.
 
 
     properties(TestParameter)
@@ -73,6 +73,11 @@ classdef texampleTests < matlab.unittest.TestCase
         function testAnalyzeTextDataUsingParallelFunctionCallwithChatGPT(testCase)
             testCase.startCapture("AnalyzeTextDataUsingParallelFunctionCallwithChatGPT");
             evalc("AnalyzeTextDataUsingParallelFunctionCallwithChatGPT");
+        end
+
+        function testAnalyzeTextDataUsingParallelFunctionCallwithOllama(testCase)
+            testCase.startCapture("AnalyzeTextDataUsingParallelFunctionCallwithOllama");
+            AnalyzeTextDataUsingParallelFunctionCallwithOllama;
         end
 
         function testCreateSimpleChatBot(testCase,ChatBotExample)

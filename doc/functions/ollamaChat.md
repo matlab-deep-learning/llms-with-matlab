@@ -62,6 +62,16 @@ Specify a custom streaming function to process the generated output as it is gen
 
 **Example:** `@(token) fprint("%s",token)`
 
+### `ToolChoice` — Functions to call during output generation
+
+`openAIFunction` object | array of `openAIFunction` objects
+
+
+Information about tools available for function calling, specified as [`openAIFunction`](openAIFunction.md) objects.
+
+
+For an example, see [Analyze Text Data Using Parallel Function Calls with Ollama](../../examples/AnalyzeTextDataUsingParallelFunctionCallwithOllama.md).
+
 # Properties Settable at Construction
 
 Optionally specify these properties at construction using name\-value arguments. Specify `PropertyName1=PropertyValue1,...,PropertyNameN=PropertyValueN`, where `PropertyName` is the property name and `PropertyValue` is the corresponding value.
@@ -187,8 +197,17 @@ The system prompt is a natural\-language description that provides the framework
 
 Set the `SystemPrompt` property during construction using the `systemPrompt` input argument.
 
-
 **Example**: `"You are a helpful assistant who provides answers to user queries in iambic pentameter."`
+
+### `FunctionNames` — Names of OpenAI functions to call during output generation
+
+string array
+
+
+This property is read\-only.
+
+
+Names of the custom functions specified in the `ToolChoice` name\-value argument.
 
 ### `Model` — Model name
 
@@ -238,7 +257,8 @@ ans = " This question is attributed to the poem "The Raven" by Edgar Allan Poe. 
 
 -  [Create Simple Ollama Chat Bot](../../examples/CreateSimpleOllamaChatBot.md) 
 -  [Retrieval Augmented Generation Using Ollama and MATLAB](../../examples/RetrievalAugmentedGenerationusingOllamaAndMATLAB.md) 
--  [Process Generated Text in Real Time by Using Ollama in Streaming Mode](../../examples/ProcessGeneratedTextInRealTimeByUsingOllamaInStreamingMode.md) 
+-  [Process Generated Text in Real Time by Using Ollama in Streaming Mode](../../examples/ProcessGeneratedTextInRealTimeByUsingOllamaInStreamingMode.md)
+-  [Analyze Text Data Using Parallel Function Calls with Ollama](../../examples/AnalyzeTextDataUsingParallelFunctionCallwithOllama.md)
 
 *Copyright 2024 The MathWorks, Inc.*
 

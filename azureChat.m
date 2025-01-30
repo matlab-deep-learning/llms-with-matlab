@@ -85,13 +85,13 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
 %       FunctionNames        - Names of the functions that the model can
 %                              request calls.
 %
-%      ResponseFormat        - The format of response the model returns.
+%       ResponseFormat       - The format of response the model returns.
 %                              "text" (default) | "json" | struct | string with JSON Schema
 %
 %       TimeOut              - Connection Timeout in seconds.
 %
 
-% Copyright 2023-2024 The MathWorks, Inc.
+% Copyright 2023-2025 The MathWorks, Inc.
 
     properties(SetAccess=private)
         Endpoint     (1,1) string

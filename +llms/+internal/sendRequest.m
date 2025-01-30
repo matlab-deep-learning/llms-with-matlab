@@ -5,7 +5,7 @@ function [response, streamedText] = sendRequest(parameters, token, endpoint, tim
 %   api key TOKEN. TIMEOUT is the number of seconds to wait for initial
 %   server connection. STREAMFUN is an optional callback function.
 
-%   Copyright 2023-2024 The MathWorks, Inc.
+%   Copyright 2023-2025 The MathWorks, Inc.
 
 arguments
     parameters
@@ -41,5 +41,15 @@ else
     consumer = llms.stream.responseStreamer(streamFun);
     response = send(request, matlab.net.URI(endpoint),httpOpts,consumer);
     streamedText = consumer.ResponseText;
+end
+
+% When the server sends jsonl or ndjson back, we do not get the automatic conversion.
+if isnumeric(response.Body.Data)
+    txt = native2unicode(response.Body.Data.',"UTF-8");
+    % convert to JSON array
+    json = "[" + replace(strtrim(txt),newline,',') + "]";
+    try
+        response.Body.Data = jsondecode(json);
+    end
 end
 end

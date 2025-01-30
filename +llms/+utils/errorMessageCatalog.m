@@ -1,7 +1,7 @@
 classdef errorMessageCatalog
 %errorMessageCatalog Stores the error messages from this repository
 
-%   Copyright 2023-2024 The MathWorks, Inc.
+%   Copyright 2023-2025 The MathWorks, Inc.
 
     properties(Constant)
         %CATALOG dictionary mapping error ids to error msgs
@@ -49,7 +49,8 @@ catalog("llms:mustBeAssistantCall") = "Input struct must contain field 'role' wi
 catalog("llms:mustBeAssistantWithContent") = "Input struct must contain field 'content' containing text with one or more characters.";
 catalog("llms:mustBeAssistantWithIdAndFunction") = "Field 'tool_call' must be a struct with fields 'id' and 'function'.";
 catalog("llms:mustBeAssistantWithNameAndArguments") = "Field 'function' must be a struct with fields 'name' and 'arguments'.";
-catalog("llms:assistantMustHaveTextNameAndArguments") = "Fields 'name' and 'arguments' must be text with one or more characters.";
+catalog("llms:assistantMustHaveTextName") = "Field 'name' must be text with one or more characters.";
+catalog("llms:assistantMustHaveTextOrStructArguments") = "Field 'arguments' must be text with one or more characters, or a scalar struct.";
 catalog("llms:mustBeValidIndex") = "Index exceeds the number of array elements. Index must be less than or equal to {1}.";
 catalog("llms:removeFromEmptyHistory") = "Unable to remove message from empty message history.";
 catalog("llms:stopSequencesMustHaveMax4Elements") = "Number of stop sequences must be less than or equal to 4.";

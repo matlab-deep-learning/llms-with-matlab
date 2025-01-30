@@ -1,7 +1,7 @@
 classdef tmessageHistory < matlab.unittest.TestCase
 % Tests for messageHistory
 
-%   Copyright 2023-2024 The MathWorks, Inc.
+%   Copyright 2023-2025 The MathWorks, Inc.
 
     properties(TestParameter)
         InvalidInputsUserPrompt = iGetInvalidInputsUserPrompt();
@@ -92,7 +92,8 @@ classdef tmessageHistory < matlab.unittest.TestCase
             testCase.verifyEqual(msgs.Messages{1}.tool_calls{1}, toolCallPrompt.tool_calls);
         end
 
-        function errorsAssistantWithWithoutToolCallId(testCase)
+        function toolCallIdIsOptional(testCase)
+            % Ollama does not (or not typically?) send an ID for tool calls
             msgs = messageHistory;
             functionName = "functionName";
             args = "{""arg1"": 1, ""arg2"": 2, ""arg3"": ""3""}";
@@ -102,7 +103,22 @@ classdef tmessageHistory < matlab.unittest.TestCase
             % tool_calls is an array of struct in API response
             toolCallPrompt.tool_calls = toolCall;
 
-            testCase.verifyError(@()addResponseMessage(msgs, toolCallPrompt), "llms:mustBeAssistantWithIdAndFunction");
+            testCase.verifyWarningFree(@()addResponseMessage(msgs, toolCallPrompt));
+        end
+
+        function toolCallCanUseStruct(testCase)
+            % for Ollama support, tool calls can immediately pass a decoded
+            % struct of arguments
+            msgs = messageHistory;
+            functionName = "functionName";
+            args = struct("arg1", 1, "arg2", 2, "arg3", "3");
+            funCall = struct("name", functionName, "arguments", args);
+            toolCall = struct("type", "function", "function", funCall);
+            toolCallPrompt = struct("role", "assistant", "content", "", "tool_calls", []);
+            % tool_calls is an array of struct in API response
+            toolCallPrompt.tool_calls = toolCall;
+
+            testCase.verifyWarningFree(@()addResponseMessage(msgs, toolCallPrompt));
         end
 
         function errorsAssistantWithToolCallsWithoutNameOrArgs(testCase, InvalidFuncCallsCases)
@@ -116,7 +132,7 @@ classdef tmessageHistory < matlab.unittest.TestCase
             testCase.verifyError(@()addResponseMessage(msgs, toolCallPrompt), InvalidFuncCallsCases.Error);
         end
 
-        function errorsAssistantWithWithNonTextNameAndArguments(testCase)
+        function errorsAssistantWithWithNonTextName(testCase)
             msgs = messageHistory;
             funCall = struct("name", 1, "arguments", 2);
             toolCall = struct("id", "123", "type", "function", "function", funCall);
@@ -124,7 +140,18 @@ classdef tmessageHistory < matlab.unittest.TestCase
             % tool_calls is an array of struct in API response
             toolCallPrompt.tool_calls = toolCall;
 
-            testCase.verifyError(@()addResponseMessage(msgs, toolCallPrompt), "llms:assistantMustHaveTextNameAndArguments");
+            testCase.verifyError(@()addResponseMessage(msgs, toolCallPrompt), "llms:assistantMustHaveTextName");
+        end
+
+        function errorsAssistantWithWithNonTextArguments(testCase)
+            msgs = messageHistory;
+            funCall = struct("name", "1", "arguments", 2);
+            toolCall = struct("id", "123", "type", "function", "function", funCall);
+            toolCallPrompt = struct("role", "assistant", "content", "", "tool_calls", []);
+            % tool_calls is an array of struct in API response
+            toolCallPrompt.tool_calls = toolCall;
+
+            testCase.verifyError(@()addResponseMessage(msgs, toolCallPrompt), "llms:assistantMustHaveTextOrStructArguments");
         end
 
         function assistantToolCallMessageWithoutArgsIsAdded(testCase)

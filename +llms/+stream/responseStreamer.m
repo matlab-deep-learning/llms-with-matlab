@@ -2,7 +2,7 @@ classdef responseStreamer < matlab.net.http.io.BinaryConsumer
 %responseStreamer Responsible for obtaining the streaming results from the
 %API
 
-%   Copyright 2023 The MathWorks, Inc.
+%   Copyright 2023-2025 The MathWorks, Inc.
 
     properties
         ResponseText
@@ -95,6 +95,12 @@ classdef responseStreamer < matlab.net.http.io.BinaryConsumer
                         txt = json.message.content;
                         if strlength(txt) > 0
                             this.StreamFun(txt);
+                            this.ResponseText = [this.ResponseText txt];
+                        end
+                        if isfield(json.message,"tool_calls")
+                            s = json.message.tool_calls;
+                            txt = jsonencode(s);
+                            this.StreamFun('');
                             this.ResponseText = [this.ResponseText txt];
                         end
                         if isfield(json,"done")

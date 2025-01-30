@@ -158,7 +158,8 @@ Updated message history, specified as a [`messageHistory`](messageHistory.md) ob
 
 [`messageHistory`](messageHistory.md) | [`openAIFunction`](openAIFunction.md) | [`generate`](generate.md) | [`addResponseMessage`](addResponseMessage.md)
 
--  [Analyze Text Data Using Parallel Function Calls with ChatGPT](../../examples/AnalyzeTextDataUsingParallelFunctionCallwithChatGPT.md) 
+-  [Analyze Text Data Using Parallel Function Calls with ChatGPT](../../examples/AnalyzeTextDataUsingParallelFunctionCallwithChatGPT.md)
+-  [Analyze Text Data Using Parallel Function Calls with Ollama](../../examples/AnalyzeTextDataUsingParallelFunctionCallwithOllama.md) 
 
 *Copyright 2024 The MathWorks, Inc.*
 

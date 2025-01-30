@@ -99,7 +99,7 @@ The supported name\-value arguments depend on the chat completion API.
 | `PresencePenalty`   | Supported   | Supported   |   |
 | `FrequencyPenalty`   | Supported   | Supported   |   |
 | `NumCompletions`   | Supported   | Supported   |   |
-| `ToolChoice`   | Supported   | Supported   |   |
+| `ToolChoice`   | Supported   | Supported   | Supported  |
 | `MinP`   |  |  | Supported    |
 | `TopK`   |  |  | Supported    |
 | `TailFreeSamplingZ`   |  |  | Supported    |

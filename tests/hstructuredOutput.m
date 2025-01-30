@@ -1,7 +1,7 @@
 classdef (Abstract) hstructuredOutput < matlab.unittest.TestCase
 % Tests for completion APIs providing structured output
 
-%   Copyright 2023-2024 The MathWorks, Inc.
+%   Copyright 2023-2025 The MathWorks, Inc.
 
     properties(Abstract)
         structuredModel
@@ -55,7 +55,6 @@ classdef (Abstract) hstructuredOutput < matlab.unittest.TestCase
             schema = iGetSchema();
 
             genUser = generate(testCase.structuredModel,"Create a sample user",ResponseFormat=schema);
-    
             testCase.verifyClass(genUser,"string");
             genUserDecoded = jsondecode(genUser);
             testCase.verifyClass(genUserDecoded.item,"struct");

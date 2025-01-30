@@ -1,7 +1,7 @@
 
 # openAIFunction
 
-Use OpenAI® Function Calls from MATLAB®
+Use Function Calls from MATLAB®
 
 # Creation
 ## Syntax
@@ -11,6 +11,8 @@ Use OpenAI® Function Calls from MATLAB®
 ## Description
 
 An `openAIFunction` object represents a tool that you have, such as a MATLAB function. It includes information about the name, syntax, and behavior of the tool. If you pass an `openAIFunction` object to a large language model (LLM), then the LLM can suggest calls to the tool in its generated output. The LLM does not execute the tool itself. However, you can write scripts that automate the tool calls suggested by the LLM.
+
+Use `openAIFunction` objects to call tools using OpenAI® or Ollama™.
 
 
 For example:
@@ -188,7 +190,8 @@ generatedText = "The sine of thirty degrees is 0.5."
 ```
 # See Also
 -  [Analyze Scientific Papers Using ChatGPT Function Calls](../../examples/AnalyzeScientificPapersUsingFunctionCalls.md) 
--  [Analyze Text Data Using Parallel Function Calls with ChatGPT](../../examples/AnalyzeTextDataUsingParallelFunctionCallwithChatGPT.md) 
+-  [Analyze Text Data Using Parallel Function Calls with ChatGPT](../../examples/AnalyzeTextDataUsingParallelFunctionCallwithChatGPT.md)
+-  [Analyze Text Data Using Parallel Function Calls with Ollama](../../examples/AnalyzeTextDataUsingParallelFunctionCallwithOllama.md) 
 
 *Copyright 2024 The MathWorks, Inc.*
 

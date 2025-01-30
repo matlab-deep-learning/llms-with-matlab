@@ -14,7 +14,7 @@ classdef (Sealed) messageHistory
     %   messageHistory properties:
     %       Messages                 - Messages in the conversation history.
 
-    % Copyright 2023-2024 The MathWorks, Inc.
+    % Copyright 2023-2025 The MathWorks, Inc.
 
     properties(SetAccess=private)
         %MESSAGES - Messages in the conversation history.
@@ -133,10 +133,9 @@ classdef (Sealed) messageHistory
 
             arguments
                 this (1,1) messageHistory
-                id {llms.utils.mustBeNonzeroLengthTextScalar}
+                id {mustBeTextScalar}
                 name {llms.utils.mustBeNonzeroLengthTextScalar}
                 content {llms.utils.mustBeNonzeroLengthTextScalar}
-
             end
 
             newMessage = struct("tool_call_id", id, "role", "tool", ...
@@ -239,8 +238,12 @@ classdef (Sealed) messageHistory
                 % tool_calls message
                 toolsStruct = repmat(struct("id",[],"type",[],"function",[]),size(toolCalls));
                 for i = 1:numel(toolCalls)
-                    toolsStruct(i).id = toolCalls(i).id;
-                    toolsStruct(i).type = toolCalls(i).type;
+                    if isfield(toolCalls(i),"id")
+                        toolsStruct(i).id = toolCalls(i).id;
+                    end
+                    if isfield(toolCalls(i),"type")
+                        toolsStruct(i).type = toolCalls(i).type;
+                    end
                     toolsStruct(i).function = struct( ...
                         "name", toolCalls(i).function.name, ...
                         "arguments", toolCalls(i).function.arguments);
@@ -272,7 +275,7 @@ end
 end
 
 function validateAssistantWithToolCalls(toolCallStruct)
-if ~(isstruct(toolCallStruct) && isfield(toolCallStruct, "id") && isfield(toolCallStruct, "function"))
+if ~(isstruct(toolCallStruct) && isfield(toolCallStruct, "function"))
     error("llms:mustBeAssistantWithIdAndFunction", ...
         llms.utils.errorMessageCatalog.getMessage("llms:mustBeAssistantWithIdAndFunction"))
 else
@@ -288,11 +291,22 @@ try
     for i = 1:numel(functionCallStruct)
         mustBeNonzeroLengthText(functionCallStruct(i).name)
         mustBeTextScalar(functionCallStruct(i).name)
-        mustBeNonzeroLengthText(functionCallStruct(i).arguments)
-        mustBeTextScalar(functionCallStruct(i).arguments)
     end
 catch ME
-    error("llms:assistantMustHaveTextNameAndArguments", ...
-        llms.utils.errorMessageCatalog.getMessage("llms:assistantMustHaveTextNameAndArguments"))
+    error("llms:assistantMustHaveTextName", ...
+        llms.utils.errorMessageCatalog.getMessage("llms:assistantMustHaveTextName"))
+end
+
+try
+    for i = 1:numel(functionCallStruct)
+        if ~(isstruct(functionCallStruct(i).arguments) && ...
+            isscalar(functionCallStruct(i).arguments))
+            mustBeNonzeroLengthText(functionCallStruct(i).arguments)
+            mustBeTextScalar(functionCallStruct(i).arguments)
+        end
+    end
+catch ME
+    error("llms:assistantMustHaveTextOrStructArguments", ...
+        llms.utils.errorMessageCatalog.getMessage("llms:assistantMustHaveTextOrStructArguments"))
 end
 end
