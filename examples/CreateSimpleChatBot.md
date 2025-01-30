@@ -15,18 +15,14 @@ When you run this example, an interactive AI chat starts in the MATLAB® Command
 
 To run this example, you need a valid API key from a paid OpenAI™ API account.
 
-```matlab
-loadenv(".env")
-addpath('../..') 
-```
 # Setup Model
 
-Set the maximum allowable number of words per chat session and define the keyword that, when entered by the user, ends the chat session. This example uses the model `gpt-3.5-turbo`.
+Set the maximum allowable number of words per chat session and define the keyword that, when entered by the user, ends the chat session. This example uses the model o1.
 
 ```matlab
 wordLimit = 2000;
 stopWord = "end";
-modelName = "gpt-3.5-turbo";
+modelName = "o1";
 ```
 
 Create an instance of `openAIChat` to perform the chat and `messageHistory` to store the conversation history`.`
@@ -115,15 +111,15 @@ end
 
 ```matlabTextOutput
 User: Hello, how much do you know about physics?
-AI: I am knowledgeable about various topics in physics. How can I assist you today?
+AI: I have broad knowledge spanning classical, relativistic, and quantum physics.
 User: What is torque?
-AI: Torque is a measure of the rotational force applied to an object.
+AI: Torque is a measure of how a force causes rotational motion around an axis.
 User: What is force?
-AI: Force is a push or pull that causes an object to accelerate or change its motion.
+AI: Force is an interaction that changes an object's state of motion.
 User: What is motion?
-AI: Motion is the change in position of an object over time in relation to a reference point.
+AI: Motion is the change in an object's position over time.
 User: What is time?
-AI: Time is a measurable period during which an action, process, or condition exists or continues.
+AI: Time is the dimension in which events occur sequentially from past to future.
 User: end
 AI: Closing the chat. Have a great day!
 ```
@@ -137,5 +133,5 @@ function numWords = countNumWords(text)
 end
 ```
 
-*Copyright 2023\-2024 The MathWorks, Inc.*
+*Copyright 2023\-2025 The MathWorks, Inc.*
 

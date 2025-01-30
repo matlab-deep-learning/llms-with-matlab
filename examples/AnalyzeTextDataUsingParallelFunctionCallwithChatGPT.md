@@ -18,10 +18,6 @@ This example contains four steps:
 
 To run this example, you need a valid API key from a paid OpenAI™ API account.
 
-```matlab
-loadenv(".env")
-addpath('../..')
-```
 # Extracting data from text
 
 The customer record contains fictional information. 
@@ -54,10 +50,10 @@ messages = messageHistory;
 messages = addUserMessage(messages,"Extract data from the record: " + record);
 ```
 
-Create a chat object. Specify the model to be `"gpt-3.5-turbo"`, which supports parallel function calls.
+Create a chat object. Specify the model to be `"gpt-4o-mini"`, which supports parallel function calls.
 
 ```matlab
-model = "gpt-3.5-turbo";
+model = "gpt-4o-mini";
 chat = openAIChat("You are an AI assistant designed to extract customer data.","ModelName",model,Tools=f);
 ```
 
@@ -105,10 +101,10 @@ f = addParameter(f,"minAge",type="integer",description="The minimum customer age
 f = addParameter(f,"maxAge",type="integer",description="The maximum customer age",RequiredParameter=true);
 ```
 
-Create a chat object with a latest model. 
+Create a chat object. 
 
 ```matlab
-model = "gpt-3.5-turbo";
+model = "gpt-4o-mini";
 chat = openAIChat("You are an AI assistant designed to search customer data.",ModelName=model,Tools=f);
 ```
 
@@ -130,7 +126,7 @@ end
 
 ```matlabTextOutput
 tcalls = struct with fields:
-          id: 'call_JKENvUzMbNclCTI8GTBmY7YT'
+          id: 'call_t4ECuPMLP5mCuRCDG8ZnyjDY'
         type: 'function'
     function: [1x1 struct]
 
@@ -161,10 +157,19 @@ end
 
 ```matlabTextOutput
 txt = 
-    "The customers who are under 30 and older than 27 are:
-1. Jane Smith (age 28)
-     2. Alex Lee (age 29)
-     3. Liam Tanaka (age 28)"
+    "Here are the customers who are under 30 and older than 27:
+     
+1. **Jane Smith**
+        - Age: 28
+        - Email: janesmith@email.com
+     
+     2. **Alex Lee**
+        - Age: 29
+        - Email: alexlee@email.com
+     
+     3. **Liam Tanaka**
+        - Age: 28
+        - Email: liam.tanaka@email.com"
 
 ```
 # Helper functions
@@ -214,5 +219,5 @@ function msg = processToolCalls(data, msg, toolCalls)
 end
 ```
 
-*Copyright 2024 The MathWorks, Inc.*
+*Copyright 2024\-2025 The MathWorks, Inc.*
 

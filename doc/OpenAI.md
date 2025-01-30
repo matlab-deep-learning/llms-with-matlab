@@ -6,7 +6,7 @@ To start using the OpenAI APIs, you first need to obtain OpenAI API keys. You ar
 
 Some of the current LLMs supported on OpenAI are:
 - gpt-4o-mini, gpt-4o-mini-2024-07-18
-- o1-preview, o1-mini
+- o1, o1-mini
 - gpt-3.5-turbo, gpt-3.5-turbo-1106, gpt-3.5-turbo-0125
 - gpt-4o, gpt-4o-2024-05-13 (GPT-4 Omni)
 - gpt-4-turbo, gpt-4-turbo-2024-04-09 (GPT-4 Turbo with Vision)
