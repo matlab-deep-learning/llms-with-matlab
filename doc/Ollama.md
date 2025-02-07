@@ -43,7 +43,7 @@ systemPrompt = "You are a sentiment analyser. You will look at a sentence and ou
     "His attitude was terribly discouraging to the team." + newline +...
     "negative" + newline + newline;
 
-chat = ollamaChat("phi3",systemPrompt);
+chat = ollamaChat("mistral",systemPrompt);
 
 % Generate a response, passing a new sentence for classification
 txt = generate(chat,"The team is feeling very motivated")
@@ -98,14 +98,14 @@ txt = generate(chat,"What is Model-Based Design and how is it related to Digital
 
 ## Understanding the content of an image
 
-You can use multimodal models like `llava` to experiment with image understanding.
+You can use multimodal models like `moondream` to experiment with image understanding.
 
 > [!TIP]  
 > Many models available for Ollama allow you to include images in the prompt, even if the model does not support image inputs. In that case, the images are silently removed from the input. This can result in unexpected outputs.
 
 
 ```matlab
-chat = ollamaChat("llava");
+chat = ollamaChat("moondream");
 image_path = "peppers.png";
 messages = messageHistory;
 messages = addUserMessageWithImages(messages,"What is in the image?",image_path);
