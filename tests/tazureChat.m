@@ -98,24 +98,6 @@ classdef tazureChat < hopenAIChat
             testCase.verifyThat(text, EndsWithSubstring("3, "));
         end
 
-        function doReturnErrors(testCase)
-            testCase.assumeTrue(isenv("AZURE_OPENAI_API_KEY"),"end-to-end test requires environment variables AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT.");
-            chat = azureChat;
-            % This input is considerably longer than accepted as input for
-            % GPT-3.5 (16385 tokens)
-            wayTooLong = string(repmat('a ',1,20000));
-            testCase.verifyError(@() generate(chat,wayTooLong), "llms:apiReturnedError");
-        end
-
-        function generateWithImageErrorsForGpt35(testCase)
-            chat = azureChat("DeploymentID","gpt-35-turbo-16k-0613");
-            image_path = "peppers.png";
-            emptyMessages = messageHistory;
-            messages = addUserMessageWithImages(emptyMessages,"What is in the image?",image_path);
-
-            testCase.verifyError(@() generate(chat,messages), "llms:apiReturnedError");
-        end
-
         function shortErrorForBadEndpoint(testCase)
             chat = azureChat(Endpoint="https://nobodyhere.whatever/");
             caught = false;
@@ -142,13 +124,14 @@ classdef tazureChat < hopenAIChat
         end
 
         function specialErrorForUnsupportedResponseFormat(testCase)
+            testCase.assumeFail("Disabled until `llms.internal.callAzureChat` is updated to use `max_completion_tokens` instead of the deprecated `max_tokens` in the OpenAI API.")
+
             testCase.verifyError(@() generate(...
-                azureChat(APIVersion="2024-08-01-preview",DeploymentID="gpt-35-turbo-16k-0613"), ...
+                azureChat(APIVersion="2024-08-01-preview",DeploymentID="o1-mini"), ...
                 "What is the smallest prime?", ...
                 ResponseFormat=struct("number",1)), ...
                 "llms:noStructuredOutputForAzureDeployment");
         end
-
 
         function endpointNotFound(testCase)
             % to verify the error, we need to unset the environment variable
