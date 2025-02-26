@@ -1,294 +1,267 @@
 # OpenAI
 
-Several functions in this repository connect MATLAB® to the [OpenAI® Chat Completions API](https://platform.openai.com/docs/guides/text-generation/chat-completions-api) (which powers ChatGPT™) and the [OpenAI Images API](https://platform.openai.com/docs/guides/images/image-generation-beta) (which powers DALL·E™).
+Connect to the [OpenAI® Chat Completions API](https://platform.openai.com/docs/guides/text-generation/chat-completions-api)  and [OpenAI Images API](https://platform.openai.com/docs/guides/images) from MATLAB®.
 
-To start using the OpenAI APIs, you first need to obtain OpenAI API keys. You are responsible for any fees OpenAI may charge for the use of their APIs. You should be familiar with the limitations and risks associated with using this technology, and you agree that you shall be solely responsible for full compliance with any terms that may apply to your use of the OpenAI APIs.
+1. [Setup](#setup)
+2. [Get Started](#get-started)
+3. [Manage Chat History](#manage-chat-history)
+4. [Images](#images)
+   - [Describe Images](#describe-images)
+   - [Generate and Edit Images](#generate-and-edit-images)
+5. [JSON\-Formatted and Structured Output](#json-formatted-and-structured-output)
+   - [JSON Mode](#json-mode)
+   - [Structured Output](#structured-output)
+6. [Tool Calling](#tool-calling)
+7. [See Also](#see-also)
+8. [Examples](#examples)
 
-Some of the current LLMs supported on OpenAI are:
-- gpt-4o-mini, gpt-4o-mini-2024-07-18
-- o1, o1-mini
-- o3-mini
-- gpt-3.5-turbo, gpt-3.5-turbo-1106, gpt-3.5-turbo-0125
-- gpt-4o, gpt-4o-2024-05-13 (GPT-4 Omni)
-- gpt-4-turbo, gpt-4-turbo-2024-04-09 (GPT-4 Turbo with Vision)
-- gpt-4, gpt-4-0613
-- dall-e-2, dall-e-3
-                                                        
-For details on the specification of each model, check the official [OpenAI documentation](https://platform.openai.com/docs/models).
+<a id="setup"></a>
+# Setup
+
+Using the OpenAI API requires an OpenAI API key. For information on how to obtain an OpenAI API key, as well as pricing, terms and conditions of use, and information about available models, see the OpenAI documentation at [https://platform.openai.com/docs/overview](https://platform.openai.com/docs/overview).
 
 
-## Setting up your OpenAI API key
+To connect to the OpenAI API from MATLAB using LLMs with MATLAB, specify the OpenAI® API key as an environment variable and save it to a file called ".env".
 
-Set up your [OpenAI API key](https://platform.openai.com/account/api-keys). Create a `.env` file in the project root directory with the following content.
 
-```
-OPENAI_API_KEY=<your key>
-```
+![envExample.png](functions/images/envExample.png)
 
-Then load your `.env` file as follows:
+
+To connect to OpenAI, the ".env" file must be on the search path.
+
+<a id="get-started"></a>
+# Get Started
+
+First, load the environment file using the [`loadenv`](https://www.mathworks.com/help/matlab/ref/loadenv.html) function.
 
 ```matlab
 loadenv(".env")
 ```
 
-## Simple call without preserving chat history
-
-In some situations, you will want to use chat completion models without preserving chat history. For example, when you want to perform independent queries in a programmatic way.
-
-Here's a simple example of how to use the `openAIChat` for sentiment analysis, initialized with a few-shot prompt:
+Connect to the OpenAI Chat Completion API using the [`openAIChat`](functions/openAIChat.md) function and generate text using the [`generate`](functions/generate.md) function.
 
 ```matlab
-% Initialize the OpenAI Chat object, passing a system prompt
-
-% The system prompt tells the assistant how to behave, in this case, as a sentiment analyzer
-systemPrompt = "You are a sentiment analyser. You will look at a sentence and output"+...
-    " a single word that classifies that sentence as either 'positive' or 'negative'."+....
-    newline + ...
-    "Examples:" + newline +...
-    "The project was a complete failure." + newline +...
-    "negative" + newline + newline +...  
-    "The team successfully completed the project ahead of schedule." + newline +...
-    "positive" + newline + newline +...
-    "His attitude was terribly discouraging to the team." + newline +...
-    "negative" + newline + newline;
-
-chat = openAIChat(systemPrompt);
-
-% Generate a response, passing a new sentence for classification
-txt = generate(chat,"The team is feeling very motivated")
-% Should output "positive"
+model = openAIChat("You are a helpful assistant.",ModelName="gpt-4o-mini");
+generate(model,"Why is a raven like a writing desk?")
 ```
 
-## Creating a chat system
+```matlabTextOutput
+ans = 
+    "The riddle "Why is a raven like a writing desk?" originates from Lewis Carroll's "Alice's Adventures in Wonderland." In the story, the Mad Hatter poses this riddle, but he does not provide an answer, leaving it open to interpretation.
+     
+     Over the years, various humorous answers have been proposed, such as:
+     
+     - "Because both have quills."
+     - "Because they both produce notes."
+     - "Because they both can be inky."
+     
+     Ultimately, the riddle is meant to be nonsensical, reflecting the whimsical and absurd nature of the story. Carroll himself later provided an answer in a preface to a later edition of the book, stating that there is no answer, emphasizing the playful nature of language and logic in his work."
 
-If you want to create a chat system, you will have to create a history of the conversation and pass that to the `generate` function.
+```
 
-To start a conversation history, create a `messageHistory` object:
+For more examples of how to generate text using the OpenAI Chat Completion API from MATLAB, see for instance:
+
+-  [Process Generated Text in Real Time by Using ChatGPT in Streaming Mode](../examples/ProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode.md) 
+-  [Summarize Large Documents Using ChatGPT and MATLAB](../examples/SummarizeLargeDocumentsUsingChatGPTandMATLAB.md) (requires Text Analytics Toolbox™) 
+-  [Retrieval\-Augmented Generation Using ChatGPT and MATLAB](../examples/RetrievalAugmentedGenerationUsingChatGPTandMATLAB.md) (requires Text Analytics Toolbox) 
+
+<a id="manage-chat-history"></a>
+# Manage Chat History
+
+Manage and store messages in a conversation using the [`messageHistory`](functions/messageHistory.md) function. Use this to create a chatbot, use few\-shot prompting, or to facilitate workflows that require more than a single LLM call, such as tool calling.
+
+
+First, load the environment file using the [`loadenv`](https://www.mathworks.com/help/matlab/ref/loadenv.html) function.
 
 ```matlab
-history = messageHistory;
+loadenv(".env")
 ```
 
-Then create the chat assistant:
+Connect to the OpenAI Chat Completion API using the [`openAIChat`](functions/openAIChat.md) function.
 
 ```matlab
-chat = openAIChat("You are a helpful AI assistant.");
+model = openAIChat("You are a helpful assistant.",ModelName="gpt-4o-mini");
 ```
 
-Add a user message to the history and pass it to `generate`:
-
-```matlab
-history = addUserMessage(history,"What is an eigenvalue?");
-[txt, response] = generate(chat, history)
-```
-
-The output `txt` will contain the answer and `response` will contain the full response, which you need to include in the history as follows:
-```matlab
-history = addResponseMessage(history, response);
-```
-
-You can keep interacting with the API and since we are saving the history, it will know about previous interactions.
-```matlab
-history = addUserMessage(history,"Generate MATLAB code that computes that");
-[txt, response] = generate(chat,history);
-% Will generate code to compute the eigenvalue
-```
-
-## Streaming the response
-
-Streaming allows you to start receiving the output from the API as it is generated token by token, rather than wait for the entire completion to be generated. You can specifying the streaming function when you create the chat assistant. In this example, the streaming function will print the response to the command window.
-```matlab
-% streaming function
-sf = @(x) fprintf("%s",x);
-chat = openAIChat(StreamFun=sf);
-txt = generate(chat,"What is Model-Based Design and how is it related to Digital Twin?")
-% Should stream the response token by token
-```
-
-## Calling MATLAB functions with the API
-
-Optionally, `Tools=functions` can be used to provide function specifications to the API. The purpose of this is to enable models to generate function arguments which adhere to the provided specifications. 
-Note that the API is not able to directly call any function, so you should call the function and pass the values to the API directly. This process can be automated as shown in [AnalyzeScientificPapersUsingFunctionCalls.mlx](/examples/AnalyzeScientificPapersUsingFunctionCalls.mlx), but it's important to consider that ChatGPT can hallucinate function names, so avoid executing any arbitrary generated functions and only allow the execution of functions that you have defined. 
-
-For example, if you want to use the API for mathematical operations such as `sind`, instead of letting the model generate the result and risk running into hallucinations, you can give the model direct access to the function as follows:
-
-```matlab
-f = openAIFunction("sind","Sine of argument in degrees");
-f = addParameter(f,"x",type="number",description="Angle in degrees.");
-chat = openAIChat("You are a helpful assistant.",Tools=f);
-```
-
-When the model identifies that it could use the defined functions to answer a query, it will return a `tool_calls` request, instead of directly generating the response:
+Initialize the message history.
 
 ```matlab
 messages = messageHistory;
-messages = addUserMessage(messages, "What is the sine of 30?");
-[txt, response] = generate(chat, messages);
-messages = addResponseMessage(messages, response);
 ```
 
-The variable `response` should contain a request for a function call.
-```bash
->> response
+Add a user message to the message history.
 
-response = 
+```matlab
+messages = addUserMessage(messages,"What is the precise definition of a treble crochet stitch?");
+```
 
-  struct with fields:
+Generate a response from the message history.
 
-             role: 'assistant'
-          content: []
-       tool_calls: [1×1 struct]
+```matlab
+[generatedText,completeOutput] = generate(model,messages)
+```
 
->> response.tool_calls
+```matlabTextOutput
+generatedText = 
+    "A treble crochet stitch (often abbreviated as "tr") is a basic crochet stitch that creates a tall and lacey fabric. The precise definition and process for creating a treble crochet stitch is as follows:
+     
+1. **Yarn Over**: Start by yarn over (wrap the yarn around your hook) twice.
+     
+     2. **Insert Hook**: Insert the hook into the stitch or space where you want to make the stitch.
+     
+     3. **Yarn Over and Pull Through**: yarn over again and pull the yarn through the stitch or space. You will have four loops on your hook.
+     
+     4. **Yarn Over and Pull Through Two Loops**: Yarn over and pull through the first two loops on your hook. You will now have three loops remaining on your hook.
+     
+     5. **Yarn Over and Pull Through Two Loops Again**: Yarn over again and pull through the next two loops. You will now be left with two loops on your hook.
+     
+     6. **Final Yarn Over and Pull Through**: Yarn over one last time and pull through the remaining two loops on your hook.
+     
+     You have now completed one treble crochet stitch, and this stitch is taller than a double crochet stitch and adds a delicate texture to your work. 
+     
+     In summary, a treble crochet stitch involves yarn overs before and after pulling through loops to create a height that makes it distinctive from other crochet stitches."
 
+completeOutput = struct with fields:
+       role: 'assistant'
+    content: 'A treble crochet stitch (often abbreviated as "tr") is a basic crochet stitch that creates a tall and lacey fabric. The precise definition and process for creating a treble crochet stitch is as follows:↵↵1. **Yarn Over**: Start by yarn over (wrap the yarn around your hook) twice.↵↵2. **Insert Hook**: Insert the hook into the stitch or space where you want to make the stitch.↵↵3. **Yarn Over and Pull Through**: yarn over again and pull the yarn through the stitch or space. You will have four loops on your hook.↵↵4. **Yarn Over and Pull Through Two Loops**: Yarn over and pull through the first two loops on your hook. You will now have three loops remaining on your hook.↵↵5. **Yarn Over and Pull Through Two Loops Again**: Yarn over again and pull through the next two loops. You will now be left with two loops on your hook.↵↵6. **Final Yarn Over and Pull Through**: Yarn over one last time and pull through the remaining two loops on your hook.↵↵You have now completed one treble crochet stitch, and this stitch is taller than a double crochet stitch and adds a delicate texture to your work. ↵↵In summary, a treble crochet stitch involves yarn overs before and after pulling through loops to create a height that makes it distinctive from other crochet stitches.'
+    refusal: []
+
+```
+
+Add the response message to the message history.
+
+```matlab
+messages = addResponseMessage(messages,completeOutput);
+```
+
+Ask a follow\-up question by adding another user message to the message history.
+
+```matlab
+messages = addUserMessage(messages,"When was it first invented?");
+```
+
+Generate a response from the message history.
+
+```matlab
+generate(model,messages)
+```
+
+```matlabTextOutput
 ans = 
+    "The precise origins of the treble crochet stitch are difficult to pinpoint, as crochet as a craft has evolved over centuries and lacks detailed historical records. Crochet itself is believed to have originated in the early 19th century, with a significant development occurring in Europe. 
+     
+     The modern form of crochet, incorporating various stitches including the treble stitch, became popular in the 19th century during the Victorian era. This period saw a surge in the use of lace-making techniques, and crochet was often used to replicate fine lace patterns. The terminology for crochet stitches, including the treble crochet, was standardized through various publications and instructional guides in the late 1800s.
+     
+     While the specific inventors of the treble crochet stitch are unknown, it is part of the rich tapestry of crochet techniques that evolved as lace-making and textile arts grew in popularity. Thus, treble crochet and its use in patterns became more formalized in crafting literature throughout the 19th century."
 
-  struct with fields:
-
-           id: 'call_wDpCLqtLhXiuRpKFw71gXzdy'
-         type: 'function'
-     function: [1×1 struct]
-
->> response.tool_calls.function
-
-ans = 
-
-  struct with fields:
-
-         name: 'sind'
-    arguments: '{↵  "x": 30↵}'
 ```
 
-You can then call the function `sind` with the specified argument and return the value to the API add a function message to the history:
+For another example of how to use and manage the message history, see the [Create Simple ChatBot](../examples/CreateSimpleChatBot.md) example (requires Text Analytics Toolbox).
+
+<a id="images"></a>
+# Images
+
+Use the OpenAI Chat Completions API to generate text based on image inputs. Use the OpenAI Image Generation API to generate and edit images.
+
+<a id="describe-images"></a>
+## Describe Images
+
+To generate text based on image inputs using the OpenAI Chat Completions API from MATLAB, add the image to the message history using the [`addUserMessageWithImages`](functions/addUserMessageWithImages.md) function.
+
+
+For an example of how to describe images using the OpenAI Chat Completions API, see [Describe Images Using ChatGPT](../examples/DescribeImagesUsingChatGPT.md).
+
+<a id="generate-and-edit-images"></a>
+## Generate and Edit Images
+
+Connect to OpenAI Image Generation API from MATLAB using the [openAIImages](functions/openAIImages.md) function.
+
+
+First, load the environment file using the [`loadenv`](https://www.mathworks.com/help/matlab/ref/loadenv.html) function.
 
 ```matlab
-% Arguments are returned as json, so you need to decode it first
-id = string(response.tool_calls.id);
-func = string(response.tool_calls.function.name);
-if func == "sind"
-    args = jsondecode(response.tool_calls.function.arguments);
-    result = sind(args.x);
-    messages = addToolMessage(messages,id,func,"x="+result);
-    [txt, response] = generate(chat, messages);
-else
-    % handle calls to unknown functions
-end
+loadenv(".env")
 ```
 
-The model then will use the function result to generate a more precise response:
-
-```shell
->> txt
-
-txt = 
-
-    "The sine of 30 degrees is approximately 0.5."
-```
-
-## Extracting structured information with the API
-
-Another useful application for defining functions is to extract structured information from some text. You can just pass a function with the output format that you would like the model to output and the information you want to extract. For example, consider the following piece of text:
+Connect to the OpenAI Images API.
 
 ```matlab
-patientReport = "Patient John Doe, a 45-year-old male, presented " + ...
-    "with a two-week history of persistent cough and fatigue. " + ...
-    "Chest X-ray revealed an abnormal shadow in the right lung." + ...
-    " A CT scan confirmed a 3cm mass in the right upper lobe," + ...
-    " suggestive of lung cancer. The patient has been referred " + ...
-    "for biopsy to confirm the diagnosis.";
+model = openAIImages(ModelName="dall-e-2");
 ```
 
-If you want to extract information from this text, you can define a function as follows:
-```matlab
-f = openAIFunction("extractPatientData","Extracts data about a patient from a record");
-f = addParameter(f,"patientName",type="string",description="Name of the patient");
-f = addParameter(f,"patientAge",type="number",description="Age of the patient");
-f = addParameter(f,"patientSymptoms",type="string",description="Symptoms that the patient is having.");
-```
-
-Note that this function does not need to exist, since it will only be used to extract the Name, Age and Symptoms of the patient and it does not need to be called:
+Generate and display an image based on a natural language prompt using the [`openAIImages.generate`](functions/openAIImages.generate.md) function.
 
 ```matlab
-chat = openAIChat("You are helpful assistant that reads patient records and extracts information", ...
-    Tools=f);
-messages = messageHistory;
-messages = addUserMessage(messages,"Extract the information from the report:" + newline + patientReport);
-[txt, response] = generate(chat, messages);
+im = generate(model,"Draw an intellectual octopus.");
+imshow(im{1})
 ```
 
-The model should return the extracted information as a function call:
-```shell
->> response
+![octopus.png](functions/images/octopus.png)
 
-response = 
+For more examples of how to generate and edit images using OpenAI from MATLAB, see:
 
-  struct with fields:
+-  [Using DALL·E To Edit Images](../examples/UsingDALLEToEditImages.md) 
+-  [Using DALL·E To Generate Images](../examples/UsingDALLEToGenerateImages.md) 
 
-             role: 'assistant'
-          content: []
-        tool_call: [1×1 struct]
+<a id="json-formatted-and-structured-output"></a>
+# JSON\-Formatted and Structured Output
 
->> response.tool_calls
+For some workflows, it is useful to generate text in a specific format. For example, a predictable output format allows you to more easily analyze the generated output.
 
-ans = 
 
-  struct with fields:
+You can specify the format either by using JSON mode, or by using structured outputs, depending on what the model supports. Both generate text containing JSON code. For more information about JSON mode, see [https://platform.openai.com/docs/guides/structured\-outputs\#json\-mode](https://platform.openai.com/docs/guides/structured-outputs#json-mode). For more information about structured outputs, see [https://platform.openai.com/docs/guides/structured\-outputs](https://platform.openai.com/docs/guides/structured-outputs).
 
-           id: 'call_4VRtN7jb3pTPosMSb4ZaLoWP'
-         type: 'function'
-     function: [1×1 struct]
+<a id="json-mode"></a>
+## JSON Mode
 
->> response.tool_calls.function
+To run an LLM in JSON mode, set the `ResponseFormat` name\-value argument of [`openAIChat`](functions/openAIChat.md) or [`generate`](functions/generate.md) to `"json"`. To configure the format of the generated JSON code, describe the format using natural language and provide it to the model either in the system prompt or as a user message. The prompt or message describing the format must contain the word `"json"` or `"JSON"`.
 
-ans = 
+<a id="structured-output"></a>
+## Structured Output
 
-  struct with fields:
+To use structured outputs, rather than describing the required format using natural language, you provide the model with a valid JSON schema.
 
-         name: 'extractPatientData'
-    arguments: '{↵  "patientName": "John Doe",↵  "patientAge": 45,↵  "patientSymptoms": "persistent cough, fatigue"↵}'
-```
 
-You can extract the arguments and write the data to a table, for example.
+In LLMs with MATLAB, you can specify the structure of the output in two different ways.
 
-## Understanding the content of an image
+-  Specify a valid JSON Schema directly. 
+-  Specify an example structure array that adheres to the required output format. The software automatically generates the corresponding JSON Schema and provides this to the LLM. Then, the software automatically converts the output of the LLM back into a structure array. 
 
-You can use gpt-4o, gpt-4o-mini, or gpt-4-turbo to experiment with image understanding. 
-```matlab
-chat = openAIChat("You are an AI assistant.");
-image_path = "peppers.png";
-messages = messageHistory;
-messages = addUserMessageWithImages(messages,"What is in the image?",image_path);
-[txt,response] = generate(chat,messages,MaxNumTokens=4096);
-txt
-% outputs a description of the image
-```
+To do this, set the `ResponseFormat` name\-value argument of [`openAIChat`](functions/openAIChat.md) or [`generate`](functions/generate.md) to:
 
-## Obtaining embeddings
+-  A string scalar containing a valid JSON Schema. 
+-  A structure array containing an example that adheres to the required format, for example: `ResponseFormat=struct("Name","Rudolph","NoseColor",[255 0 0])` 
 
-You can extract embeddings from your text with OpenAI using the function `extractOpenAIEmbeddings` as follows:
-```matlab
-exampleText = "Here is an example!";
-emb = extractOpenAIEmbeddings(exampleText);
-```
+For an example of how to use structured output with LLMs with MATLAB, see [Analyze Sentiment in Text Using ChatGPT and Structured Output](../examples/AnalyzeSentimentinTextUsingChatGPTwithStructuredOutput.md).
 
-The resulting embedding is a vector that captures the semantics of your text and can be used on tasks such as retrieval augmented generation and clustering.
+<a id="tool-calling"></a>
+# Tool Calling
 
-```matlab
->> size(emb)
+Some large language models can suggest calls to a tool that you have, such as a MATLAB function, in their generated output. An LLM does not execute the tool itself. Instead, the model encodes the name of the tool and the name and value of any input arguments. You can then write scripts that automate the tool calls suggested by the LLM.
 
-ans =
 
-           1        1536
-```
-## Getting Started with Images API
+To use tool calling, specify the `Tools` name\-value argument of the [`openAIChat`](functions/openAIChat.md) function.
 
-To get started, you can either create an `openAIImages` object and use its methods or use it in a more complex setup, as needed.
+For some examples of how to use tool calling with this add\-on, see:
+-  [Analyze Scientific Papers Using ChatGPT Function Calls](../examples/AnalyzeScientificPapersUsingFunctionCalls.md) 
+-  [Analyze Text Data Using Parallel Function Calls with ChatGPT](../examples/AnalyzeTextDataUsingParallelFunctionCallwithChatGPT.md) 
 
-```matlab
-mdl = openAIImages(ModelName="dall-e-3");
-images = generate(mdl,"Create a 3D avatar of a whimsical sushi on the beach. He is decorated with various sushi elements and is playfully interacting with the beach environment.");
-figure
-imshow(images{1})
-% Should output an image based on the prompt
-```
+<a id="see-also"></a>
+# See Also
+
+[openAIChat](functions/openAIChat.md) | [generate](functions/generate.md) | [openAIFunction](functions/openAIFunction.md) | [addParameter](functions/addParameter.md) | [openAIImages](functions/openAIImages.md) | [openAIImages.generate](functions/openAIImages.generate.md) | [edit](functions/edit.md) | [createVariation](functions/createVariation.md) | [messageHistory](functions/messageHistory.md) | [addSystemMessage](functions/addSystemMessage.md) | [addUserMessage](functions/addUserMessage.md) | [addUserMessageWithImages](functions/addUserMessageWithImages.md) | [addToolMessage](functions/addToolMessage.md) | [addResponseMessage](functions/addResponseMessage.md) | [removeMessage](functions/removeMessage.md)
+
+<a id="examples"></a>
+# Examples
+
+- [Process Generated Text in Real Time by Using ChatGPT in Streaming Mode](../examples/ProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode.md) 
+- [Summarize Large Documents Using ChatGPT and MATLAB](../examples/SummarizeLargeDocumentsUsingChatGPTandMATLAB.md) (requires Text Analytics Toolbox)
+- [Create Simple ChatBot](../examples/CreateSimpleChatBot.md) (requires Text Analytics Toolbox)
+- [Analyze Scientific Papers Using ChatGPT Function Calls](../examples/AnalyzeScientificPapersUsingFunctionCalls.md)
+- [Analyze Sentiment in Text Using ChatGPT and Structured Output](../examples/AnalyzeSentimentinTextUsingChatGPTwithStructuredOutput.md)
+- [Analyze Text Data Using Parallel Function Calls with ChatGPT](../examples/AnalyzeTextDataUsingParallelFunctionCallwithChatGPT.md)
+- [Retrieval-Augmented Generation Using ChatGPT and MATLAB](../examples/RetrievalAugmentedGenerationUsingChatGPTandMATLAB.md) (requires Text Analytics Toolbox)
+- [Describe Images Using ChatGPT](../examples/DescribeImagesUsingChatGPT.md)
+- [Using DALL·E To Edit Images](../examples/UsingDALLEToEditImages.md)
+- [Using DALL·E To Generate Images](../examples/UsingDALLEToGenerateImages.md)
 
