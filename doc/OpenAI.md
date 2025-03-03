@@ -265,3 +265,4 @@ For some examples of how to use tool calling with this add\-on, see:
 - [Using DALL·E To Edit Images](../examples/UsingDALLEToEditImages.md)
 - [Using DALL·E To Generate Images](../examples/UsingDALLEToGenerateImages.md)
 
+*Copyright 2024-2025 The MathWorks, Inc.*
