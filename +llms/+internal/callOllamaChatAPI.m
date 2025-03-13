@@ -100,7 +100,7 @@ end
 options = struct;
 
 if strcmp(nvp.ResponseFormat,"json")
-    parameters.format = struct('type','json_object');
+    parameters.format = "json";
 elseif isstruct(nvp.ResponseFormat)
     parameters.format = llms.internal.jsonSchemaFromPrototype(nvp.ResponseFormat);
 elseif startsWith(string(nvp.ResponseFormat), asManyOfPattern(whitespacePattern)+"{")

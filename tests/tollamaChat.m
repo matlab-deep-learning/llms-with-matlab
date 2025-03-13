@@ -61,6 +61,12 @@ classdef tollamaChat < hstructuredOutput & htoolCalls
             testCase.verifyThat(text, EndsWithSubstring("3, "));
         end
 
+        function generateJSON(testCase)
+            testCase.verifyClass( ...
+                generate(testCase.defaultModel,"create some address, return json",ResponseFormat="json"), ...
+                "string");
+        end
+
         function generateWithToolsAndStreamFunc(testCase)
             % The test point in htoolCalls expects a format that is
             % different from what we get from Ollama. Having that
