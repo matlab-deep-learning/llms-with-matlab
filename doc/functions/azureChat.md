@@ -117,7 +117,7 @@ Instead of using the `DeploymentID` name\-value argument, you can also set the e
 
 ### `APIVersion` — API Version
 
-`"2024-06-01"` (default) | `"2024-02-01"` | `"2023-05-15"` | `"2024-05-01-preview"` | `"2024-04-01-preview"` | ...
+`"2024-10-21"` (default) | `"2024-06-01"` | `"2024-02-01"` | `"2025-02-01-preview"` | `"2025-01-01-preview"` | ...
 
 
 After construction, this property is read\-only.

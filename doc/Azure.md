@@ -250,10 +250,10 @@ Create a sample output structure.
 sampleOutput = struct("Animal","Penguin","CanFly",false);
 ```
 
-Connect to Azure OpenAI Service. Use an API version that supports structured outputs.
+Connect to Azure OpenAI Service.
 
 ```matlab
-model = azureChat(APIVersion="2024-08-01-preview");
+model = azureChat;
 ```
 
 Generate structured output.
