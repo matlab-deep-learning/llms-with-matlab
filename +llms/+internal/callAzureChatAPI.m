@@ -37,7 +37,7 @@ function [text, message, response] = callAzureChatAPI(endpoint, deploymentID, me
 %   % Send a request
 %   [text, message] = llms.internal.callAzureChatAPI(messages, functions, APIKey=apiKey)
 
-%   Copyright 2023-2024 The MathWorks, Inc.
+%   Copyright 2023-2025 The MathWorks, Inc.
 
 arguments
     endpoint
@@ -65,6 +65,17 @@ URL = endpoint + "openai/deployments/" + deploymentID + "/chat/completions?api-v
 parameters = buildParametersCall(messages, functions, nvp);
 
 [response, streamedText] = llms.internal.sendRequestWrapper(parameters,nvp.APIKey, URL, nvp.TimeOut, nvp.StreamFun);
+
+% For old models like GPT-3.5, we may have to change the request sent a
+% little. Since we cannot detect the model used other than trying to send a
+% request, we have to analyze the response instead.
+if response.StatusCode=="BadRequest" && ...
+        isfield(response.Body.Data,"error") && ...
+        isfield(response.Body.Data.error,"message") && ...
+        response.Body.Data.error.message == "Unrecognized request argument supplied: max_completion_tokens"
+    parameters = renameStructField(parameters,'max_completion_tokens','max_tokens');
+    [response, streamedText] = llms.internal.sendRequestWrapper(parameters,nvp.APIKey, URL, nvp.TimeOut, nvp.StreamFun);
+end
 
 % If call errors, "choices" will not be part of response.Body.Data, instead
 % we get response.Body.Data.error
@@ -136,10 +147,15 @@ dict = mapNVPToParameters;
 
 nvpOptions = keys(dict);
 for opt = nvpOptions.'
-    if isfield(nvp, opt)
+    if isfield(nvp, opt) && ~isempty(nvp.(opt))
         parameters.(dict(opt)) = nvp.(opt);
     end
 end
+
+if nvp.MaxNumTokens == Inf
+    parameters = rmfield(parameters,dict("MaxNumTokens"));
+end
+
 end
 
 function dict = mapNVPToParameters()
@@ -148,7 +164,7 @@ dict("Temperature") = "temperature";
 dict("TopP") = "top_p";
 dict("NumCompletions") = "n";
 dict("StopSequences") = "stop";
-dict("MaxNumTokens") = "max_tokens";
+dict("MaxNumTokens") = "max_completion_tokens";
 dict("PresencePenalty") = "presence_penalty";
 dict("FrequencyPenalty") = "frequency_penalty";
 end

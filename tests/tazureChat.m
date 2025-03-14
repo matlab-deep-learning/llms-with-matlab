@@ -1,7 +1,7 @@
 classdef tazureChat < hopenAIChat
 % Tests for azureChat
 
-%   Copyright 2024 The MathWorks, Inc.
+%   Copyright 2024-2025 The MathWorks, Inc.
 
     properties(TestParameter)
         ValidConstructorInput = iGetValidConstructorInput();
@@ -69,6 +69,20 @@ classdef tazureChat < hopenAIChat
                 "llms:structuredOutputRequiresAPI");
         end
 
+        function maxNumTokensWithReasoningModel(testCase)
+            % Unlike OpenAI, Azure requires different parameter names for
+            % different models (max_tokens vs max_completion_tokens). Since
+            % we do not even know what model some deployment uses (us naming
+            % them after the model deployed is not a guarantee), that is a
+            % somewhat painful distinction.
+            testCase.verifyWarningFree(@() generate( ...
+                azureChat(DeploymentID="gpt-35-turbo-16k-0613"), ...
+                "What is object oriented design?", MaxNumTokens=23));
+            testCase.verifyWarningFree(@() generate( ...
+                azureChat(DeploymentID="o1-mini"), ...
+                "What is object oriented design?", MaxNumTokens=23));
+        end
+
         function generateWithImage(testCase)
             chat = azureChat(DeploymentID="gpt-4o");
             image_path = "peppers.png";
@@ -123,10 +137,10 @@ classdef tazureChat < hopenAIChat
         end
 
         function specialErrorForUnsupportedResponseFormat(testCase)
-            testCase.assumeFail("Disabled until `llms.internal.callAzureChat` is updated to use `max_completion_tokens` instead of the deprecated `max_tokens` in the OpenAI API.")
-
+            % Our "gpt-4o" deployment has the model version 2024-05-13,
+            % which does not support structured output
             testCase.verifyError(@() generate(...
-                azureChat(DeploymentID="o1-mini"), ...
+                azureChat(DeploymentID="gpt-4o"), ...
                 "What is the smallest prime?", ...
                 ResponseFormat=struct("number",1)), ...
                 "llms:noStructuredOutputForAzureDeployment");
