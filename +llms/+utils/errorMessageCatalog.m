@@ -77,4 +77,5 @@ catalog("llms:stream:responseStreamer:InvalidInput") = "Input does not have the 
 catalog("llms:unsupportedDatatypeInPrototype") = "Invalid data type ''{1}'' in prototype. Prototype must be a struct, composed of numerical, string, logical, categorical, or struct.";
 catalog("llms:incorrectResponseFormat") = "Invalid response format. Response format must be ""text"", ""json"", a struct, or a string with a JSON Schema definition.";
 catalog("llms:OllamaStructuredOutputNeeds05") = "Structured output is not supported for Ollama version {1}. Use version 0.5.0 or newer.";
+catalog("llms:noOllamaFound") = "Unable to connect to Ollama. Check that {1} is a valid endpoint and ensure that Ollama is installed and running.";
 end

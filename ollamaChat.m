@@ -236,7 +236,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator & ...
                 streamFun = this.StreamFun;
             end
 
-            try % just for nicer errors, reducing the stack depth shown
+            try
                 [text, message, response] = llms.internal.callOllamaChatAPI(...
                     nvp.ModelName, messagesStruct, this.FunctionsStruct, ...
                     Temperature=nvp.Temperature, ToolChoice=toolChoice, ...
@@ -247,6 +247,10 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator & ...
                     TimeOut=nvp.TimeOut, StreamFun=streamFun, ...
                     Endpoint=nvp.Endpoint);
             catch e
+                if e.identifier == "MATLAB:webservices:ConnectionRefused"
+                    error("llms:noOllamaFound",llms.utils.errorMessageCatalog.getMessage("llms:noOllamaFound",nvp.Endpoint));
+                end
+                % for nicer errors, throw instead of rethrow, reducing the stack depth shown
                 throw(e);
             end 
 

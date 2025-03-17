@@ -277,6 +277,12 @@ classdef tollamaChat < hstructuredOutput & htoolCalls
             testCase.verifyError(@() generate(chat,"hi!"), "llms:apiReturnedError");
         end
 
+        function errorNoOllamaServer(testCase)
+            % we expect no server running on this port
+            chat = ollamaChat("mistral",Endpoint="127.0.0.1:11433");
+            testCase.verifyError(@() generate(chat,"hi!"), "llms:noOllamaFound");
+        end
+
         function invalidInputsConstructor(testCase, InvalidConstructorInput)
             testCase.verifyError(@() ollamaChat(testCase.defaultModelName, InvalidConstructorInput.Input{:}), InvalidConstructorInput.Error);
         end
