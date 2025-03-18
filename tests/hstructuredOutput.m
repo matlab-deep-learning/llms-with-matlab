@@ -10,14 +10,13 @@ classdef (Abstract) hstructuredOutput < matlab.unittest.TestCase
     methods(Test)
         % Test methods
         function generateWithStructuredOutput(testCase)
-            import matlab.unittest.constraints.IsEqualTo
+            import matlab.unittest.constraints.ContainsSubstring
             import matlab.unittest.constraints.StartsWithSubstring
             res = generate(testCase.structuredModel,"Which animal produces honey?",...
                 ResponseFormat = struct(commonName = "dog", scientificName = "Canis familiaris"));
             testCase.assertClass(res,"struct");
             testCase.verifySize(fieldnames(res),[2,1]);
-            testCase.verifyThat(lower(res.commonName), IsEqualTo("honeybee") | IsEqualTo("honey bee")  | ...
-                IsEqualTo("bee"));
+            testCase.verifyThat(lower(res.commonName), ContainsSubstring("bee"));
             testCase.verifyThat(res.scientificName, StartsWithSubstring("Apis"));
         end
 

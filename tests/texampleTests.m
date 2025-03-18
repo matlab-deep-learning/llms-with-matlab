@@ -77,7 +77,7 @@ classdef texampleTests < matlab.unittest.TestCase
 
         function testAnalyzeTextDataUsingParallelFunctionCallwithOllama(testCase)
             testCase.startCapture("AnalyzeTextDataUsingParallelFunctionCallwithOllama");
-            AnalyzeTextDataUsingParallelFunctionCallwithOllama;
+            evalc("AnalyzeTextDataUsingParallelFunctionCallwithOllama");
         end
 
         function testCreateSimpleChatBot(testCase,ChatBotExample)
