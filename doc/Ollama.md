@@ -47,8 +47,8 @@ By default, the `ollamaChat` function connects to a local server. To use a remot
 
 For more examples of how to generate text using Ollama from MATLAB, see for instance:
 
--  [Process Generated Text in Real Time by Using Ollama in Streaming Mode](../examples/ProcessGeneratedTextinRealTimebyUsingOllamainStreamingMode.md) 
--  [Retrieval\-Augmented Generation Using Ollama and MATLAB](../examples/RetrievalAugmentedGenerationUsingOllamaandMATLAB.md) (requires Text Analytics Toolbox™) 
+-  [Process Generated Text in Real Time by Using Ollama in Streaming Mode](../examples/ProcessGeneratedTextInRealTimeByUsingOllamaInStreamingMode.md) 
+-  [Retrieval\-Augmented Generation Using Ollama and MATLAB](../examples/RetrievalAugmentedGenerationUsingOllamaAndMATLAB.md) (requires Text Analytics Toolbox™) 
 
 <a id="manage-chat-history"></a>
 # Manage Chat History
@@ -212,7 +212,7 @@ For an example of how to use tool calling with Ollama in LLMs with MATLAB, see [
 <a id="examples"></a>
 # Examples
 
-- [Process Generated Text in Real Time by Using Ollama in Streaming Mode](/examples/ProcessGeneratedTextInRealTimebyUsingOllamaInStreamingMode.md) 
+- [Process Generated Text in Real Time by Using Ollama in Streaming Mode](/examples/ProcessGeneratedTextInRealTimeByUsingOllamaInStreamingMode.md) 
 - [Create Simple Ollama ChatBot](/examples/CreateSimpleOllamaChatBot.md) (requires Text Analytics Toolbox)
 - [Analyze Sentiment in Text Using ChatGPT and Structured Output](/examples/AnalyzeSentimentinTextUsingChatGPTwithStructuredOutput.md)
 - [Analyze Text Data Using Parallel Function Calls with Ollama](/examples/AnalyzeTextDataUsingParallelFunctionCallwithOllama.md)
