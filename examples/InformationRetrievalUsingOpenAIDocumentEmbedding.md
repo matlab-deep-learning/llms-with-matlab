@@ -1,5 +1,5 @@
 
-# Information Retrieval Using OpenAI™ Document Embedding
+# Information Retrieval Using OpenAI Document Embedding
 
 To run the code shown on this page, open the MLX file in MATLAB®: [mlx-scripts/InformationRetrievalUsingOpenAIDocumentEmbedding.mlx](mlx-scripts/InformationRetrievalUsingOpenAIDocumentEmbedding.mlx) 
 
@@ -19,11 +19,10 @@ This process is sometimes referred to as Retrieval\-Augmented Generation (RAG), 
 This example requires Text Analytics Toolbox™. 
 
 
-To run this example, you need a valid API key from a paid OpenAI API account.
+To run this example, you need a valid API key from a paid OpenAI™ API account.
 
 ```matlab
 loadenv(".env")
-addpath('../..') 
 ```
 # Embed Query Document
 
@@ -40,6 +39,7 @@ ans = 1x5
    -0.0051   -0.0005    0.0362   -0.0069    0.0534
 
 ```
+
 # Download and Embed Source Text
 
 In this example, we will scrape content from several MATLAB documentation pages. 
@@ -106,6 +106,7 @@ ans =
 
 ```
 
+
 Pass the question and the context for generation to get a contextualized answer.
 
 ```matlab
@@ -120,6 +121,7 @@ ans =
      This makes tables an ideal data structure for organizing and manipulating data in a tabular format."
 
 ```
+
 # Helper Function
 
 Helper function to wrap text for easier reading in the live script.

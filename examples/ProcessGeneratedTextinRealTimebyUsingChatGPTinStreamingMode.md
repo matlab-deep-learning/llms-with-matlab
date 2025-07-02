@@ -1,9 +1,9 @@
 
-# Process Generated Text in Real Time by Using ChatGPT™ in Streaming Mode
+# Process Generated Text in Real Time by Using ChatGPT in Streaming Mode
 
 To run the code shown on this page, open the MLX file in MATLAB®: [mlx-scripts/ProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode.mlx](mlx-scripts/ProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode.mlx) 
 
-This example shows how to process generated text in real time by using ChatGPT in streaming mode.
+This example shows how to process generated text in real time by using ChatGPT™ in streaming mode.
 
 
 By default, when you pass a prompt to ChatGPT, it generates a response internally and then outputs it in full at the end. To print out and format generated text as the model is generating it, use the `StreamFun` name\-value argument of the `openAIChat` class. The streaming function is a custom function handle that tells the model what to do with the output.
@@ -18,7 +18,6 @@ To run this example, you need a valid API key from a paid OpenAI™ API account.
 
 ```matlab
 loadenv(".env")
-addpath('../..') 
 ```
 # Print Stream Directly to Screen
 
@@ -49,6 +48,7 @@ generate(chat, prompt, MaxNumTokens=500);
 ```matlabTextOutput
 Model-Based Design is an approach to system development that uses graphical models to design and simulate systems before implementing them in hardware or software. It involves creating models that represent the behavior and interactions of system components, and using these models to analyze, validate, and optimize the system before building it. Model-Based Design can help to improve the efficiency, reliability, and quality of system development by enabling engineers to explore design alternatives, detect errors early in the development process, and facilitate collaboration between different teams working on the same project.
 ```
+
 # Print Stream to HTML UI Component
 
 In this example, the streamed output is printed to the HTML component. 

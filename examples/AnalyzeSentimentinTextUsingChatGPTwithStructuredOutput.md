@@ -10,7 +10,6 @@ To run this example, you need a valid API key from a paid OpenAI™ API account.
 
 ```matlab
 loadenv(".env")
-addpath('../..')
 ```
 
 Define some text to analyze the sentiment.
@@ -50,6 +49,7 @@ prototype = struct with fields:
 
 ```
 
+
 Create a chat object and set `ResponseFormat` to `prototype`.
 
 ```matlab
@@ -78,6 +78,8 @@ T = struct2table(scores);
 T.text = inputText;
 T = movevars(T,"text","Before","sentiment")
 ```
+
+
 | |text|sentiment|confidence|
 |:--:|:--:|:--:|:--:|
 |1|"I can't stand homework."|negative|0.9500|
@@ -88,6 +90,7 @@ T = movevars(T,"text","Before","sentiment")
 |6|"I hate chocolate"|negative|0.9500|
 |7|"More work. Great."|negative|0.8500|
 |8|"More work. Great!"|positive|0.9000|
+
 
 
 *Copyright 2024 The MathWorks, Inc.*

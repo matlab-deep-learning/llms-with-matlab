@@ -14,7 +14,6 @@ To run this example, you need a valid API key from a paid OpenAI™ API account.
 
 ```matlab
 loadenv(".env")
-addpath('../..')
 ```
 # Initialize OpenAI API Function and Chat
 

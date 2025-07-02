@@ -1,16 +1,15 @@
 
-# Using DALL·E™ to Edit Images
+# Using DALL·E to Edit Images
 
 To run the code shown on this page, open the MLX file in MATLAB®: [mlx-scripts/UsingDALLEToEditImages.mlx](mlx-scripts/UsingDALLEToEditImages.mlx) 
 
 This example shows how to generate and edit images using the `openAIImages` object.
 
 
-To run this example, you need a valid OpenAI™ API key. Creating images using DALL•E may incur a fee.
+To run this example, you need a valid OpenAI™ API key. Creating images using DALL•E™ may incur a fee.
 
 ```matlab
 loadenv(".env")
-addpath("../..")
 ```
 
 We want to load images files relative to the project directory below:

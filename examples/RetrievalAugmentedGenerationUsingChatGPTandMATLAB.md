@@ -1,5 +1,5 @@
 
-# Retrieval\-Augmented Generation Using ChatGPT™ and MATLAB
+# Retrieval\-Augmented Generation Using ChatGPT and MATLAB
 
 To run the code shown on this page, open the MLX file in MATLAB®: [mlx-scripts/RetrievalAugmentedGenerationUsingChatGPTandMATLAB.mlx](mlx-scripts/RetrievalAugmentedGenerationUsingChatGPTandMATLAB.mlx) 
 
@@ -10,7 +10,7 @@ The example contains three steps:
 
 -  Download and preprocess documents. 
 -  Find documents relevant to a query using keyword search. 
--  Generate a response using ChatGPT based on the both the query and the most relevant source document. \-> title "Generate Response" 
+-  Generate a response using ChatGPT™ based on the both the query and the most relevant source document. 
 
 This example requires Text Analytics Toolbox™. 
 
@@ -19,7 +19,6 @@ To run this example, you need a valid API key from a paid OpenAI™ API account.
 
 ```matlab
 loadenv(".env")
-addpath('../..')
 ```
 # Download and Preprocess Documents
 
@@ -138,6 +137,7 @@ ans =
      connection of DPV installations to the grid efficiently and effectively."
 
 ```
+
 # Helper Functions
 ```matlab
 function allDocs = preprocessDocuments(str)

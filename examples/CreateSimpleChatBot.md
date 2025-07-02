@@ -15,6 +15,9 @@ When you run this example, an interactive AI chat starts in the MATLAB® Command
 
 To run this example, you need a valid API key from a paid OpenAI™ API account.
 
+```matlab
+loadenv(".env")
+```
 # Setup Model
 
 Set the maximum allowable number of words per chat session and define the keyword that, when entered by the user, ends the chat session. This example uses the model o1.
@@ -123,6 +126,7 @@ AI: Time is the dimension in which events occur sequentially from past to future
 User: end
 AI: Closing the chat. Have a great day!
 ```
+
 # `countNumWords` function
 
 Function to count the number of words in a text string

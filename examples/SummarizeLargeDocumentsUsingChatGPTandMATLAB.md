@@ -1,9 +1,9 @@
 
-# Summarize Large Documents Using ChatGPT™ and MATLAB®
+# Summarize Large Documents Using ChatGPT and MATLAB
 
 To run the code shown on this page, open the MLX file in MATLAB®: [mlx-scripts/SummarizeLargeDocumentsUsingChatGPTandMATLAB.mlx](mlx-scripts/SummarizeLargeDocumentsUsingChatGPTandMATLAB.mlx) 
 
-This example shows how to use ChatGPT to summarize documents that are too large to be summarized at once.
+This example shows how to use ChatGPT™ to summarize documents that are too large to be summarized at once.
 
 
 To summarize short documents using ChatGPT, you can pass the documents directly as a prompt together with an instruction to summarize them. However, ChatGPT can only process prompts of limited size.
@@ -24,7 +24,6 @@ To run this example, you need a valid API key from a paid OpenAI™ API account.
 
 ```matlab
 loadenv(".env")
-addpath('../..')
 ```
 # Download Text Data
 
@@ -107,6 +106,7 @@ ans =
      The narrative is filled with illogical and imaginative elements, capturing readers' imaginations with its colorful and eccentric storytelling."
 
 ```
+
 # `createChunks` function
 
 This function segments a long text into smaller parts of a predefined size to facilitate easier summarization. It preserves the structure of sentences. The `chunkSize` should be large enough to fit at least one sentence.

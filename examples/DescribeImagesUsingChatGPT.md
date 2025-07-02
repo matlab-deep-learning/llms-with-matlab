@@ -7,7 +7,6 @@ This example shows how to generate image descriptions using the addUserMessageWi
 
 ```matlab
 loadenv(".env")
-addpath('../..')
 ```
 # Load and Display Image Data
 
@@ -54,6 +53,7 @@ wrappedText =
      is bright and cloudy, creating a serene and tranquil atmosphere."
 
 ```
+
 # Helper function
 ```matlab
 function wrappedText = wrapText(text)
