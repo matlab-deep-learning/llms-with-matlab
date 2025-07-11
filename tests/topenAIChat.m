@@ -17,6 +17,7 @@ classdef topenAIChat < hopenAIChat
         visionModel = openAIChat;
         structuredModel = openAIChat;
         noStructuredOutputModel = openAIChat(ModelName="gpt-3.5-turbo");
+        gpt35Model = openAIChat(ModelName="gpt-3.5-turbo");
     end
     
     methods(Test)

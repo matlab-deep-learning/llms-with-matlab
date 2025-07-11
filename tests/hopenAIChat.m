@@ -17,6 +17,7 @@ classdef (Abstract) hopenAIChat < hstructuredOutput & htoolCalls
         constructor
         defaultModel
         visionModel
+        gpt35Model
     end
     
     methods(Test)
@@ -126,7 +127,7 @@ classdef (Abstract) hopenAIChat < hstructuredOutput & htoolCalls
             % This input is considerably longer than accepted as input for
             % GPT-3.5 (16385 tokens)
             wayTooLong = string(repmat('a ',1,20000));
-            testCase.verifyError(@() generate(testCase.defaultModel,wayTooLong), "llms:apiReturnedError");
+            testCase.verifyError(@() generate(testCase.gpt35Model,wayTooLong), "llms:apiReturnedError");
         end
 
         function createChatWithStreamFunc(testCase)
