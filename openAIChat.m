@@ -80,7 +80,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
 %       TimeOut              - Connection Timeout in seconds.
 %
 
-% Copyright 2023-2024 The MathWorks, Inc.
+% Copyright 2023-2025 The MathWorks, Inc.
 
     properties(SetAccess=private)
         %MODELNAME   Model name.
@@ -270,7 +270,9 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
                 error("llms:apiReturnedError",llms.utils.errorMessageCatalog.getMessage("llms:apiReturnedError",err));
             end
 
-            text = llms.internal.reformatOutput(text,nvp.ResponseFormat);
+            if ~isempty(text)
+                text = llms.internal.reformatOutput(text,nvp.ResponseFormat);
+            end
         end
     end
 

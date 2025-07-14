@@ -172,5 +172,23 @@ classdef (Abstract) hopenAIChat < hstructuredOutput & htoolCalls
             unsetenv("AZURE_OPENAI_API_KEY");
             testCase.verifyError(testCase.constructor, "llms:keyMustBeSpecified");
         end
+
+        function toolCallingAndStructuredOutput(testCase)
+            import matlab.unittest.constraints.HasField
+
+            f = openAIFunction("addTwoNumbers", "Add two numbers");
+            f = addParameter(f, "a");
+            f = addParameter(f, "b");
+
+            responseFormat = struct("llmReply", "The LLM returns a struct if no tool is called");
+            
+            chat = testCase.constructor("You are a helpful agent.", ...
+                Tools=f, ResponseFormat=responseFormat);
+            prompt = "What's 1+1?";
+            
+            [reply, complete] = testCase.verifyWarningFree(@() generate(chat, prompt));
+            testCase.verifyEmpty(reply);
+            testCase.verifyThat(complete, HasField("tool_calls"));
+        end
     end
 end

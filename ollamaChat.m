@@ -94,7 +94,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator & ...
                 nvp.MinP                           {llms.utils.mustBeValidProbability} = 0
                 nvp.TopK                     (1,1) {mustBeReal,mustBePositive} = Inf
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}
-                nvp.ResponseFormat           (1,1) string {mustBeMember(nvp.ResponseFormat,["text","json"])} = "text"
+                nvp.ResponseFormat                 {llms.utils.mustBeResponseFormat} = "text"
                 nvp.TimeOut                  (1,1) {mustBeNumeric,mustBeReal,mustBePositive} = 120
                 nvp.TailFreeSamplingZ        (1,1) {mustBeNumeric,mustBeReal} = 1
                 nvp.StreamFun                (1,1) {mustBeA(nvp.StreamFun,'function_handle')}

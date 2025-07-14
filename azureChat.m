@@ -292,7 +292,9 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
                 error("llms:apiReturnedError",llms.utils.errorMessageCatalog.getMessage("llms:apiReturnedError",err));
             end
 
-            text = llms.internal.reformatOutput(text,nvp.ResponseFormat);
+            if ~isempty(text)
+                text = llms.internal.reformatOutput(text,nvp.ResponseFormat);
+            end
         end
     end
 
