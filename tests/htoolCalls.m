@@ -1,4 +1,4 @@
-classdef (Abstract) htoolCalls < matlab.unittest.TestCase
+classdef (Abstract) htoolCalls < matlab.mock.TestCase
 % Tests for backends with tool calls
 
 %   Copyright 2023-2025 The MathWorks, Inc.

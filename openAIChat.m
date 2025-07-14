@@ -87,6 +87,10 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
         ModelName
     end
 
+    properties (Hidden)
+        % test seam
+        sendRequestFcn = @llms.internal.sendRequestWrapper
+    end
 
     methods
         function this = openAIChat(systemPrompt, nvp)
@@ -255,7 +259,8 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
                     StopSequences=nvp.StopSequences, MaxNumTokens=nvp.MaxNumTokens, ...
                     PresencePenalty=nvp.PresencePenalty, FrequencyPenalty=nvp.FrequencyPenalty, ...
                     ResponseFormat=nvp.ResponseFormat,Seed=nvp.Seed, ...
-                    APIKey=nvp.APIKey,TimeOut=nvp.TimeOut, StreamFun=streamFun);
+                    APIKey=nvp.APIKey,TimeOut=nvp.TimeOut, StreamFun=streamFun, ...
+                    sendRequestFcn=this.sendRequestFcn);
             catch e
                 throw(e);
             end

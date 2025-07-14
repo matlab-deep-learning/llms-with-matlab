@@ -1,4 +1,4 @@
-classdef (Abstract) hstructuredOutput < matlab.unittest.TestCase
+classdef (Abstract) hstructuredOutput < matlab.mock.TestCase
 % Tests for completion APIs providing structured output
 
 %   Copyright 2023-2025 The MathWorks, Inc.

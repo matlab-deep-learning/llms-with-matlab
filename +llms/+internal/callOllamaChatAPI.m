@@ -41,6 +41,7 @@ arguments
     nvp.TimeOut
     nvp.StreamFun
     nvp.Endpoint
+    nvp.sendRequestFcn
 end
 
 URL = nvp.Endpoint + "/api/chat";
@@ -56,7 +57,7 @@ end
 
 parameters = buildParametersCall(model, messages, functions, nvp);
 
-[response, streamedText] = llms.internal.sendRequestWrapper(parameters,[],URL,nvp.TimeOut,nvp.StreamFun);
+[response, streamedText] = nvp.sendRequestFcn(parameters,[],URL,nvp.TimeOut,nvp.StreamFun);
 
 % If call errors, "choices" will not be part of response.Body.Data, instead
 % we get response.Body.Data.error
