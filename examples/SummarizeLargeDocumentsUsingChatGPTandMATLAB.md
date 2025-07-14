@@ -30,10 +30,10 @@ loadenv(".env")
 Download and read the content from Alice's Adventures in Wonderland by Lewis Carroll from Project Gutenberg.
 
 
-First read the contents of the webpage.
+First read the contents of the webpage using the `webread` function. Specify the time out duration using the `weboptions` function. The HTML header from the source document does not specify the character encoding. To ensure good results independent of your language settings, also specify the character encoding using the `weboptions` function.
 
 ```matlab
-options = weboptions(Timeout=30);
+options = weboptions(Timeout=30,CharacterEncoding="UTF-8");
 code = webread("https://www.gutenberg.org/files/11/11-h/11-h.htm", options);
 longText = extractHTMLText(string(code));
 ```
