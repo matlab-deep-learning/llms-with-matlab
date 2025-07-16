@@ -7,13 +7,41 @@ classdef (Abstract) hstructuredOutput < matlab.mock.TestCase
         constructor
         structuredModel
     end
+
+    methods (Abstract)
+        responseMessage
+    end
     
-    methods(Test)
+    methods (Test) % not calling the server
         function constructWithStructuredOutput(testCase)
             responseFormat = struct("llmReply","This is an example struct");
             testCase.verifyWarningFree(@() testCase.constructor(ResponseFormat=responseFormat));
         end
 
+        function incompleteJSONResponse(testCase)
+            [sendRequestStub,sendRequestBehaviour] = ...
+                createMock(testCase, AddedMethods="sendRequest");
+            testCase.assignOutputsWhen( ...
+                withAnyInputs(sendRequestBehaviour.sendRequest),...
+                testCase.responseMessage("{""country"":""Azerbaijan"","),...
+                "This output is unused with Stream=false");
+
+            country = ["USA";"UK"];
+            capital = ["Washington, D.C.";"London"];
+            population = [345716792;69203012];
+            prototype = struct("country",country,"capital",capital,"population",population);
+
+            chat = testCase.structuredModel;
+            chat.sendRequestFcn = @(varargin) sendRequestStub.sendRequest(varargin{:});
+
+            testCase.verifyError(@() generate(testCase.structuredModel, ...
+                "What are the five largest countries whose English names" + ...
+                " start with the letter A?", ...
+                ResponseFormat = prototype, MaxNumTokens=3), "llms:apiReturnedIncompleteJSON");
+        end
+    end
+
+    methods (Test) % calling the server, end-to-end tests
         function generateWithStructuredOutput(testCase)
             import matlab.unittest.constraints.ContainsSubstring
             import matlab.unittest.constraints.StartsWithSubstring
@@ -40,18 +68,6 @@ classdef (Abstract) hstructuredOutput < matlab.mock.TestCase
             res = generate(testCase.structuredModel,"What is the positive root of x^2-2*x+1?", ...
                 ResponseFormat=prototype);
             testCase.verifyCompatibleStructs(res,prototype);
-        end
-
-        function incompleteJSONResponse(testCase)
-            country = ["USA";"UK"];
-            capital = ["Washington, D.C.";"London"];
-            population = [345716792;69203012];
-            prototype = struct("country",country,"capital",capital,"population",population);
-
-            testCase.verifyError(@() generate(testCase.structuredModel, ...
-                "What are the five largest countries whose English names" + ...
-                " start with the letter A?", ...
-                ResponseFormat = prototype, MaxNumTokens=3), "llms:apiReturnedIncompleteJSON");
         end
 
         function generateWithExplicitSchema(testCase)

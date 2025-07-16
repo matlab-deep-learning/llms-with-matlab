@@ -19,7 +19,7 @@ classdef tollamaChat < hstructuredOutput & htoolCalls
         constructor = @(varargin) ollamaChat("mistral-nemo", varargin{:})
     end
 
-    methods(Test)
+    methods (Test) % not calling the server
         function simpleConstruction(testCase)
             bot = ollamaChat(testCase.defaultModelName);
             testCase.verifyClass(bot,"ollamaChat");
@@ -40,20 +40,13 @@ classdef tollamaChat < hstructuredOutput & htoolCalls
             testCase.verifyEqual(chat.StopSequences, stop);
         end
 
-        function doGenerate(testCase,StringInputs)
-            chat = testCase.defaultModel;
-            response = testCase.verifyWarningFree(@() generate(chat,StringInputs));
-            testCase.verifyClass(response,'string');
-            testCase.verifyGreaterThan(strlength(response),0);
-        end
-
         function sendsSystemPrompt(testCase)
             import matlab.unittest.constraints.HasField
             [sendRequestMock,sendRequestBehaviour] = ...
                 createMock(testCase, AddedMethods="sendRequest");
             testCase.assignOutputsWhen( ...
                 withAnyInputs(sendRequestBehaviour.sendRequest),...
-                iResponseMessage("Hello"),"This output is unused with Stream=false");
+                testCase.responseMessage("Hello"),"This output is unused with Stream=false");
 
             chat = testCase.constructor("You are a helpful assistant");
             chat.sendRequestFcn = @(varargin) sendRequestMock.sendRequest(varargin{:});
@@ -64,13 +57,164 @@ classdef tollamaChat < hstructuredOutput & htoolCalls
 
             testCase.verifySize(calls,[1,1]);
             sentHistory = calls.Inputs{2};
-            testCase.verifyThat(sentHistory,HasField("messages"));
+            testCase.assertThat(sentHistory,HasField("messages"));
             testCase.verifyEqual(sentHistory.messages, ...
                 { ...
                     struct(role="system",content="You are a helpful assistant"),...
                     struct(role="user",content="Hi") ...
                 });
             testCase.verifyEqual(response,"Hello");
+        end
+
+        function extremeTopK(testCase)
+            % As an end-to-end test, we should get the same response here for
+            % repeated calls. That does seem to work reliably on some machines;
+            % on others, Ollama receives the parameter, but either Ollama or
+            % llama.cpp fails to honor it correctly. We only test that we send
+            % the parameter correctly.
+            import matlab.unittest.constraints.HasField
+            [sendRequestMock,sendRequestBehaviour] = ...
+                createMock(testCase, AddedMethods="sendRequest");
+            testCase.assignOutputsWhen( ...
+                withAnyInputs(sendRequestBehaviour.sendRequest),...
+                testCase.responseMessage("Hello"),"This output is unused with Stream=false");
+
+            % setting top-k to k=1 leaves no random choice,
+            % so we expect to get a fixed response.
+            chat = ollamaChat(testCase.defaultModelName,TopK=1);
+            chat.sendRequestFcn = @(varargin) sendRequestMock.sendRequest(varargin{:});
+
+            prompt = "Top-k sampling with k=1 returns a definite answer.";
+            generate(chat,prompt);
+
+            calls = testCase.getMockHistory(sendRequestMock);
+
+            testCase.verifySize(calls,[1,1]);
+            sentHistory = calls.Inputs{2};
+            testCase.assertThat(sentHistory,HasField("options"));
+            testCase.assertThat(sentHistory.options,HasField("top_k"));
+            testCase.verifyEqual(sentHistory.options.top_k,1);
+        end
+
+        function extremeMinP(testCase)
+            % As an end-to-end test, we should get the same response here for
+            % repeated calls. That does seem to work reliably on some machines;
+            % on others, Ollama receives the parameter, but either Ollama or
+            % llama.cpp fails to honor it correctly. We only test that we send
+            % the parameter correctly.
+            import matlab.unittest.constraints.HasField
+            [sendRequestMock,sendRequestBehaviour] = ...
+                createMock(testCase, AddedMethods="sendRequest");
+            testCase.assignOutputsWhen( ...
+                withAnyInputs(sendRequestBehaviour.sendRequest),...
+                testCase.responseMessage("Hello"),"This output is unused with Stream=false");
+
+            % setting min-p to p=1 means only tokens with the same logit as
+            % the most likely one can be chosen, which will almost certainly
+            % only ever be one, so we expect to get a fixed response.
+            chat = ollamaChat(testCase.defaultModelName,MinP=1);
+            chat.sendRequestFcn = @(varargin) sendRequestMock.sendRequest(varargin{:});
+
+            prompt = "Min-p sampling with p=1 returns a definite answer.";
+            generate(chat,prompt);
+
+            calls = testCase.getMockHistory(sendRequestMock);
+
+            testCase.verifySize(calls,[1,1]);
+            sentHistory = calls.Inputs{2};
+            testCase.assertThat(sentHistory,HasField("options"));
+            testCase.assertThat(sentHistory.options,HasField("min_p"));
+            testCase.verifyEqual(sentHistory.options.min_p,1);
+        end
+
+        function extremeTfsZ(testCase)
+            % As an end-to-end test, we should get the same response here for
+            % repeated calls. That does seem to work reliably on some machines;
+            % on others, Ollama receives the parameter, but either Ollama or
+            % llama.cpp fails to honor it correctly. We only test that we send
+            % the parameter correctly.
+            import matlab.unittest.constraints.HasField
+            [sendRequestMock,sendRequestBehaviour] = ...
+                createMock(testCase, AddedMethods="sendRequest");
+            testCase.assignOutputsWhen( ...
+                withAnyInputs(sendRequestBehaviour.sendRequest),...
+                testCase.responseMessage("Hello"),"This output is unused with Stream=false");
+
+            % setting tfs_z to z=0 leaves no random choice, but degrades to
+            % greedy sampling, so we expect to get a fixed response.
+            chat = ollamaChat(testCase.defaultModelName,TailFreeSamplingZ=0);
+            chat.sendRequestFcn = @(varargin) sendRequestMock.sendRequest(varargin{:});
+
+            prompt = "Sampling with tfs_z=0 returns a definite answer.";
+            generate(chat,prompt);
+
+            calls = testCase.getMockHistory(sendRequestMock);
+
+            testCase.verifySize(calls,[1,1]);
+            sentHistory = calls.Inputs{2};
+            testCase.assertThat(sentHistory,HasField("options"));
+            testCase.assertThat(sentHistory.options,HasField("tfs_z"));
+            testCase.verifyEqual(sentHistory.options.tfs_z,0);
+        end
+
+        function stopSequences(testCase)
+            import matlab.unittest.constraints.HasField
+            [sendRequestMock,sendRequestBehaviour] = ...
+                createMock(testCase, AddedMethods="sendRequest");
+            testCase.assignOutputsWhen( ...
+                withAnyInputs(sendRequestBehaviour.sendRequest),...
+                testCase.responseMessage("Hello"),"This output is unused with Stream=false");
+
+            chat = ollamaChat(testCase.defaultModelName,StopSequences=["a" "b"]);
+            chat.sendRequestFcn = @(varargin) sendRequestMock.sendRequest(varargin{:});
+
+            prompt = "Top-k sampling with k=1 returns a definite answer.";
+            generate(chat,prompt);
+
+            calls = testCase.getMockHistory(sendRequestMock);
+
+            testCase.verifySize(calls,[1,1]);
+            sentHistory = calls.Inputs{2};
+            testCase.assertThat(sentHistory,HasField("options"));
+            testCase.assertThat(sentHistory.options,HasField("stop"));
+            testCase.verifyEqual(sentHistory.options.stop,["a" "b"]);
+        end
+
+        function invalidInputsConstructor(testCase, InvalidConstructorInput)
+            testCase.verifyError(@() ollamaChat(testCase.defaultModelName, InvalidConstructorInput.Input{:}), InvalidConstructorInput.Error);
+        end
+
+        function invalidInputsGenerate(testCase, InvalidGenerateInput)
+            chat = testCase.defaultModel;
+            testCase.verifyError(@() generate(chat,InvalidGenerateInput.Input{:}), InvalidGenerateInput.Error);
+        end
+
+        function invalidSetters(testCase, InvalidValuesSetters)
+            chat = testCase.defaultModel;
+            function assignValueToProperty(property, value)
+                chat.(property) = value;
+            end
+
+            testCase.verifyError(@() assignValueToProperty(InvalidValuesSetters.Property,InvalidValuesSetters.Value), InvalidValuesSetters.Error);
+        end
+
+        function validSetters(testCase, ValidValuesSetters)
+            chat = testCase.defaultModel;
+            function assignValueToProperty(property, value)
+                chat.(property) = value;
+            end
+
+            testCase.verifyWarningFree(@() assignValueToProperty(ValidValuesSetters.Property,ValidValuesSetters.Value));
+        end
+
+    end
+
+    methods (Test) % calling the server, end-to-end tests
+        function doGenerate(testCase,StringInputs)
+            chat = testCase.defaultModel;
+            response = testCase.verifyWarningFree(@() generate(chat,StringInputs));
+            testCase.verifyClass(response,'string');
+            testCase.verifyGreaterThan(strlength(response),0);
         end
 
         function generateOverridesProperties(testCase)
@@ -157,72 +301,17 @@ classdef tollamaChat < hstructuredOutput & htoolCalls
             [~, ~, response] = generate(paperExtractor, prompt);
 
             % if the tool call works, which is not guaranteed to happen, we
-            % will see a cell array here.
+            % will see a cell array here, with the first message a struct
+            % containing a tool_call field.
             testCase.assumeClass(response.Body.Data,"cell");
             response_call = response.Body.Data{1}.message;
-            testCase.assertThat(response_call, HasField("tool_calls"));
+            testCase.assumeThat(response_call, HasField("tool_calls"));
             % Ollama does not have response_call.tool_calls.type == 'function' as returned by OpenAI
             testCase.verifyEqual(response_call.tool_calls.function.name,'writePaperDetails');
             % already decoded
             data = response_call.tool_calls.function.arguments;
             testCase.verifyEqual(sort(string(fieldnames(data))), ...
                 sort(["name";"url";"explanation"]));
-        end
-
-        function extremeTopK(testCase)
-            %% This should work, and it does on some computers. On others, Ollama
-            %% receives the parameter, but either Ollama or llama.cpp fails to
-            %% honor it correctly.
-            testCase.assumeFail("disabled due to Ollama/llama.cpp not honoring parameter reliably");
-
-            % setting top-k to k=1 leaves no random choice,
-            % so we expect to get a fixed response.
-            chat = ollamaChat(testCase.defaultModelName,TopK=1);
-            prompt = "Top-k sampling with k=1 returns a definite answer.";
-            response1 = generate(chat,prompt);
-            response2 = generate(chat,prompt);
-            testCase.verifyEqual(response1,response2);
-        end
-
-        function extremeMinP(testCase)
-            %% This should work, and it does on some computers. On others, Ollama
-            %% receives the parameter, but either Ollama or llama.cpp fails to
-            %% honor it correctly.
-            testCase.assumeFail("disabled due to Ollama/llama.cpp not honoring parameter reliably");
-
-            % setting min-p to p=1 means only tokens with the same logit as
-            % the most likely one can be chosen, which will almost certainly
-            % only ever be one, so we expect to get a fixed response.
-            chat = ollamaChat(testCase.defaultModelName,MinP=1);
-            prompt = "Min-p sampling with p=1 returns a definite answer.";
-            response1 = generate(chat,prompt);
-            response2 = generate(chat,prompt);
-            testCase.verifyEqual(response1,response2);
-        end
-
-        function extremeTfsZ(testCase)
-            %% This should work, and it does on some computers. On others, Ollama
-            %% receives the parameter, but either Ollama or llama.cpp fails to
-            %% honor it correctly.
-            testCase.assumeFail("disabled due to Ollama/llama.cpp not honoring parameter reliably");
-
-            % setting tfs_z to z=0 leaves no random choice, but degrades to
-            % greedy sampling, so we expect to get a fixed response.
-            chat = ollamaChat(testCase.defaultModelName,TailFreeSamplingZ=0);
-            prompt = "Sampling with tfs_z=0 returns a definite answer.";
-            response1 = generate(chat,prompt);
-            response2 = generate(chat,prompt);
-            testCase.verifyEqual(response1,response2);
-        end
-
-        function stopSequences(testCase)
-            chat = ollamaChat(testCase.defaultModelName,TopK=1);
-            prompt = "Top-k sampling with k=1 returns a definite answer.";
-            response1 = generate(chat,prompt);
-            chat.StopSequences = "1";
-            response2 = generate(chat,prompt);
-
-            testCase.verifyEqual(response2, extractBefore(response1,"1"));
         end
 
         function seedFixesResult(testCase)
@@ -238,8 +327,6 @@ classdef tollamaChat < hstructuredOutput & htoolCalls
         end
 
         function generateWithImages(testCase)
-            testCase.assumeFail("CI only assertion failure within Ollama, as of 2024-10-30, Ollama 0.3.14");
-
             import matlab.unittest.constraints.ContainsSubstring
             chat = ollamaChat("moondream");
             image_path = "peppers.png";
@@ -302,33 +389,6 @@ classdef tollamaChat < hstructuredOutput & htoolCalls
             testCase.verifyError(@() generate(chat,"hi!"), "llms:noOllamaFound");
         end
 
-        function invalidInputsConstructor(testCase, InvalidConstructorInput)
-            testCase.verifyError(@() ollamaChat(testCase.defaultModelName, InvalidConstructorInput.Input{:}), InvalidConstructorInput.Error);
-        end
-
-        function invalidInputsGenerate(testCase, InvalidGenerateInput)
-            chat = testCase.defaultModel;
-            testCase.verifyError(@() generate(chat,InvalidGenerateInput.Input{:}), InvalidGenerateInput.Error);
-        end
-
-        function invalidSetters(testCase, InvalidValuesSetters)
-            chat = testCase.defaultModel;
-            function assignValueToProperty(property, value)
-                chat.(property) = value;
-            end
-
-            testCase.verifyError(@() assignValueToProperty(InvalidValuesSetters.Property,InvalidValuesSetters.Value), InvalidValuesSetters.Error);
-        end
-
-        function validSetters(testCase, ValidValuesSetters)
-            chat = testCase.defaultModel;
-            function assignValueToProperty(property, value)
-                chat.(property) = value;
-            end
-
-            testCase.verifyWarningFree(@() assignValueToProperty(ValidValuesSetters.Property,ValidValuesSetters.Value));
-        end
-
         function queryModels(testCase)
             % our test setup has at least mistral-nemo loaded
             models = ollamaChat.models;
@@ -336,6 +396,18 @@ classdef tollamaChat < hstructuredOutput & htoolCalls
             testCase.verifyThat(models, ...
                 matlab.unittest.constraints.IsSupersetOf("mistral-nemo"));
         end
+    end
+
+    methods
+        function msg = responseMessage(~,txt)
+            % minimal structure replacing the real matlab.net.http.ResponseMessage() in our mocks
+            msg = struct(...
+                StatusCode="OK",...
+                Body=struct(...
+                    Data=struct(...
+                        message=struct(...
+                            content=txt))));
+            end
     end
 end
 
@@ -533,12 +605,3 @@ invalidGenerateInput = struct( ...
             "Error","MATLAB:validators:mustBePositive"));
 end
 
-function msg = iResponseMessage(txt)
-% minimal structure replacing the real matlab.net.http.ResponseMessage() in our mocks
-msg = struct(...
-    StatusCode="OK",...
-    Body=struct(...
-        Data=struct(...
-            message=struct(...
-                content=txt))));
-end

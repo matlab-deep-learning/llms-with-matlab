@@ -19,7 +19,7 @@ classdef tazureChat < hopenAIChat
         gpt35Model = azureChat(DeploymentID="gpt-35-turbo-16k-0613");
     end
 
-    methods(Test)
+    methods (Test) % not calling the server
         function constructChatWithAllNVP(testCase)
             deploymentID = "hello";
             functions = openAIFunction("funName");
@@ -41,21 +41,13 @@ classdef tazureChat < hopenAIChat
             testCase.verifyEqual(chat.PresencePenalty, presenceP);
         end
 
-        function doGenerateUsingSystemPrompt(testCase)
-            testCase.assumeTrue(isenv("AZURE_OPENAI_API_KEY"),"end-to-end test requires environment variables AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT.");
-            chat = azureChat("You are a helpful assistant");
-            response = testCase.verifyWarningFree(@() generate(chat,"Hi"));
-            testCase.verifyClass(response,'string');
-            testCase.verifyGreaterThan(strlength(response),0);
-        end
-
         function sendsSystemPrompt(testCase)
             import matlab.unittest.constraints.HasField
             [sendRequestMock,sendRequestBehaviour] = ...
                 createMock(testCase, AddedMethods="sendRequest");
             testCase.assignOutputsWhen( ...
                 withAnyInputs(sendRequestBehaviour.sendRequest),...
-                iResponseMessage("Hello"),"This output is unused with Stream=false");
+                testCase.responseMessage("Hello"),"This output is unused with Stream=false");
 
             chat = testCase.constructor("You are a helpful assistant");
             chat.sendRequestFcn = @(varargin) sendRequestMock.sendRequest(varargin{:});
@@ -73,6 +65,36 @@ classdef tazureChat < hopenAIChat
                     struct(role="user",content="Hi") ...
                 });
             testCase.verifyEqual(response,"Hello");
+        end
+
+        function endpointNotFound(testCase)
+            % to verify the error, we need to unset the environment variable
+            % AZURE_OPENAI_ENDPOINT, if given. Use a fixture to restore the
+            % value on leaving the test point
+            import matlab.unittest.fixtures.EnvironmentVariableFixture
+            testCase.applyFixture(EnvironmentVariableFixture("AZURE_OPENAI_ENDPOINT","dummy"));
+            unsetenv("AZURE_OPENAI_ENDPOINT");
+            testCase.verifyError(@()azureChat, "llms:endpointMustBeSpecified");
+        end
+
+        function deploymentNotFound(testCase)
+            % to verify the error, we need to unset the environment variable
+            % AZURE_OPENAI_DEPLOYMENT, if given. Use a fixture to restore the
+            % value on leaving the test point
+            import matlab.unittest.fixtures.EnvironmentVariableFixture
+            testCase.applyFixture(EnvironmentVariableFixture("AZURE_OPENAI_DEPLOYMENT","dummy"));
+            unsetenv("AZURE_OPENAI_DEPLOYMENT");
+            testCase.verifyError(@()azureChat, "llms:deploymentMustBeSpecified");
+        end
+    end
+
+    methods (Test) % end-to-end, calling the server
+        function doGenerateUsingSystemPrompt(testCase)
+            testCase.assumeTrue(isenv("AZURE_OPENAI_API_KEY"),"end-to-end test requires environment variables AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT.");
+            chat = azureChat("You are a helpful assistant");
+            response = testCase.verifyWarningFree(@() generate(chat,"Hi"));
+            testCase.verifyClass(response,'string');
+            testCase.verifyGreaterThan(strlength(response),0);
         end
 
         function generateMultipleResponses(testCase)
@@ -131,13 +153,6 @@ classdef tazureChat < hopenAIChat
             testCase.verifyThat(text,ContainsSubstring("same") | ContainsSubstring("identical"));
         end
 
-        function generateOverridesProperties(testCase)
-            import matlab.unittest.constraints.EndsWithSubstring
-            chat = azureChat;
-            text = generate(chat, "Please count from 1 to 10.", Temperature = 0, StopSequences = "4");
-            testCase.verifyThat(text, EndsWithSubstring("3, "));
-        end
-
         function shortErrorForBadEndpoint(testCase)
             chat = azureChat(Endpoint="https://nobodyhere.whatever/");
             caught = false;
@@ -170,27 +185,19 @@ classdef tazureChat < hopenAIChat
                 ResponseFormat=struct("number",1)), ...
                 "llms:noStructuredOutputForAzureDeployment");
         end
+    end
 
-        function endpointNotFound(testCase)
-            % to verify the error, we need to unset the environment variable
-            % AZURE_OPENAI_ENDPOINT, if given. Use a fixture to restore the
-            % value on leaving the test point
-            import matlab.unittest.fixtures.EnvironmentVariableFixture
-            testCase.applyFixture(EnvironmentVariableFixture("AZURE_OPENAI_ENDPOINT","dummy"));
-            unsetenv("AZURE_OPENAI_ENDPOINT");
-            testCase.verifyError(@()azureChat, "llms:endpointMustBeSpecified");
+    methods
+        function msg = responseMessage(~,txt)
+            % minimal structure replacing the real matlab.net.http.ResponseMessage() in our mocks
+            msg = struct(...
+                StatusCode="OK",...
+                Body=struct(...
+                    Data=struct(...
+                        choices=struct(...
+                            message=struct(...
+                                content=txt)))));
         end
-
-        function deploymentNotFound(testCase)
-            % to verify the error, we need to unset the environment variable
-            % AZURE_OPENAI_DEPLOYMENT, if given. Use a fixture to restore the
-            % value on leaving the test point
-            import matlab.unittest.fixtures.EnvironmentVariableFixture
-            testCase.applyFixture(EnvironmentVariableFixture("AZURE_OPENAI_DEPLOYMENT","dummy"));
-            unsetenv("AZURE_OPENAI_DEPLOYMENT");
-            testCase.verifyError(@()azureChat, "llms:deploymentMustBeSpecified");
-        end
-
     end
 end
 
@@ -528,15 +535,4 @@ end
 
 function apiVersions = iGetAPIVersions()
 apiVersions = cellstr(llms.azure.apiVersions);
-end
-
-function msg = iResponseMessage(txt)
-% minimal structure replacing the real matlab.net.http.ResponseMessage() in our mocks
-msg = struct(...
-    StatusCode="OK",...
-    Body=struct(...
-        Data=struct(...
-            choices=struct(...
-                message=struct(...
-                    content=txt)))));
 end
