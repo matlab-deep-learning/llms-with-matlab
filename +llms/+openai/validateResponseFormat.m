@@ -9,7 +9,7 @@ function validateResponseFormat(format,model,messages)
     end
 
     if isequal(format, "json")
-        if ismember(model,["gpt-4","gpt-4-0613","o1-preview","o1-mini","o1"])
+        if ismember(model,["gpt-4","gpt-4-0613","o1-mini","o1"])
             error("llms:invalidOptionAndValueForModel", ...
                 llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionAndValueForModel", "ResponseFormat", "json", model));
         elseif nargin > 2

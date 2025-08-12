@@ -44,10 +44,7 @@ character vector | string scalar
 
 Specify the system prompt and set the `SystemPrompt` property. The system prompt is a natural language description that provides the framework in which a large language model generates its responses. The system prompt can include instructions about tone, communications style, language, etc.
 
-Specifying a system prompt is not supported for these models:
-
--  `ModelName="o1-preview"` 
--  `ModelName="o1-mini"` 
+Specifying a system prompt is not supported for `ModelName="o1-mini"`.
 
 **Example**: `"You are a helpful assistant who provides answers to user queries in iambic pentameter."`
 
@@ -191,7 +188,6 @@ The JSON response format is not supported for these models:
 
 -  `"gpt-4"` 
 -  `"gpt-4-0613"` 
--  `"o1-preview"` 
 -  `"o1-mini"` 
 
 #### Structured Output
@@ -218,10 +214,7 @@ The system prompt is a natural\-language description that provides the framework
 
 To set the `SystemPrompt` property at construction, specify the `systemPrompt` input argument.
 
-Specifying a system prompt is not supported for these models:
-
--  `ModelName="o1-preview"` 
--  `ModelName="o1-mini"` 
+Specifying a system prompt is not supported for `ModelName="o1-mini"`.
 
 **Example**: `"You are a helpful assistant who provides answers to user queries in iambic pentameter."`
 

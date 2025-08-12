@@ -209,7 +209,6 @@ The JSON response format is not supported for these models:
 
 -  `"gpt-4"` 
 -  `"gpt-4-0613"` 
--  `"o1-preview"` 
 -  `"o1-mini"` 
 
 #### Structured Output
