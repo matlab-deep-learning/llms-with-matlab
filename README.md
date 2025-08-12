@@ -63,7 +63,7 @@ For more information about how to connect to the different APIs from MATLAB, inc
 # Examples
 
 - [Process Generated Text in Real Time by Using ChatGPT in Streaming Mode](/examples/ProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode.md) 
-- [Process Generated Text in Real Time by Using Ollama in Streaming Mode](/examples/ProcessGeneratedTextinRealTimebyUsingOllamaInStreamingMode.md) 
+- [Process Generated Text in Real Time by Using Ollama in Streaming Mode](/examples/ProcessGeneratedTextInRealTimeByUsingOllamaInStreamingMode.md) 
 - [Summarize Large Documents Using ChatGPT and MATLAB](/examples/SummarizeLargeDocumentsUsingChatGPTandMATLAB.md) (requires Text Analytics Toolbox™)
 - [Create Simple ChatBot](/examples/CreateSimpleChatBot.md) (requires Text Analytics Toolbox)
 - [Create Simple Ollama ChatBot](/examples/CreateSimpleOllamaChatBot.md) (requires Text Analytics Toolbox)
