@@ -152,6 +152,11 @@ classdef texampleTests < matlab.unittest.TestCase
             evalc("RetrievalAugmentedGenerationUsingOllamaAndMATLAB");
         end
 
+        function testSolveSimpleMathProblemUsingAIAgent(testCase)
+            testCase.startCapture("SolveSimpleMathProblemUsingAIAgent");
+            evalc("SolveSimpleMathProblemUsingAIAgent");
+        end
+
         function testSummarizeLargeDocumentsUsingChatGPTandMATLAB(testCase)
             testCase.startCapture("SummarizeLargeDocumentsUsingChatGPTandMATLAB");
             evalc("SummarizeLargeDocumentsUsingChatGPTandMATLAB");
