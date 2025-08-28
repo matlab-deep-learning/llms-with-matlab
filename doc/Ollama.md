@@ -25,6 +25,11 @@ Connecting to Ollama models using this add\-on requires an installed version of 
 >> !ollama pull mistral
 ```
 
+For information on which Ollama models you have installed, use the `models` method of the `ollamaChat` class:
+```matlab
+listOfAvailableModels = ollamaChat.models;
+```
+
 <a id="get-started"></a>
 # Get Started
 
