@@ -171,7 +171,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
             %                          The default value is CHAT.ModelName.
             %
             %       Temperature      - Temperature value for controlling the randomness
-            %                          of the output. Default value is CHAT.Temperatur;
+            %                          of the output. Default value is CHAT.Temperature;
             %                          higher values increase the randomness (in some sense,
             %                          the “creativity”) of outputs, lower values
             %                          reduce it. Setting Temperature=0 removes
