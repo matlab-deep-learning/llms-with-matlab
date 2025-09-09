@@ -99,7 +99,7 @@ The supported name\-value arguments depend on the chat completion API.
 | `PresencePenalty`   | Supported   | Supported   |   |
 | `FrequencyPenalty`   | Supported   | Supported   |   |
 | `NumCompletions`   | Supported   | Supported   |   |
-| `ToolChoice`   | Supported   | Supported   | Supported  |
+| `ToolChoice`   | Supported   | Supported   |   |
 | `MinP`   |  |  | Supported    |
 | `TopK`   |  |  | Supported    |
 | `TailFreeSamplingZ`   |  |  | Supported    |
@@ -261,25 +261,26 @@ This option is only supported for these chat completion APIs:
 -  [`azureChat`](azureChat.md) objects 
 ### `ToolChoice` — Tool choice
 
-`model.ToolChoice` (default) | `"auto"` | `"none"` | `openAIFunction` object | array of `openAIFunction` objects
+`"auto"` (default) | `"none"` | `"required"` | string scalar
 
 
-OpenAI functions to call during output generation. For more information on OpenAI function calling, see [`openAIFunction`](openAIFunction.md).
+Tools that a model is allowed to call during output generation, specified as `"auto"`, `"none"`, `"required"`, or as a tool name. For more information on OpenAI function calling, see [`openAIFunction`](openAIFunction.md).
 
 
-If the tool choice is `"auto"`, then any function calls specified in `chat` are executed during generation. To see whether any function calls are specified, check the `FunctionNames` property of `chat`.
+If the tool choice is set to `"auto"`, then any tools available to the model can be called during output generation. To find out which tools are available to the model, see the `FunctionNames` property of the `model` input argument.
 
 
-If the tool choice is `"none"`, then no function call is executed during generation.
+If the tool choice is set to `"none"`, then no tools are called during output generation.
 
+If the tool choice is set to `"required"`, then one or more tools are called during output generation. 
 
-You can also specify one or more [`openAIFunction`](openAIFunction.md) objects directly.
-
+You can also require that the model uses a specific tool by setting `ToolChoice` to the name of that tool. The name must be part of `model.FunctionNames`.
 
 This option is only supported for these chat completion APIs:
 
 -  [`openAIChat`](openAIChat.md) objects 
--  [`azureChat`](azureChat.md) objects 
+-  [`azureChat`](azureChat.md) objects
+  
 ### `MinP` — Minimum probability ratio
 
 `model.MinP` (default) | numeric scalar between `0` and `1`

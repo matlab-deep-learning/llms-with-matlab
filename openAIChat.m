@@ -161,7 +161,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
             %       MaxNumTokens     - Maximum number of tokens in the generated response.
             %                          Default value is inf.
             %
-            %       ToolChoice       - Function to execute. 'none', 'auto',
+            %       ToolChoice       - Function to execute. 'none', 'auto', 'required',
             %                          or specify the function to call.
             %
             %       Seed             - An integer value to use to obtain

@@ -1,4 +1,4 @@
-classdef (Abstract) hopenAIChat < hstructuredOutput & htoolCalls
+classdef (Abstract) hopenAIChat < hstructuredOutput & htoolCalls & htoolChoice
 % Tests for OpenAI-based chats (openAIChat, azureChat)
 
 %   Copyright 2023-2025 The MathWorks, Inc.

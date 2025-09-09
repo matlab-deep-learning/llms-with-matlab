@@ -7,20 +7,7 @@ classdef (Abstract) htoolCalls < matlab.mock.TestCase
         defaultModel
     end
     
-    methods (Test) % not calling the server
-        function errorsWhenPassingToolChoiceWithEmptyTools(testCase)
-            testCase.verifyError(@()generate(testCase.defaultModel,"input", ToolChoice="bla"), "llms:mustSetFunctionsForCall");
-        end
-    end
-
     methods (Test) % calling the server, end-to-end tests
-        function settingToolChoiceWithNone(testCase)
-            functions = openAIFunction("funName");
-            chat = testCase.constructor(Tools=functions);
-
-            testCase.verifyWarningFree(@()generate(chat,"This is okay","ToolChoice","none"));
-        end
-
         function generateWithToolsAndStreamFunc(testCase)
             import matlab.unittest.constraints.HasField
 

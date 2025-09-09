@@ -94,7 +94,7 @@ if ~isempty(functions)
     parameters.tools = functions;
 end
 
-if ~isempty(nvp.ToolChoice)
+if isfield(nvp,"ToolChoice") && ~isempty(nvp.ToolChoice)
     parameters.tool_choice = nvp.ToolChoice;
 end
 
