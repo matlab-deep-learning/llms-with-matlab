@@ -135,11 +135,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
             this.Temperature = nvp.Temperature;
             this.TopP = nvp.TopP;
             this.StopSequences = nvp.StopSequences;
-
-            % ResponseFormat is only supported in the latest models only
-            llms.openai.validateResponseFormat(nvp.ResponseFormat, this.ModelName);
             this.ResponseFormat = nvp.ResponseFormat;
-
             this.PresencePenalty = nvp.PresencePenalty;
             this.FrequencyPenalty = nvp.FrequencyPenalty;
             this.APIKey = llms.internal.getApiKeyFromNvpOrEnv(nvp,"OPENAI_API_KEY");
@@ -239,12 +235,9 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
                 messagesStruct = this.encodeImages(messages.Messages);
             end
 
-            llms.openai.validateMessageSupported(messagesStruct{end}, nvp.ModelName);
             if ~isempty(this.SystemPrompt)
                 messagesStruct = horzcat(this.SystemPrompt, messagesStruct);
             end
-
-            llms.openai.validateResponseFormat(nvp.ResponseFormat, nvp.ModelName, messagesStruct);
 
             if isfield(nvp,"StreamFun")
                 streamFun = nvp.StreamFun;
