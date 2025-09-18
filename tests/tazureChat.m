@@ -110,14 +110,6 @@ classdef tazureChat < hopenAIChat
                 "string");
         end
 
-        function responseFormatRequiresNewAPI(testCase)
-            chat = azureChat(APIVersion="2024-02-01");
-            testCase.verifyError(@() generate(chat, ...
-                "What is the smallest prime?", ...
-                ResponseFormat=struct("number",1)), ...
-                "llms:structuredOutputRequiresAPI");
-        end
-
         function maxNumTokensWithReasoningModel(testCase)
             % Unlike OpenAI, Azure requires different parameter names for
             % different models (max_tokens vs max_completion_tokens). Since
@@ -176,14 +168,6 @@ classdef tazureChat < hopenAIChat
             response = testCase.verifyWarningFree(@() generate(chat,"How similar is the DNA of a cat and a tiger?"));
             testCase.verifyClass(response,'string');
             testCase.verifyGreaterThan(strlength(response),0);
-        end
-
-        function specialErrorForUnsupportedResponseFormat(testCase)
-            testCase.verifyError(@() generate(...
-                azureChat(DeploymentID="o1-mini"), ...
-                "What is the smallest prime?", ...
-                ResponseFormat=struct("number",1)), ...
-                "llms:noStructuredOutputForAzureDeployment");
         end
     end
 

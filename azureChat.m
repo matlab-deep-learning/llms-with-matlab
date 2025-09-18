@@ -249,8 +249,6 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
                 messagesStruct = horzcat(this.SystemPrompt, messagesStruct);
             end
 
-            llms.azure.validateResponseFormat(nvp.ResponseFormat, this, messagesStruct);
-
             toolChoice = convertToolChoice(this, nvp.ToolChoice);
 
             if isfield(nvp,"StreamFun")
@@ -281,15 +279,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
             end
 
             if isfield(response.Body.Data,"error")
-                err = response.Body.Data.error.message;
-                if startsWith(err,"'json_schema' is not one of ['json_object', 'text']") || ...
-                    startsWith(replace(err,newline," "),...
-                        "Invalid parameter: 'response_format' of type 'json_schema' is not supported with this model.")
-                    error("llms:noStructuredOutputForAzureDeployment", ...
-                        llms.utils.errorMessageCatalog.getMessage( ...
-                            "llms:noStructuredOutputForAzureDeployment",this.DeploymentID));
-                end
-                error("llms:apiReturnedError",llms.utils.errorMessageCatalog.getMessage("llms:apiReturnedError",err));
+                error("llms:apiReturnedError",llms.utils.errorMessageCatalog.getMessage("llms:apiReturnedError",response.Body.Data.error.message));
             end
 
             if ~isempty(text)

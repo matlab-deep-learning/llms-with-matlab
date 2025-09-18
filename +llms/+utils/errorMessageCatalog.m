@@ -61,8 +61,6 @@ catalog("llms:mustHaveMessages") = "Message history must not be empty.";
 catalog("llms:mustSetFunctionsForCall") = "When no functions are defined, ToolChoice must not be specified.";
 catalog("llms:mustBeMessagesOrTxt") = "Message must be nonempty string, character array, cell array of character vectors, or messageHistory object.";
 catalog("llms:invalidOptionAndValueForModel") = "'{1}' with value '{2}' is not supported for model ""{3}"".";
-catalog("llms:noStructuredOutputForAzureDeployment") = "Structured output is not supported for deployment ""{1}"".";
-catalog("llms:structuredOutputRequiresAPI") = "Structured output is not supported for API version ""{1}"". Use APIVersion=""2024-08-01-preview"" or newer.";
 catalog("llms:invalidOptionForModel") = "Invalid argument name {1} for model ""{2}"".";
 catalog("llms:functionNotAvailableForModel") = "Image editing is not supported for model ""{1}"".";
 catalog("llms:promptLimitCharacter") = "Prompt must contain at most {1} characters for model ""{2}"".";
