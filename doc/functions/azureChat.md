@@ -113,7 +113,7 @@ The deployment ID, also known as deployment name, specifies the Azure OpenAI dep
 
 Instead of using the `DeploymentID` name\-value argument, you can also set the environment variable AZURE\_OPENAI\_DEPLOYMENT. For more information, see [Azure OpenAI Services API](../Azure.md).
 
-**Example**: `"my-gpt-35-turbo-deployment"`
+**Example**: `"my-gpt-4o-mini-deployment"`
 
 ### `APIVersion` — API Version
 
@@ -207,14 +207,12 @@ To configure the format of the generated JSON file, describe the format using na
 
 The JSON response format is not supported for these models:
 
--  `"gpt-4"` 
--  `"gpt-4-0613"` 
 -  `"o1-mini"` 
 
 #### Structured Output
 
 
-To ensure that the model follows the required format, use structured output. To do this, set `ReponseFormat` to:
+To ensure that the model follows the required format, use structured output. To do this, set `ResponseFormat` to:
 
 -  A string scalar containing a valid JSON Schema.
 -  A structure array containing an example that adheres to the required format, for example: `ResponseFormat=struct("Name","Rudolph","NoseColor",[255 0 0])`
@@ -281,5 +279,5 @@ ans = "The question "Why is a raven like a writing desk?" is a famous nonsensica
 [`generate`](generate.md) | [`openAIChat`](openAIChat.md) | [`ollamaChat`](ollamaChat.md)
 
 
-*Copyright 2024 The MathWorks, Inc.*
+*Copyright 2024-2025 The MathWorks, Inc.*
 

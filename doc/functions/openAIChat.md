@@ -101,7 +101,7 @@ Optionally specify these properties at construction using name\-value arguments.
 Name of the OpenAI model to use for text generation.
 
 
-For information about currently supported models, see [OpenAI API](../OpenAI.md).
+For information about currently supported models, see the OpenAI documentation at [https://platform.openai.com/docs/overview](https://platform.openai.com/docs/overview).
 
 ### `Temperature` — Temperature
 

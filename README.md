@@ -40,19 +40,7 @@ The recommended way of using the add-on on an installed version of MATLAB is to 
 1. In MATLAB, go to the **Home** tab, and in the **Environment** section, click the **Add\-Ons** icon.
 2. In the Add\-On Explorer, search for "Large Language Models (LLMs) with MATLAB".
 3. Select **Install**.
-## Install by Cloning GitHub Repository
 
-Alternatively, to use the add-on on an installed version of MATLAB, you can clone the GitHub repository. In the MATLAB Command Window, run this command:
-
-```
->> !git clone https://github.com/matlab-deep-learning/llms-with-matlab.git
-```
-
-To run code from the add-on outside of the installation directory, if you install the add-on by cloning the GitHub repository, then you must add the path to the installation directory.
-
-```
->> addpath("path/to/llms-with-matlab")
-```
 # Get Started with External APIs
 
 For more information about how to connect to the different APIs from MATLAB, including installation requirements, see:
