@@ -157,8 +157,13 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
             %       MaxNumTokens     - Maximum number of tokens in the generated response.
             %                          Default value is inf.
             %
-            %       ToolChoice       - Function to execute. 'none', 'auto', 'required',
+            %       ToolChoice       - Function to execute. "none", "auto", "required",
             %                          or specify the function to call.
+            %                          The default value is "auto".
+            %
+            %       Tools            - Array of openAIFunction objects representing
+            %                          custom functions to be used during chat completions.
+            %                          The default value is CHAT.Tools.
             %
             %       Seed             - An integer value to use to obtain
             %                          reproducible responses
@@ -222,11 +227,20 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
                 nvp.StreamFun           (1,1) {mustBeA(nvp.StreamFun,'function_handle')}
                 nvp.NumCompletions      (1,1) {mustBeNumeric,mustBePositive, mustBeInteger} = 1
                 nvp.MaxNumTokens        (1,1) {mustBeNumeric,mustBePositive} = inf
-                nvp.ToolChoice                {mustBeValidFunctionCall(this, nvp.ToolChoice)} = []
+                nvp.ToolChoice          (1,:) {mustBeTextScalar} = "auto"
+                nvp.Tools               (1,:) {mustBeA(nvp.Tools, "openAIFunction")}
                 nvp.Seed                      {mustBeIntegerOrEmpty(nvp.Seed)} = []
             end
 
-            toolChoice = convertToolChoice(this, nvp.ToolChoice);
+            if ~isfield(nvp, 'Tools')
+                functionsStruct = this.FunctionsStruct;
+                functionNames = this.FunctionNames;
+            else
+                [functionsStruct, functionNames] = functionAsStruct(nvp.Tools);
+            end
+
+            mustBeValidFunctionCall(this, nvp.ToolChoice, functionNames);
+            toolChoice = convertToolChoice(this, nvp.ToolChoice, functionNames);
 
             messages = convertCharsToStrings(messages);
             if isstring(messages) && isscalar(messages)
@@ -246,7 +260,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
             end
 
             try % just for nicer errors, reducing the stack depth shown
-                [text, message, response] = llms.internal.callOpenAIChatAPI(messagesStruct, this.FunctionsStruct,...
+                [text, message, response] = llms.internal.callOpenAIChatAPI(messagesStruct, functionsStruct,...
                     ModelName=nvp.ModelName, ToolChoice=toolChoice, Temperature=nvp.Temperature, ...
                     TopP=nvp.TopP, NumCompletions=nvp.NumCompletions,...
                     StopSequences=nvp.StopSequences, MaxNumTokens=nvp.MaxNumTokens, ...

@@ -1,10 +1,14 @@
-classdef (Abstract) htoolCalls < matlab.mock.TestCase
+classdef (Abstract) htoolCalls < hmockSendRequest
 % Tests for backends with tool calls
 
 %   Copyright 2023-2025 The MathWorks, Inc.
     properties(Abstract)
         constructor
         defaultModel
+    end
+
+    properties(TestParameter)
+        ToolsForChatConstruction = {openAIFunction.empty, openAIFunction("SomeToolNameForChat")}
     end
     
     methods (Test) % calling the server, end-to-end tests
@@ -82,6 +86,80 @@ classdef (Abstract) htoolCalls < matlab.mock.TestCase
             testCase.verifyThat(data,HasField("name"));
             testCase.verifyThat(data,HasField("url"));
             testCase.verifyThat(data,HasField("explanation"));
+        end
+    end
+
+    methods (Test) % generate Tools tests without calling the server
+
+        function generateWithEmptyToolsSwitchesOffChatTools(testCase)
+            import matlab.unittest.constraints.HasField
+
+            sendRequestMock = testCase.setUpSendRequestMock;
+
+            chat = testCase.constructor("You are a helpful assistant", Tools=openAIFunction("SomeToolNameForChat"));
+            chat.sendRequestFcn = @(varargin) sendRequestMock.sendRequest(varargin{:});
+
+            emptyTools = openAIFunction.empty;
+            testCase.verifyWarningFree(@() generate(chat,"Hi",Tools=emptyTools));
+
+            calls = testCase.getMockHistory(sendRequestMock);
+
+            testCase.verifySize(calls,[1,1]);
+            sentHistory = calls.Inputs{2};
+            testCase.verifyFalse(isfield(sentHistory,'tools'))
+        end
+
+        function generateSendsOverriddenTools(testCase, ToolsForChatConstruction)
+            import matlab.unittest.constraints.HasField
+
+            sendRequestMock = testCase.setUpSendRequestMock;
+
+            chat = testCase.constructor("You are a helpful assistant", Tools=ToolsForChatConstruction);
+            chat.sendRequestFcn = @(varargin) sendRequestMock.sendRequest(varargin{:});
+
+            tools = openAIFunction("ToolForGenerate");
+            response = testCase.verifyWarningFree(@() generate(chat,"Hi",Tools=tools));
+
+            calls = testCase.getMockHistory(sendRequestMock);
+
+            testCase.verifySize(calls,[1,1]);
+            sentHistory = calls.Inputs{2};
+            testCase.verifyThat(sentHistory,HasField("tools"));
+            expectedTool = struct('type', 'function', ...
+                                  'function', struct('name', "ToolForGenerate", ...
+                                                     'parameters', struct('type', "object", ...
+                                                                          'properties', struct())));
+            testCase.verifySize(sentHistory.tools, [1,1]);
+            testCase.verifyEqual(sentHistory.tools{1}, expectedTool);
+            testCase.verifyEqual(response,"Hello");
+        end
+
+        function generateWithNoToolsDoesNotOverrideTopLevelTools(testCase)
+            import matlab.unittest.constraints.HasField
+
+            sendRequestMock = testCase.setUpSendRequestMock;
+
+            tools = openAIFunction("funNameAtTopLevel");
+            chat = testCase.constructor("You are a helpful assistant", Tools=tools);
+            chat.sendRequestFcn = @(varargin) sendRequestMock.sendRequest(varargin{:});
+
+            response = testCase.verifyWarningFree(@() generate(chat,"Hi"));
+
+            calls = testCase.getMockHistory(sendRequestMock);
+
+            testCase.verifySize(calls,[1,1]);
+            sentHistory = calls.Inputs{2};
+            testCase.verifyThat(sentHistory,HasField("tools"));
+            expectedTool = struct( ...
+                'type', 'function', ...
+                'function', struct( ...
+                    'name', "funNameAtTopLevel", ...
+                    'parameters', struct( ...
+                        'type', "object", ...
+                        'properties', struct())));
+            testCase.verifySize(sentHistory.tools, [1,1]);
+            testCase.verifyEqual(sentHistory.tools{1}, expectedTool);
+            testCase.verifyEqual(response,"Hello");
         end
     end
 end

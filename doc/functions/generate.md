@@ -99,6 +99,7 @@ The supported name\-value arguments depend on the chat completion API.
 | `PresencePenalty`   | Supported   | Supported   |   |
 | `FrequencyPenalty`   | Supported   | Supported   |   |
 | `NumCompletions`   | Supported   | Supported   |   |
+| `Tools` | Supported | Supported | Supported |
 | `ToolChoice`   | Supported   | Supported   |   |
 | `MinP`   |  |  | Supported    |
 | `TopK`   |  |  | Supported    |
@@ -259,10 +260,16 @@ This option is only supported for these chat completion APIs:
 
 -  [`openAIChat`](openAIChat.md) objects 
 -  [`azureChat`](azureChat.md) objects 
+
+### `Tools` — Functions to call during output generation
+
+`model.Tools` (default) | `openAIFunction` object | array of `openAIFunction` objects
+
+Information about tools available for function calling, specified as [`openAIFunction`](openAIFunction.md) objects.
+
 ### `ToolChoice` — Tool choice
 
 `"auto"` (default) | `"none"` | `"required"` | string scalar
-
 
 Tools that a model is allowed to call during output generation, specified as `"auto"`, `"none"`, `"required"`, or as a tool name. For more information on OpenAI function calling, see [`openAIFunction`](openAIFunction.md).
 
@@ -274,13 +281,13 @@ If the tool choice is set to `"none"`, then no tools are called during output ge
 
 If the tool choice is set to `"required"`, then one or more tools are called during output generation. 
 
-You can also require that the model uses a specific tool by setting `ToolChoice` to the name of that tool. The name must be part of `model.FunctionNames`.
+You can also require that the model uses a specific tool by setting `ToolChoice` to the name of that tool. The name must refer to a tool that is available to the model. To give a model access to specific tools, either specify the `Tools` name-value argument during construction of the `model` object, or specify the `Tools` name-value argument of the `generate` function. 
 
 This option is only supported for these chat completion APIs:
 
 -  [`openAIChat`](openAIChat.md) objects 
 -  [`azureChat`](azureChat.md) objects
-  
+
 ### `MinP` — Minimum probability ratio
 
 `model.MinP` (default) | numeric scalar between `0` and `1`

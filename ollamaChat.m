@@ -147,6 +147,10 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator & ...
             %       MaxNumTokens      - Maximum number of tokens in the generated response.
             %                           Default value is inf.
             %
+            %       Tools             - Array of openAIFunction objects representing
+            %                           custom functions to be used during chat completions.
+            %                           The default value is CHAT.Tools.
+            %
             %       Seed              - An integer value to use to obtain
             %                           reproducible responses
             %
@@ -216,6 +220,13 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator & ...
                 nvp.Endpoint            (1,1) string = this.Endpoint
                 nvp.MaxNumTokens        (1,1) {mustBeNumeric,mustBePositive} = inf
                 nvp.Seed                      {mustBeIntegerOrEmpty(nvp.Seed)} = []
+                nvp.Tools               (1,:) {mustBeA(nvp.Tools, "openAIFunction")}
+            end
+
+            if ~isfield(nvp, 'Tools')
+                functionsStruct = this.FunctionsStruct;
+            else
+                functionsStruct = functionAsStruct(nvp.Tools);
             end
 
             messages = convertCharsToStrings(messages);
@@ -237,7 +248,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator & ...
 
             try
                 [text, message, response] = llms.internal.callOllamaChatAPI(...
-                    nvp.ModelName, messagesStruct, this.FunctionsStruct, ...
+                    nvp.ModelName, messagesStruct, functionsStruct, ...
                     Temperature=nvp.Temperature, ...
                     TopP=nvp.TopP, MinP=nvp.MinP, TopK=nvp.TopK,...
                     TailFreeSamplingZ=nvp.TailFreeSamplingZ,...

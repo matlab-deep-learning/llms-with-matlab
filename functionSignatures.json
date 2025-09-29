@@ -41,7 +41,8 @@
             {"name":"PresencePenalty","kind":"namevalue","type":["numeric","scalar","<=2",">=-2"]},
             {"name":"FrequencyPenalty","kind":"namevalue","type":["numeric","scalar","<=2",">=-2"]},
             {"name":"TimeOut","kind":"namevalue","type":["numeric","scalar","real","positive"]},
-            {"name":"StreamFun","kind":"namevalue","type":"function_handle"}
+            {"name":"StreamFun","kind":"namevalue","type":"function_handle"},
+            {"name":"Tools","kind":"namevalue","type":"openAIFunction"}
         ],
         "outputs":
         [
@@ -92,7 +93,8 @@
             {"name":"PresencePenalty","kind":"namevalue","type":["numeric","scalar","<=2",">=-2"]},
             {"name":"FrequencyPenalty","kind":"namevalue","type":["numeric","scalar","<=2",">=-2"]},
             {"name":"TimeOut","kind":"namevalue","type":["numeric","scalar","real","positive"]},
-            {"name":"StreamFun","kind":"namevalue","type":"function_handle"}
+            {"name":"StreamFun","kind":"namevalue","type":"function_handle"},
+            {"name":"Tools","kind":"namevalue","type":"openAIFunction"}
         ],
         "outputs":
         [
@@ -142,7 +144,8 @@
             {"name":"TailFreeSamplingZ","kind":"namevalue","type":["numeric","scalar","real"]},
             {"name":"TimeOut","kind":"namevalue","type":["numeric","scalar","real","positive"]},
             {"name":"StreamFun","kind":"namevalue","type":"function_handle"},
-            {"name":"Endpoint","kind":"namevalue","type":["string","scalar"]}
+            {"name":"Endpoint","kind":"namevalue","type":["string","scalar"]},
+            {"name":"Tools","kind":"namevalue","type":"openAIFunction"}
         ],
         "outputs":
         [

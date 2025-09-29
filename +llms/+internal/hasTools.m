@@ -14,23 +14,33 @@ classdef (Abstract) hasTools
     end
 
     methods(Hidden)
-        function mustBeValidFunctionCall(this, functionCall)
+        function mustBeValidFunctionCall(this, functionCall, functionNames)
+            if nargin < 3
+                functionNames = this.FunctionNames;
+            end
+
             if ~isempty(functionCall)
                 mustBeTextScalar(functionCall);
-                if isempty(this.FunctionNames)
+                if isempty(functionNames) && ~ismember(functionCall, ["auto", "none"])
                     error("llms:mustSetFunctionsForCall", llms.utils.errorMessageCatalog.getMessage("llms:mustSetFunctionsForCall"));
                 end
-                mustBeMember(functionCall, ["none","auto","required", this.FunctionNames]);
+                mustBeMember(functionCall, ["none","auto","required", functionNames]);
             end
         end
 
-        function toolChoice = convertToolChoice(this, toolChoice)
+        function toolChoice = convertToolChoice(this, toolChoice, functionNames)
+            if nargin < 3
+                functionNames = this.FunctionNames;
+            end
+
             % if toolChoice is empty
             if isempty(toolChoice)
                 % if Tools is not empty, the default is 'auto'.
                 if ~isempty(this.Tools)
                     toolChoice = "auto";
                 end
+            elseif ismember(toolChoice, ["auto", "none"]) && isempty(functionNames)
+                toolChoice = strings(1,0);
             elseif ~ismember(toolChoice,["auto","none","required"])
                 % if toolChoice is not empty, then it must be "auto", "none",
                 % "required", or in the format {"type": "function", "function":

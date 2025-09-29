@@ -173,8 +173,13 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
             %       MaxNumTokens     - Maximum number of tokens in the generated response.
             %                          Default value is inf.
             %
-            %       ToolChoice       - Function to execute. 'none', 'auto', 'required',
+            %       ToolChoice       - Function to execute. "none", "auto", "required",
             %                          or specify the function to call.
+            %                          The default value is "auto".
+            %
+            %       Tools            - Array of openAIFunction objects representing
+            %                          custom functions to be used during chat completions.
+            %                          The default value is CHAT.Tools.
             %
             %       Seed             - An integer value to use to obtain
             %                          reproducible responses
@@ -234,9 +239,20 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
                 nvp.StreamFun           (1,1) {mustBeA(nvp.StreamFun,'function_handle')}
                 nvp.NumCompletions      (1,1) {mustBeNumeric,mustBePositive, mustBeInteger} = 1
                 nvp.MaxNumTokens        (1,1) {mustBeNumeric,mustBePositive} = inf
-                nvp.ToolChoice          {mustBeValidFunctionCall(this, nvp.ToolChoice)} = []
+                nvp.ToolChoice          (1,:) {mustBeTextScalar} = "auto"
+                nvp.Tools               (1,:) {mustBeA(nvp.Tools, "openAIFunction")}
                 nvp.Seed                {mustBeIntegerOrEmpty(nvp.Seed)} = []
             end
+
+            if isfield(nvp, 'Tools')
+                [functionsStruct, functionNames] = functionAsStruct(nvp.Tools);
+            else
+                functionsStruct = this.FunctionsStruct;
+                functionNames = this.FunctionNames;
+            end
+
+            mustBeValidFunctionCall(this, nvp.ToolChoice, functionNames);
+            toolChoice = convertToolChoice(this, nvp.ToolChoice, functionNames);
 
             messages = convertCharsToStrings(messages);
             if isstring(messages) && isscalar(messages)
@@ -248,9 +264,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
             if ~isempty(this.SystemPrompt)
                 messagesStruct = horzcat(this.SystemPrompt, messagesStruct);
             end
-
-            toolChoice = convertToolChoice(this, nvp.ToolChoice);
-
+!
             if isfield(nvp,"StreamFun")
                 streamFun = nvp.StreamFun;
             else
@@ -259,7 +273,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
 
             try
                 [text, message, response] = llms.internal.callAzureChatAPI(this.Endpoint, ...
-                    this.DeploymentID, messagesStruct, this.FunctionsStruct, ...
+                    this.DeploymentID, messagesStruct, functionsStruct, ...
                     ToolChoice=toolChoice, APIVersion = this.APIVersion, Temperature=nvp.Temperature, ...
                     TopP=nvp.TopP, NumCompletions=nvp.NumCompletions,...
                     StopSequences=nvp.StopSequences, MaxNumTokens=nvp.MaxNumTokens, ...
