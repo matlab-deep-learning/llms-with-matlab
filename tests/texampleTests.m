@@ -127,6 +127,11 @@ classdef texampleTests < matlab.unittest.TestCase
             evalc("DescribeImagesUsingChatGPT");
         end
 
+        function testFitPolynomialToDataUsingAIAgentExample(testCase)
+            testCase.startCapture("FitPolynomialToDataUsingAIAgentExample");
+            evalc("FitPolynomialToDataUsingAIAgentExample");
+        end
+
         function testInformationRetrievalUsingOpenAIDocumentEmbedding(testCase)
             testCase.startCapture("InformationRetrievalUsingOpenAIDocumentEmbedding");
             evalc("InformationRetrievalUsingOpenAIDocumentEmbedding");
