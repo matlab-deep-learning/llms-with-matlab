@@ -192,6 +192,8 @@ generatedText = "The sine of thirty degrees is 0.5."
 -  [Analyze Scientific Papers Using ChatGPT Function Calls](../../examples/AnalyzeScientificPapersUsingFunctionCalls.md) 
 -  [Analyze Text Data Using Parallel Function Calls with ChatGPT](../../examples/AnalyzeTextDataUsingParallelFunctionCallwithChatGPT.md)
 -  [Analyze Text Data Using Parallel Function Calls with Ollama](../../examples/AnalyzeTextDataUsingParallelFunctionCallwithOllama.md) 
+-  [Solve Simple Math Problem Using AI Agent](/examples/SolveSimpleMathProblemUsingAIAgent.md)
+-  [Fit Polynomial to Data Using AI Agent](/examples/FitPolynomialToDataUsingAIAgent.md) (requires Curve Fitting Toolbox™)
 
 *Copyright 2024 The MathWorks, Inc.*
 

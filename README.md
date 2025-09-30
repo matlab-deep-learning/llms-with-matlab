@@ -57,6 +57,7 @@ For more information about how to connect to the different APIs from MATLAB, inc
 - [Create Simple Ollama ChatBot](/examples/CreateSimpleOllamaChatBot.md) (requires Text Analytics Toolbox)
 ### Agentic Workflows
 - [Solve Simple Math Problem Using AI Agent](/examples/SolveSimpleMathProblemUsingAIAgent.md)
+- [Fit Polynomial to Data Using AI Agent](/examples/FitPolynomialToDataUsingAIAgent.md) (requires Curve Fitting Toolbox™)
 ### Tool Calling
 - [Analyze Scientific Papers Using ChatGPT Function Calls](/examples/AnalyzeScientificPapersUsingFunctionCalls.md)
 - [Analyze Text Data Using Parallel Function Calls with ChatGPT](/examples/AnalyzeTextDataUsingParallelFunctionCallwithChatGPT.md)

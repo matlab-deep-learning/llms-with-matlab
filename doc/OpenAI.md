@@ -244,7 +244,9 @@ To use tool calling, specify the `Tools` name\-value argument of the [`openAICha
 
 For some examples of how to use tool calling with this add\-on, see:
 -  [Analyze Scientific Papers Using ChatGPT Function Calls](../examples/AnalyzeScientificPapersUsingFunctionCalls.md) 
--  [Analyze Text Data Using Parallel Function Calls with ChatGPT](../examples/AnalyzeTextDataUsingParallelFunctionCallwithChatGPT.md) 
+-  [Analyze Text Data Using Parallel Function Calls with ChatGPT](../examples/AnalyzeTextDataUsingParallelFunctionCallwithChatGPT.md)
+-  [Solve Simple Math Problem Using AI Agent](/examples/SolveSimpleMathProblemUsingAIAgent.md)
+-  [Fit Polynomial to Data Using AI Agent](/examples/FitPolynomialToDataUsingAIAgent.md) (requires Curve Fitting Toolbox™)
 
 <a id="see-also"></a>
 # See Also
@@ -264,5 +266,7 @@ For some examples of how to use tool calling with this add\-on, see:
 - [Describe Images Using ChatGPT](../examples/DescribeImagesUsingChatGPT.md)
 - [Using DALL·E To Edit Images](../examples/UsingDALLEToEditImages.md)
 - [Using DALL·E To Generate Images](../examples/UsingDALLEToGenerateImages.md)
+- [Solve Simple Math Problem Using AI Agent](/examples/SolveSimpleMathProblemUsingAIAgent.md)
+- [Fit Polynomial to Data Using AI Agent](/examples/FitPolynomialToDataUsingAIAgent.md) (requires Curve Fitting Toolbox)
 
 *Copyright 2024-2025 The MathWorks, Inc.*
