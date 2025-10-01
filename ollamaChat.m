@@ -300,7 +300,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator & ...
         end
     end
 
-    methods(Static)
+    methods (Static)
         function mdls = models
             %ollamaChat.models - return models available on Ollama server
             %   MDLS = ollamaChat.models returns a string vector MDLS
@@ -312,7 +312,17 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator & ...
             %   "phi".
             endpoint = "http://localhost:11434/api/tags";
             response = webread(endpoint);
-            mdls = string({response.models.name}).';
+            mdls = ollamaChat.extractModelNames(response.models);
+        end
+    end
+
+    methods (Static, Access=?tollamaChat)
+        function mdls = extractModelNames(models)
+            if isstruct(models)
+                mdls = string({models.name}).';
+            else
+                mdls = cellfun(@(md)string(md.name), models);
+            end
             baseMdls = unique(extractBefore(mdls,":latest"));
             % remove all those "mistral:latest", iff those are the only
             % model entries pointing at some model
