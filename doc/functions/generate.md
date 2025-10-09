@@ -161,7 +161,7 @@ Specify a custom streaming function to process the generated output as it is bei
 For an example, see [Process Generated Text in Real Time by Using ChatGPT™ in Streaming Mode](../../examples/ProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode.md).
 
 
-**Example:** `@(token) fprint("%s",token)`
+**Example:** `@(token) fprintf("%s",token)`
 
 ### `ResponseFormat` — Response format
 
