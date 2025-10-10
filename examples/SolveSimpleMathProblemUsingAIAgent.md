@@ -47,7 +47,7 @@ The `solveQuadraticEquation` function takes the three coefficients of a quadrati
 
 ```matlab
 function r = solveQuadraticEquation(a,b,c)
-    r = roots([a b c]);
+r = roots([a b c]);
 end
 ```
 
@@ -98,38 +98,34 @@ toolRegistry("smallestRealNumber") = struct( ...
     "functionHandle",@smallestRealNumber);
 ```
 
-Define a function to evaluate tool calls identified by the LLM. LLMs can hallucinate tool calls or make errors about the parameters that the tools need. Therefore, first validate the tool name and parameters by comparing them to the `toolRegistry` dictionary. Then, run the functions associated with the tools using the [`feval`](https://www.mathworks.com/help/matlab/ref/feval.html) function.
+Define a function to evaluate tool calls identified by the LLM. LLMs can hallucinate tool calls or make errors about the parameters that the tools need. Therefore, first validate the tool name and parameters by comparing them to the `toolRegistry` dictionary. Then, run the functions associated with the tools. Return the result as an observation to the agent.
 
 ```matlab
-function result = evaluateToolCall(toolCall,toolRegistry)
-    % Validate tool name
-    toolName = toolCall.function.name;
-    assert(isKey(toolRegistry,toolName),"Invalid tool name ''%s''.",toolName)
-    
-    % Validate JSON syntax
-    try
-        args = jsondecode(toolCall.function.arguments);
-    catch
-        error("Model returned invalid JSON syntax for arguments of tool ''%s''.",toolName);
-    end
-    
-    % Validate tool parameters
-    tool = toolRegistry(toolName);
-    requiredArgs = string(fieldnames(tool.toolSpecification.Parameters));
-    assert(all(isfield(args,requiredArgs)),"Invalid tool parameters: %s",strjoin(fieldnames(args),","))
+function observation = evaluateToolCall(toolCall,toolRegistry)
+% Validate tool name
+toolName = toolCall.function.name;
+assert(isKey(toolRegistry,toolName),"Invalid tool name ''%s''.",toolName)
 
-    extraArgs = setdiff(string(fieldnames(args)),requiredArgs);
-    if ~isempty(extraArgs)
-        warning("Ignoring extra tool parameters: %s",strjoin(extraArgs,","));
-    end
-    
-    % Execute tool
-    argValues = arrayfun(@(fieldName) args.(fieldName),requiredArgs,UniformOutput=false);   
-    try
-        result = feval(tool.functionHandle,argValues{:});
-    catch ME
-        error("Tool call '%s' failed with error: %s",toolName,ME.message)
-    end
+% Validate JSON syntax
+try
+    args = jsondecode(toolCall.function.arguments);
+catch
+    error("Model returned invalid JSON syntax for arguments of tool ''%s''.",toolName);
+end
+
+% Validate tool parameters
+tool = toolRegistry(toolName);
+requiredArgs = string(fieldnames(tool.toolSpecification.Parameters));
+assert(all(isfield(args,requiredArgs)),"Invalid tool parameters: %s",strjoin(fieldnames(args),","))
+
+extraArgs = setdiff(string(fieldnames(args)),requiredArgs);
+if ~isempty(extraArgs)
+    warning("Ignoring extra tool parameters: %s",strjoin(extraArgs,","));
+end
+
+% Execute tool
+argValues = arrayfun(@(fieldName) args.(fieldName),requiredArgs,UniformOutput=false);
+observation = tool.functionHandle(argValues{:});
 end
 ```
 # Set Up ReAct Agent
@@ -149,10 +145,10 @@ This architecture is an iterative workflow. For each iteration, the agent perfor
 2. Action — The agent executes the next action.
 3. Observation — The agent observes the tool output.
 
-Define the function `runAgent` that answers a user query `userQuery` using the ReAct agent architecture and the tools provided in `toolRegistry`.
+Define the function `runReActAgent` that answers a user query `userQuery` using the ReAct agent architecture and the tools provided in `toolRegistry`.
 
 ```matlab
-function agentResponse = runAgent(userQuery,toolRegistry)
+function agentResponse = runReActAgent(userQuery,toolRegistry)
 ```
 
 To ensure the agent stops after it answers the user query, create a tool `finalAnswer` and add it to the tool list.
@@ -170,10 +166,10 @@ systemPrompt = ...
     "Solve the problem. When done, call the tool finalAnswer else you will get stuck in a loop.";
 ```
 
-Connect to the OpenAI Chat Completion API using the [`openAIChat`](../doc/functions/openAIChat.md) function. Use the OpenAI model `"gpt-4.1"`. Provide the LLM with tools using the `Tools` name\-value argument. Initialize the message history.
+Connect to the OpenAI Chat Completion API using the [`openAIChat`](../doc/functions/openAIChat.md) function. Use the OpenAI model GPT\-4.1 mini. Provide the LLM with tools using the `Tools` name\-value argument. Initialize the message history.
 
 ```matlab
-chat = openAIChat(systemPrompt,ModelName="gpt-4.1",Tools=tools);
+llm = openAIChat(systemPrompt,ModelName="gpt-4.1-mini",Tools=tools);
 history = messageHistory;
 ```
 
@@ -200,28 +196,28 @@ while ~problemSolved
 Instruct the agent to plan the next step. Generate a response from the message history. To ensure the agent outputs text, set the `ToolChoice` name\-value argument to `"none"`.
 
 ```matlab
-    history = addUserMessage(history,"Plan your next step.");
-    [thought,completeOutput] = generate(chat,history,ToolChoice="none");
+    history = addUserMessage(history,"Plan your single next step concisely.");
+    [thought,completeOutput] = generate(llm,history,ToolChoice="none");
     disp("[Thought] " + thought);
     history = addResponseMessage(history,completeOutput);
 ```
 
-Instruct the agent to call a tool. Instruct the agent to always call a tool in this step.
+Instruct the agent to always call a tool.
 
 ```matlab
-    history = addUserMessage(history,"Call tools to solve the problem. Always call a tool.");
-    [~,completeOutput] = generate(chat,history);
+    history = addUserMessage(history,"Execute the next step.");
+    [~,completeOutput] = generate(llm,history,ToolChoice="required");
     history = addResponseMessage(history,completeOutput);
     actions = completeOutput.tool_calls;
 ```
 
-If the agent calls the `finalAnswer` tool, add the return the final agent response to the message history.
+If the agent calls the `finalAnswer` tool, add the final agent response to the message history.
 
 ```matlab
     if isscalar(actions) && strcmp(actions(1).function.name,"finalAnswer")
         history = addToolMessage(history,actions.id,"finalAnswer","Final answer below");
         history = addUserMessage(history,"Return the final answer as a statement.");
-        agentResponse = generate(chat,history,ToolChoice="none");
+        agentResponse = generate(llm,history,ToolChoice="none");
         problemSolved = true;
 ```
 
@@ -239,8 +235,8 @@ Otherwise, log and evaluate each tool call in the agent output.
 To enable the agent to observe the output, add the tool call result to the message history.
 
 ```matlab
-            fprintf("[Observation] Result from tool '%s': %s\n",toolName,jsonencode(string(observation)));
-            history = addToolMessage(history,action.id,toolName,"Observation: " + jsonencode(string(observation)));
+            fprintf("[Observation] Result from tool '%s': %s\n",toolName,jsonencode(observation));
+            history = addToolMessage(history,action.id,toolName,"Observation: " + jsonencode(observation));
         end
     end
 end
@@ -252,20 +248,20 @@ Define the query. Answer the query using the agent.
 
 ```matlab
 userQuery = "What is the smallest root of x^2+2x-3=0?";
-agentResponse = runAgent(userQuery,toolRegistry);
+agentResponse = runReActAgent(userQuery,toolRegistry);
 ```
 
 ```matlabTextOutput
 User: What is the smallest root of x^2+2x-3=0?
-[Thought] To find the smallest root, I will:
-1. Solve the quadratic equation x^2 + 2x - 3 = 0 to find both roots.
-2. Compare the two roots and select the smallest one.
+[Thought] To find the smallest root of the quadratic equation \(x^2 + 2x - 3 = 0\), I will first solve the quadratic equation to find both roots. Then, I will determine the smallest root.
+
+I will start by solving the quadratic equation.
 [Action] Calling tool 'solveQuadraticEquation' with args: "{\"a\":1,\"b\":2,\"c\":-3}"
-[Observation] Result from tool 'solveQuadraticEquation': ["-3","1"]
-[Thought] Now that I have both roots (-3 and 1), I will compare them to determine which is the smallest root. Then I will provide the smallest root as the final answer.
+[Observation] Result from tool 'solveQuadraticEquation': [-3.0000000000000004,0.99999999999999978]
+[Thought] I have found the roots of the equation to be approximately -3 and 1. Now, I will identify the smallest root between these two values.
 [Action] Calling tool 'smallestRealNumber' with args: "{\"x1\":\"-3\",\"x2\":\"1\"}"
-[Observation] Result from tool 'smallestRealNumber': "-3"
-[Thought] I have identified -3 as the smallest root. My next step is to provide -3 as the final answer.
+[Observation] Result from tool 'smallestRealNumber': -3
+[Thought] The smallest root of the quadratic equation \(x^2 + 2x - 3 = 0\) is -3. I will now provide this as the final answer.
 ```
 
 
@@ -276,7 +272,7 @@ disp(agentResponse);
 ```
 
 ```matlabTextOutput
-The smallest root of the equation x^2 + 2x - 3 = 0 is -3.
+The smallest root of the equation \(x^2 + 2x - 3 = 0\) is -3.
 ```
 
 # References

@@ -420,14 +420,14 @@ while ~problemSolved
     history = addResponseMessage(history,completeOutput);
 
     % Action
-    history = addUserMessage(history,"Call tools to solve the problem.");
+    history = addUserMessage(history,"Execute the next step.");
     [~,completeOutput] = generate(llm,history,ToolChoice="required");
     history = addResponseMessage(history,completeOutput);
     actions = completeOutput.tool_calls;
     if isscalar(actions) && strcmp(actions(1).function.name,"finalAnswer")
         history = addToolMessage(history,actions.id,"finalAnswer","Final answer below");
         history = addUserMessage(history,"Return the final answer concisely.");
-        agentResponse = generate(llm,history,ResponseFormat=responseFormat);
+        agentResponse = generate(llm,history,ToolChoice="none",ResponseFormat=responseFormat);
         problemSolved = true;
     else
         for i = 1:numel(actions)
@@ -466,13 +466,18 @@ catch
 end
 
 % Validate tool parameters
-toolSpec = toolRegistry(toolName);
-requiredArgs = string(fieldnames(toolSpec.toolSpecification.Parameters));
+tool = toolRegistry(toolName);
+requiredArgs = string(fieldnames(tool.toolSpecification.Parameters));
 assert(all(isfield(args,requiredArgs)),"Invalid tool parameters: %s",strjoin(fieldnames(args),","))
 
+extraArgs = setdiff(string(fieldnames(args)),requiredArgs);
+if ~isempty(extraArgs)
+    warning("Ignoring extra tool parameters: %s",strjoin(extraArgs,","));
+end
+
 % Execute tool
-argValues = cellfun(@(fieldName) args.(fieldName),cellstr(requiredArgs),UniformOutput=false);
-functionHandle = toolSpec.functionHandle;
+argValues = arrayfun(@(fieldName) args.(fieldName),requiredArgs,UniformOutput=false);
+functionHandle = tool.functionHandle;
 nout = nargout(functionHandle);
 if nout == 2
     [data,observation] = functionHandle(data,argValues{:});
