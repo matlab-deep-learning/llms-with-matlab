@@ -264,7 +264,7 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
             if ~isempty(this.SystemPrompt)
                 messagesStruct = horzcat(this.SystemPrompt, messagesStruct);
             end
-!
+
             if isfield(nvp,"StreamFun")
                 streamFun = nvp.StreamFun;
             else
