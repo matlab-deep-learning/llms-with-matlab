@@ -205,10 +205,6 @@ If you set the response format to `"json"`, then the generated output is a forma
 To configure the format of the generated JSON file, describe the format using natural language and provide it to the model either in the system prompt or as a user message. The prompt or message describing the format must contain the word `"json"` or `"JSON"`.
 
 
-The JSON response format is not supported for these models:
-
--  `"o1-mini"` 
-
 #### Structured Output
 
 
