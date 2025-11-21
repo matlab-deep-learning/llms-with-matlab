@@ -43,11 +43,12 @@ In this example, use an LLM to find the smallest root of a second\-order polynom
 -  Find the smallest real number from a list of two numbers. 
 ## Compute Roots of Second\-Order Polynomial
 
-The `solveQuadraticEquation` function takes the three coefficients of a quadratic polynomial as input and uses the [`roots`](https://www.mathworks.com/help/matlab/ref/roots.html) function to return a column vector containing the two roots.
+The `solveQuadraticEquation` function takes the three coefficients of a quadratic polynomial as input and uses the [`roots`](https://www.mathworks.com/help/matlab/ref/roots.html) function to return a column vector containing the two roots. The LLM used in this example uses textual representations of tool call results in JSON format. Roots of polynomials can be complex, but JSON does not support complex numbers. Therefore, specify the roots as strings.
 
 ```matlab
-function r = solveQuadraticEquation(a,b,c)
+function strR = solveQuadraticEquation(a,b,c)
 r = roots([a b c]);
+strR = string(r);
 end
 ```
 
@@ -62,7 +63,7 @@ toolSolveQuadraticEquation = addParameter(toolSolveQuadraticEquation,"c",type="n
 ```
 ## Find Smallest Real Number
 
-The `smallestRealNumber` function computes the smallest real number from a list of two numbers. The LLM used in this example expresses tool calls, including input parameters, in JSON format. Roots of polynomials can be complex, but JSON does not support complex numbers. Therefore, specify the roots as strings and convert them back into numbers using the [`str2double`](https://www.mathworks.com/help/matlab/ref/str2double.html) function.
+The `smallestRealNumber` function computes the smallest real number from a list of two numbers. The LLM used in this example expresses tool calls, including input parameters, in JSON format. As JSON does not support complex numbers, specify the roots as strings and convert them back into numbers using the [`str2double`](https://www.mathworks.com/help/matlab/ref/str2double.html) function.
 
 ```matlab
 function xMin = smallestRealNumber(strX1,strX2)
@@ -253,15 +254,13 @@ agentResponse = runReActAgent(userQuery,toolRegistry);
 
 ```matlabTextOutput
 User: What is the smallest root of x^2+2x-3=0?
-[Thought] To find the smallest root of the quadratic equation \(x^2 + 2x - 3 = 0\), I will first solve the quadratic equation to find both roots. Then, I will determine the smallest root.
-
-I will start by solving the quadratic equation.
+[Thought] I will solve the quadratic equation x^2 + 2x - 3 = 0 to find its roots.
 [Action] Calling tool 'solveQuadraticEquation' with args: "{\"a\":1,\"b\":2,\"c\":-3}"
-[Observation] Result from tool 'solveQuadraticEquation': [-3.0000000000000004,0.99999999999999978]
-[Thought] I have found the roots of the equation to be approximately -3 and 1. Now, I will identify the smallest root between these two values.
+[Observation] Result from tool 'solveQuadraticEquation': ["-3","1"]
+[Thought] I will find the smallest root from the roots -3 and 1.
 [Action] Calling tool 'smallestRealNumber' with args: "{\"x1\":\"-3\",\"x2\":\"1\"}"
 [Observation] Result from tool 'smallestRealNumber': -3
-[Thought] The smallest root of the quadratic equation \(x^2 + 2x - 3 = 0\) is -3. I will now provide this as the final answer.
+[Thought] The smallest root is -3. I will now provide the final answer.
 ```
 
 
@@ -272,7 +271,7 @@ disp(agentResponse);
 ```
 
 ```matlabTextOutput
-The smallest root of the equation \(x^2 + 2x - 3 = 0\) is -3.
+The smallest root of the equation x^2 + 2x - 3 = 0 is -3.
 ```
 
 # References
