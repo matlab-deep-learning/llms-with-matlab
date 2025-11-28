@@ -18,7 +18,8 @@ Using this add-on, you can:
 -  Generate responses to natural language prompts.
 -  Manage chat history.
 -  Generate JSON\-formatted and structured output. 
--  Use tool calling.  
+-  Use tool calling.
+-  Call external tools provided by MCP servers (requires the MATLAB MCP HTTP Client add\-on).
 -  Generate, edit, and describe images. 
 
 For more information about the features in this add-on, see the documentation in the [`doc`](/doc) directory.

@@ -37,8 +37,17 @@ classdef (Sealed) openAIFunction
     methods
         function this = openAIFunction(name, description)
             arguments
-                name (1,1) {mustBeNonzeroLengthText}
+                name {mustBeNonzeroLengthTextOrStruct}
                 description {llms.utils.mustBeTextOrEmpty} = []
+            end
+
+            if isstruct(name) || (iscell(name) && ~isempty(name) && isstruct(name{1}))
+                if nargin > 1
+                    error("llms:mustOnlyBeStruct", ...
+                        llms.utils.errorMessageCatalog.getMessage("llms:mustOnlyBeStruct"));
+                end
+                this = structToFunction(name);
+                return
             end
 
             this.FunctionName = name;
@@ -157,6 +166,18 @@ if ~isvarname(value)
 end
 end
 
+function mustBeNonzeroLengthTextOrStruct(value)
+if isstruct(value) || (iscell(value) && all(cellfun(@isstruct,value)))
+    return
+end
+try
+    mustBeNonzeroLengthText(value)
+    mustBeTextScalar(value)
+catch
+    error("llms:mustBeNonzeroLengthTextOrStruct", llms.utils.errorMessageCatalog.getMessage("llms:mustBeNonzeroLengthTextOrStruct"));
+end
+end
+
 function validatePropertyValue(value,name)
 switch(name)
     case "type"
@@ -181,4 +202,43 @@ function validatePropertyEnum(value)
 if ~llms.utils.isUnique(value)
     error("llms:mustBeUnique", llms.utils.errorMessageCatalog.getMessage("llms:mustBeUnique"));
 end
+end
+
+function fns = structToFunction(fnStruct)
+    if iscell(fnStruct)
+        fns = cellfun(@structToFunction,fnStruct,"UniformOutput",false);
+        fns = reshape([fns{:}],size(fnStruct));
+        return
+    end
+    if ~isscalar(fnStruct)
+        fns = arrayfun(@structToFunction,fnStruct,"UniformOutput",false);
+        fns = reshape([fns{:}],size(fnStruct));
+        return
+    end
+
+    if isfield(fnStruct,'description')
+        fns = openAIFunction(string(fnStruct.name),string(fnStruct.description));
+    else
+        fns = openAIFunction(string(fnStruct.name));
+    end
+    argStruct = fnStruct.inputSchema;
+    props = argStruct.properties;
+    names = string(fieldnames(props));
+    for name = names(:).'
+        optargs = {};
+        if isfield(props.(name),"type")
+            type = string(props.(name).type);
+            % openAIFunction only supports a subset of types
+            if ismember(type,["string","number","integer","object","boolean","null"])
+                optargs = [optargs, {"type",type}];%#ok<AGROW>
+            end
+        end
+        if isfield(props.(name),"description")
+            description = string(props.(name).description);
+            optargs = [optargs, {"description", description}];%#ok<AGROW>
+        end
+        required = isfield(argStruct,"required") && ismember(name,argStruct.required);
+        fns = addParameter(fns,name,optargs{:}, ...
+                RequiredParameter=required);
+    end
 end

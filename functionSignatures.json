@@ -153,5 +153,28 @@
             {"name":"message","type":"struct"},
             {"name":"response","type":"matlab.net.http.ResponseMessage"}
         ]
+    },
+    "openAIFunction.openAIFunction":
+    {
+        "inputs":
+        [
+            {"name":"name","kind":"required","type":["string","scalar"]},
+            {"name":"description","kind":"positional","type":["string","scalar"]}
+        ],
+        "outputs":
+        [
+            {"name":"this","type":"openAIFunction"}
+        ]
+    },
+    "openAIFunction.openAIFunction":
+    {
+        "inputs":
+        [
+            {"name":"definition","kind":"required","type":[["struct"],["cell"]]}
+        ],
+        "outputs":
+        [
+            {"name":"this","type":"openAIFunction"}
+        ]
     }
 }

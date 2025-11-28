@@ -8,9 +8,13 @@ Use Function Calls from MATLAB®
 
 `f = openAIFunction(name,description)`
 
+`f = openAIFunction(mcpTool)`
+
 ## Description
 
 An `openAIFunction` object represents a tool that you have, such as a MATLAB function. It includes information about the name, syntax, and behavior of the tool. If you pass an `openAIFunction` object to a large language model (LLM), then the LLM can suggest calls to the tool in its generated output. The LLM does not execute the tool itself. However, you can write scripts that automate the tool calls suggested by the LLM.
+
+If you have the MATLAB MCP HTTP Client add\-on installed, then you can also use tools provided by external MCP servers.
 
 Use `openAIFunction` objects to call tools using OpenAI® or Ollama™.
 
@@ -21,7 +25,9 @@ For example:
 ![Diagram illustrating how to incorporate function calling in text generation.](images/openAIFunction1.png)
 
 
-`f = openAIFunction(name,description)` creates an `openAIFunction` object. 
+`f = openAIFunction(name,description)` creates an `openAIFunction` object with a name `name` and description `description`.
+
+`f = openAIFunction(mcpTool)` creates an `openAIFunction` object from one or more tools provided by an MCP server specified as a cell array of struct. For example, `mcpTool = client.Tools` for an `mcpHTTPClient` object `client` (requires the MATLAB MCP HTTP Client add\-on).
 
 # Input Arguments
 ### `name` — Function name
@@ -37,6 +43,13 @@ Specify the function name and set the `FunctionName` property.
 
 
 Describe the function using natural language and set the `Description` property.
+
+### `mcpTool` — Tool provided by MCP server
+cell array of struct
+
+Tool provided by an external MCP server, specified as a cell array of struct (requires the MATLAB MCP HTTP Client add\-on).  
+
+For example, if you have an `mcpHTTPClient` (MATLAB MCP HTTP Client) object `client`, then you can specify `mcpTool` as `client.Tools`.
 
 # Properties
 ### `FunctionName` — Tool name
