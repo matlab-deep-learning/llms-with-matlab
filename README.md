@@ -19,7 +19,7 @@ Using this add-on, you can:
 -  Manage chat history.
 -  Generate JSON\-formatted and structured output. 
 -  Use tool calling.
--  Call external tools provided by MCP servers (requires the [MATLAB MCP HTTP Client add\-on](https://www.mathworks.com/matlabcentral/fileexchange/182699-mcphttpclient)).
+-  Call external tools provided by MCP servers (requires the [MATLAB MCP HTTP Client](https://www.mathworks.com/matlabcentral/fileexchange/182699-mcphttpclient)  add\-on).
 -  Generate, edit, and describe images. 
 
 For more information about the features in this add-on, see the documentation in the [`doc`](/doc) directory.
