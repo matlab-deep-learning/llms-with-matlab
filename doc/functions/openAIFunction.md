@@ -14,7 +14,7 @@ Use Function Calls from MATLAB®
 
 An `openAIFunction` object represents a tool that you have, such as a MATLAB function. It includes information about the name, syntax, and behavior of the tool. If you pass an `openAIFunction` object to a large language model (LLM), then the LLM can suggest calls to the tool in its generated output. The LLM does not execute the tool itself. However, you can write scripts that automate the tool calls suggested by the LLM.
 
-If you have the MATLAB MCP HTTP Client add\-on installed, then you can also use tools provided by external MCP servers.
+If you have the [MATLAB MCP HTTP Client add\-on](https://www.mathworks.com/matlabcentral/fileexchange/182699-mcphttpclient) installed, then you can also use tools provided by external MCP servers.
 
 Use `openAIFunction` objects to call tools using OpenAI® or Ollama™.
 
