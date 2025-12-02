@@ -16,7 +16,6 @@ classdef topenAIChat < hopenAIChat
         defaultModel = openAIChat;
         visionModel = openAIChat;
         structuredModel = openAIChat;
-        gpt35Model = openAIChat(ModelName="gpt-3.5-turbo");
     end
     
     methods(Test)
@@ -82,14 +81,6 @@ classdef topenAIChat < hopenAIChat
             testCase.verifyClass( ...
                 generate(chat,"create some address",ResponseFormat="json"), ...
                 "string");
-        end
-
-        function doReturnErrors(testCase)
-            chat = openAIChat(ModelName="gpt-3.5-turbo");
-            % This input is considerably longer than accepted as input for
-            % GPT-3.5 (16385 tokens)
-            wayTooLong = string(repmat('a ',1,20000));
-            testCase.verifyError(@() generate(chat,wayTooLong), "llms:apiReturnedError");
         end
     end
 

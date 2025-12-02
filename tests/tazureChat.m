@@ -16,7 +16,6 @@ classdef tazureChat < hopenAIChat
         defaultModel = azureChat;
         visionModel = azureChat(Deployment="gpt-4o");
         structuredModel = azureChat("Deployment","gpt-4o-2024-08-06");
-        gpt35Model = azureChat(DeploymentID="gpt-35-turbo-16k-0613");
     end
 
     methods (Test) % not calling the server
