@@ -25,6 +25,9 @@ Set up the function to store paper details and initiate a chat with the OpenAI A
 
 Define the function that you want the model to have access to. In this example the used function is `writePaperDetails`.
 
+
+This example uses the model gpt\-4.1\-mini.
+
 ```matlab
 f = openAIFunction("writePaperDetails", "Function to write paper details to a table.");
 f = addParameter(f, "name", type="string", description="Name of the paper.");
@@ -33,9 +36,9 @@ f = addParameter(f, "explanation", type="string", description="Explanation on wh
 
 paperVerifier = openAIChat("You are an expert in filtering scientific papers. " + ...
     "Given a certain topic, you are able to decide if the paper" + ...
-    " fits the given topic or not.");
+    " fits the given topic or not.", ModelName="gpt-4.1-mini");
 
-paperExtractor = openAIChat("You are an expert in extracting information from a paper.", Tools=f);
+paperExtractor = openAIChat("You are an expert in extracting information from a paper.", Tools=f, ModelName="gpt-4.1-mini");
 
 function writePaperDetails(name, url, desc)
 filename = "papers_to_read.csv";

@@ -50,10 +50,10 @@ prototype = struct with fields:
 ```
 
 
-Create a chat object and set `ResponseFormat` to `prototype`.
+Create a chat object and set `ResponseFormat` to `prototype`. This example uses the model GPT\-4.1 nano.
 
 ```matlab
-chat = openAIChat(systemPrompt, ResponseFormat=prototype);
+chat = openAIChat(systemPrompt, ResponseFormat=prototype, ModelName="gpt-4.1-nano");
 ```
 
 Concatenate the prompt and input text and generate an answer with the model.
@@ -84,12 +84,12 @@ T = movevars(T,"text","Before","sentiment")
 |:--:|:--:|:--:|:--:|
 |1|"I can't stand homework."|negative|0.9500|
 |2|"This sucks. I'm bored."|negative|0.9500|
-|3|"I can't wait for Halloween!!!"|positive|0.9500|
-|4|"I am neither for nor against the idea."|neutral|0.9500|
+|3|"I can't wait for Halloween!!!"|positive|0.8500|
+|4|"I am neither for nor against the idea."|neutral|0.9000|
 |5|"My cat is adorable ❤️❤️"|positive|0.9500|
 |6|"I hate chocolate"|negative|0.9500|
-|7|"More work. Great."|negative|0.8500|
-|8|"More work. Great!"|positive|0.9000|
+|7|"More work. Great."|negative|0.8000|
+|8|"More work. Great!"|positive|0.8000|
 
 
 

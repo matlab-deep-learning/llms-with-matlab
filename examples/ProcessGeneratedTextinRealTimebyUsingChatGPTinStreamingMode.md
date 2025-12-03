@@ -19,6 +19,9 @@ To run this example, you need a valid API key from a paid OpenAI™ API account.
 ```matlab
 loadenv(".env")
 ```
+
+This example uses the model GPT\-4.1 nano.
+
 # Print Stream Directly to Screen
 
 In this example, the streamed output is printed directly to the screen. 
@@ -35,7 +38,7 @@ end
 Create the chat object with the defined function as a handle. 
 
 ```matlab
-chat = openAIChat(StreamFun=@printToken);
+chat = openAIChat(StreamFun=@printToken, ModelName="gpt-4.1-nano");
 ```
 
 Generate response to a prompt in streaming mode. 
@@ -46,7 +49,15 @@ generate(chat, prompt, MaxNumTokens=500);
 ```
 
 ```matlabTextOutput
-Model-Based Design is an approach to system development that uses graphical models to design and simulate systems before implementing them in hardware or software. It involves creating models that represent the behavior and interactions of system components, and using these models to analyze, validate, and optimize the system before building it. Model-Based Design can help to improve the efficiency, reliability, and quality of system development by enabling engineers to explore design alternatives, detect errors early in the development process, and facilitate collaboration between different teams working on the same project.
+Model-Based Design (MBD) is a systematic methodology used in engineering and development processes where models—often graphical or mathematical representations—are employed to design, analyze, simulate, and verify complex systems before they are physically built. This approach enables engineers to visualize system behavior, perform simulations, and validate functionality early in the development cycle, thereby reducing costs, minimizing risks, and improving overall reliability.
+
+Key aspects of Model-Based Design include:
+- **Creating high-level models** of system components and interactions
+- **Simulating system behavior** to evaluate performance under various conditions
+- **Automatically generating code** from models for deployment on hardware
+- **Executing rapid prototyping and testing** within simulation environments
+
+MBD is widely used in industries like aerospace, automotive, and robotics, especially for embedded systems and control applications, as it streamlines development and enhances collaboration among multidisciplinary teams.
 ```
 
 # Print Stream to HTML UI Component
@@ -70,7 +81,7 @@ resetTable(h);
 Create the chat object with the function handle, which requires the `uihtml` object created earlier. 
 
 ```matlab
-chat = openAIChat(StreamFun=@(x)printStream(h,x));
+chat = openAIChat(StreamFun=@(x)printStream(h,x), ModelName="gpt-4.1-nano");
 ```
 
 Add the user prompt to the table in the HTML UI component.

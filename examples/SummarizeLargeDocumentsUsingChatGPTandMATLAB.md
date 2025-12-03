@@ -48,10 +48,10 @@ chunks = createChunks(incrementalSummary, limitChunkWords);
 ```
 # Summarize Chunks
 
-Initialize a ChatGPT session with the role of summarizing text
+Initialize a ChatGPT session with the role of summarizing text. This example uses the model GPT\-4.1 nano.
 
 ```matlab
-summarizer = openAIChat("You are a professional summarizer.");
+summarizer = openAIChat("You are a professional summarizer.", ModelName="gpt-4.1-nano");
 ```
 
 Looping process to gradually summarize the text chunk by chunk, reducing the chunk size with each iteration. 
@@ -99,11 +99,17 @@ wrapText(fullSummary)
 
 ```matlabTextOutput
 ans = 
-    ""Alice's Adventures in Wonderland" by Lewis Carroll follows the whimsical journey of a young girl, Alice, who falls into a fantastical world through a rabbit hole.
-     Throughout her adventures, Alice encounters a series of peculiar characters and bizarre events while trying to find her way back home.
-     She navigates through surreal situations such as a Caucus-race with talking animals, converses with a cryptic Caterpillar about identity and size changes, and experiences a mad tea party with the March Hare and the Hatter.
-     Alice also interacts with the Queen of Hearts during a chaotic croquet game, intervenes in a trial involving the theft of tarts, and meets the Mock Turtle and Gryphon who share odd stories and engage in whimsical discussions about lobsters and fish tails.
-     The narrative is filled with illogical and imaginative elements, capturing readers' imaginations with its colorful and eccentric storytelling."
+    "The excerpt from Lewis Carroll's "Alice’s Adventures in Wonderland" vividly depicts Alice’s fantastical journey through a surreal and whimsical realm filled with eccentric characters, bizarre settings, and illogical scenarios.
+     Initially, Alice adventures down a rabbit-hole while chasing the White Rabbit with a pocket watch, leading her into Wonderland, a land of constant size changes and peculiar encounters.
+     She consumes mysterious cakes and potions that cause her to shrink or grow, sometimes making her over nine feet tall and other times too small to fit through doors, exemplifying the whimsical logic of the world.
+     Throughout her travels, Alice interacts with a diverse array of characters, including the White Rabbit, a grumpy Caterpillar smoking a hookah who challenges her understanding of identity, the Cheshire Cat offering cryptic advice, the Duchess with her sarcastic banter, and various animals engaged in nonsensical activities.
+     She explores strange environments such as a locked hall with a tiny door leading to a beautiful garden, chaotic kitchens, and a garden where roses are painted white.
+     Notable scenes include the humorous Caucus-race where everyone wins prizes, Alice helping the White Rabbit find his gloves and fan, and her participation in a mad tea-party hosted by the March Hare and the Hatter, featuring riddles like “Why is a raven like a writing-desk?”
+     and conversations about manipulating time and living at the bottom of a treacle well.
+     Alice also witnesses the Queen of Hearts’ violent temper during a chaotic game of croquet using live hedgehogs and flamingoes, and observes a courtroom trial over stolen tarts with improbable evidence and absurd proceedings, satirizing judicial processes.
+     Throughout her journey, Alice experiences moments of wonder, confusion, frustration, and curiosity.
+     She contemplates her identity, questions her surroundings, and navigates the illogical world with a playful sense of imagination.
+     The narrative's surreal and humorous tone highlights themes of curiosity, nonsense, authority, and the blurring of reality and imagination, creating a richly satirical and whimsical portrayal of Wonderland’s chaotic, absurd universe."
 
 ```
 

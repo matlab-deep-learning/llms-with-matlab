@@ -20,12 +20,12 @@ loadenv(".env")
 ```
 # Setup Model
 
-Set the maximum allowable number of words per chat session and define the keyword that, when entered by the user, ends the chat session. This example uses the model o1.
+Set the maximum allowable number of words per chat session and define the keyword that, when entered by the user, ends the chat session. This example uses the model GPT\-4.1 nano.
 
 ```matlab
 wordLimit = 2000;
 stopWord = "end";
-modelName = "o1";
+modelName = "gpt-4.1-nano";
 ```
 
 Create an instance of `openAIChat` to perform the chat and `messageHistory` to store the conversation history`.`
@@ -114,15 +114,15 @@ end
 
 ```matlabTextOutput
 User: Hello, how much do you know about physics?
-AI: I have broad knowledge spanning classical, relativistic, and quantum physics.
+AI: I know basics of physics, including classical mechanics, electromagnetism, thermodynamics, and modern physics.
 User: What is torque?
-AI: Torque is a measure of how a force causes rotational motion around an axis.
+AI: Torque is a measure of the rotational force applied to an object.
 User: What is force?
-AI: Force is an interaction that changes an object's state of motion.
+AI: Force is a push or pull that can cause an object to move or change motion.
 User: What is motion?
 AI: Motion is the change in an object's position over time.
 User: What is time?
-AI: Time is the dimension in which events occur sequentially from past to future.
+AI: Time is a measurable period during which events occur.
 User: end
 AI: Closing the chat. Have a great day!
 ```

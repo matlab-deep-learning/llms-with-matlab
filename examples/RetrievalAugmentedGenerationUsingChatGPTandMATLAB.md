@@ -64,13 +64,14 @@ Split the text data into paragraphs with the helper function `preprocessDocument
 documents = preprocessDocuments(str);
 ```
 
-Initialize the chatbot with a system prompt and API key. Include your API key in the environment variable `OPENAI_API_KEY` or pass your key using the `APIKey` name\-value pair.
+Initialize the chatbot with a system prompt and API key. Include your API key in the environment variable `OPENAI_API_KEY` or pass your key using the `APIKey` name\-value pair. This example uses the model GPT\-4.1 mini.
 
 ```matlab
 chat = openAIChat("You are a helpful assistant. You will get a " + ...
     "context for each question, but only use the information " + ...
     "in the context if that makes sense to answer the question. " + ...
-    "Let's think step-by-step, explaining how you reached the answer.");
+    "Let's think step-by-step, explaining how you reached the answer.", ...
+    ModelName="gpt-4.1-mini");
 ```
 # Retrieve Relevant Documents
 
@@ -123,18 +124,41 @@ wrapText(response)
 
 ```matlabTextOutput
 ans = 
-    "The context provides information on how technical criteria can be used to 
-     streamline new approvals for grid-friendly DPV. It mentions that technical 
-     approvals for DPV installations to connect to the grid can be streamlined with 
-     prudent screening criteria for systems that meet certain specifications. 
-     Additionally, it emphasizes the importance of having a grid code that reflects 
-     expected future growth of distributed energy resources.
+    "To streamline new approvals for grid-friendly distributed photovoltaics (DPV), 
+     prudent technical criteria can be applied that balance deployment with the 
+     technical requirements of the distribution system. Specifically:
      
-     Therefore, the technical criteria that can be used to streamline new approvals 
-     for grid-friendly DPV include having prudent screening criteria based on 
-     specific specifications and ensuring that the grid code is in line with the 
-     expected growth of distributed resources. This helps in facilitating the 
-     connection of DPV installations to the grid efficiently and effectively."
+1. **Technical Screening Criteria**: Utilities can use technical screening
+     criteria based on metrics relevant to the impact of DPV on low-voltage 
+     distribution grids. For example, limiting DPV capacity relative to the minimum 
+     feeder daytime load helps prevent technical issues.
+     
+     2. **Hosting Capacity Calculations**: These calculations estimate the point at 
+     which DPV penetration would induce technical impacts on system operation. 
+     Screening criteria derived from these calculations allow utilities to set 
+     limits that ensure grid stability.
+     
+     3. **Connection Size Limits**: Some regulations specify maximum DPV 
+     installation sizes relative to customer peak load (e.g., 80 percent of peak 
+     load in India), serving as a straightforward technical criterion for approval.
+     
+     4. **Advanced Inverter Functions**: Specifying that inverters have advanced 
+     capabilities such as reactive power control and active power curtailment before 
+     connection approval helps maintain grid stability and voltage management.
+     
+     5. **Grid Codes Reflecting DPV Growth**: Adopting or updating grid codes to 
+     include expected growth of distributed energy resources and requirements for 
+     inverter functionalities streamlines approvals by setting clear technical 
+     standards.
+     
+     6. **Cost-effective and Forward-looking Measures**: The criteria should be easy 
+     to implement, cost-efficient, and anticipate future system integration needs, 
+     helping avoid costly retrofits.
+     
+     Thus, prudent technical criteria include setting size limits relative to load, 
+     applying hosting capacity-based screens, requiring advanced inverter 
+     functionalities, and updating grid codes to reflect DPV penetration—all 
+     facilitating streamlined, grid-friendly DPV approvals."
 
 ```
 
