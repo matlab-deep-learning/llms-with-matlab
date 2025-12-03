@@ -61,11 +61,13 @@ arguments
     nvp.sendRequestFcn
 end
 
-URL = endpoint + "openai/deployments/" + deploymentID + "/chat/completions?api-version=" + nvp.APIVersion;
+URL = matlab.net.URI(endpoint);
+URL.Path = [URL.Path, "openai", "deployments", deploymentID, "chat", "completions"];
+URL.Query = matlab.net.QueryParameter("api-version", nvp.APIVersion);
 
 parameters = buildParametersCall(messages, functions, nvp);
 
-[response, streamedText] = nvp.sendRequestFcn(parameters,nvp.APIKey, URL, nvp.TimeOut, nvp.StreamFun);
+[response, streamedText] = nvp.sendRequestFcn(parameters,nvp.APIKey, URL.EncodedURI, nvp.TimeOut, nvp.StreamFun);
 
 % For old models like GPT-3.5, we may have to change the request sent a
 % little. Since we cannot detect the model used other than trying to send a
@@ -75,7 +77,7 @@ if response.StatusCode=="BadRequest" && ...
         isfield(response.Body.Data.error,"message") && ...
         response.Body.Data.error.message == "Unrecognized request argument supplied: max_completion_tokens"
     parameters = renameStructField(parameters,'max_completion_tokens','max_tokens');
-    [response, streamedText] = nvp.sendRequestFcn(parameters,nvp.APIKey, URL, nvp.TimeOut, nvp.StreamFun);
+    [response, streamedText] = nvp.sendRequestFcn(parameters,nvp.APIKey, URL.EncodedURI, nvp.TimeOut, nvp.StreamFun);
 end
 
 % If call errors, "choices" will not be part of response.Body.Data, instead

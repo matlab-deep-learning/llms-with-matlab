@@ -65,6 +65,31 @@ classdef tazureChat < hopenAIChat
                 });
             testCase.verifyEqual(response,"Hello");
         end
+        
+        function formatsURLCorrectly(testCase)
+            [sendRequestMock,sendRequestBehaviour] = ...
+                createMock(testCase, AddedMethods="sendRequest");
+            testCase.assignOutputsWhen( ...
+                withAnyInputs(sendRequestBehaviour.sendRequest),...
+                testCase.responseMessage("Hello"),"This output is unused with Stream=false");
+
+            endpoint = "https://some.domain/without.final.forward.slash";
+            deploymentID = "someDeploymentID";
+            apiVersion = "2025-04-01-preview";
+            chat = testCase.constructor("You are a helpful assistant", ...
+                Endpoint=endpoint, ...
+                DeploymentID=deploymentID, ...
+                APIVersion=apiVersion);
+            chat.sendRequestFcn = @(varargin) sendRequestMock.sendRequest(varargin{:});
+
+            testCase.verifyWarningFree(@() generate(chat,"Hi"));
+
+            calls = testCase.getMockHistory(sendRequestMock);
+            URI = calls.Inputs{4};
+            expectedURI = endpoint + "/openai/deployments/" + deploymentID + ...
+                "/chat/completions?api-version=" + apiVersion;
+            testCase.verifyEqual(URI, expectedURI);
+        end
 
         function endpointNotFound(testCase)
             % to verify the error, we need to unset the environment variable
