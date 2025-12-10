@@ -19,9 +19,10 @@ pwd
 changedMlxFiles=`git diff --cached --name-only --diff-filter=d '*.mlx'`
 
 if [ -n "$changedMlxFiles" ]; then
-    # Keep the line break here, we replace end-of-line with "' '" to get the quotes right
-    matlab -batch "for file = {'${changedMlxFiles//
-/' '}'}, export(file{1},replace(erase(file{1},'mlx-scripts'),'.mlx','.md')); end"
+    for file in $changedMlxFiles; do
+        echo "Pre-commit hook: exporting ${file} to md"
+        matlab -batch "export('${file}',replace(erase('${file}','mlx-scripts'),'.mlx','.md'));"
+    done
     tmp=${changedMlxFiles//mlx-scripts\//}
     mdFiles=${tmp//.mlx/.md}
     for file in $mdFiles; do
