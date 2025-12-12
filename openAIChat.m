@@ -82,9 +82,9 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
 
 % Copyright 2023-2025 The MathWorks, Inc.
 
-    properties(SetAccess=private)
+    properties
         %MODELNAME   Model name.
-        ModelName
+        ModelName (1,1) string {mustBeModel} = "gpt-4o-mini"
     end
 
     properties (Hidden)

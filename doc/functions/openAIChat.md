@@ -102,8 +102,6 @@ Name of the OpenAI model to use for text generation.
 
 For information about currently supported models, see the OpenAI documentation at [https://platform.openai.com/docs/overview](https://platform.openai.com/docs/overview).
 
-After construction, this property is read\-only.
-
 ### `Temperature` — Temperature
 
 `1` (default) | numeric scalar between `0` and `2`
@@ -284,5 +282,5 @@ ans = "The phrase "Why is a raven like a writing desk?" is famously posed by the
 -  [Analyze Scientific Papers Using Function Calls](../../examples/AnalyzeScientificPapersUsingFunctionCalls.md) 
 -  [Analyze Sentiment in Text Using ChatGPT in JSON Mode](../../examples/AnalyzeSentimentinTextUsingChatGPTinJSONMode.md) 
 
-*Copyright 2024 The MathWorks, Inc.*
+*Copyright 2024-2025 The MathWorks, Inc.*
 
