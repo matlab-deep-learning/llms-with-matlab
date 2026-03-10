@@ -208,6 +208,15 @@ classdef (Abstract) hopenAIChat < hstructuredOutput & htoolCalls & htoolChoice
                 "llms:apiReturnedError");
         end
 
+        function httpsProxyIsHonored(testCase)
+            import matlab.unittest.fixtures.EnvironmentVariableFixture
+            testCase.applyFixture(EnvironmentVariableFixture("HTTPS_PROXY","http://nosuchhost.example.com:1234"));
+
+            chat = testCase.constructor();
+            testCase.verifyError(@() generate(chat, "Hello"), ...
+                "MATLAB:webservices:UnknownHost");
+        end
+
         function createChatWithStreamFunc(testCase)
             function seen = sf(str)
                 persistent data;

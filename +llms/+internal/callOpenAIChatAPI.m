@@ -59,9 +59,10 @@ arguments
     nvp.sendRequestFcn
     nvp.Verbosity
     nvp.ReasoningEffort
+    nvp.BaseURL
 end
 
-END_POINT = "https://api.openai.com/v1/chat/completions";
+END_POINT = nvp.BaseURL + "/chat/completions";
 
 parameters = llms.internal.buildOpenAIParameters(messages, functions, nvp);
 
