@@ -59,7 +59,6 @@ For more information about how to connect to the different APIs from MATLAB, inc
 ### Agentic Workflows
 - [Solve Simple Math Problem Using AI Agent](/examples/SolveSimpleMathProblemUsingAIAgent.md)
 - [Fit Polynomial to Data Using AI Agent](/examples/FitPolynomialToDataUsingAIAgentExample.md) (requires Curve Fitting Toolbox™)
-### Data Analysis
 - [Analyze Table Data Using ChatGPT](/examples/AnalyzeTableDataUsingChatGPTExample.md)
 - [Visualize Table Data Using ChatGPT](/examples/VisualizeTableDataUsingChatGPTExample.md)
 ### Tool Calling
@@ -75,6 +74,8 @@ For more information about how to connect to the different APIs from MATLAB, inc
 - [Describe Images Using ChatGPT](/examples/DescribeImagesUsingChatGPT.md)
 - [Using DALL·E To Edit Images](/examples/UsingDALLEToEditImages.md)
 - [Using DALL·E To Generate Images](/examples/UsingDALLEToGenerateImages.md)
+### See Also
+- [Add OpenTelemetry Observability to AI Agent](https://github.com/mathworks/OpenTelemetry-MATLAB/blob/main/examples/ai_agent/AddObservabilityToAIAgent.md) (OpenTelemetry-MATLAB)
 
 # Functions
 | **Function**   | **Description**  |
