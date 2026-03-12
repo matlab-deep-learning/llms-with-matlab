@@ -93,7 +93,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
 
     properties
         %ModelName   Model name.
-        ModelName (1,1) string {mustBeModel} = "gpt-4o-mini"
+        ModelName = "gpt-4o-mini"
 
         %Verbosity   Verbosity level for the model output.
         Verbosity (1,1) string {mustBeVerbosity} = "auto"
@@ -101,7 +101,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
         %ReasoningEffort   Reasoning effort level for reasoning models.
         ReasoningEffort (1,1) string {mustBeReasoningEffort} = "auto"
 
-        %BaseURL  Service baser URL.
+        %BaseURL  Service base URL.
         BaseURL (1,1) string = "https://api.openai.com/v1"
     end
 
@@ -115,7 +115,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
             arguments
                 systemPrompt                       {llms.utils.mustBeTextOrEmpty} = []
                 nvp.Tools                    (1,:) {mustBeA(nvp.Tools, "openAIFunction")} = openAIFunction.empty
-                nvp.ModelName                (1,1) string {mustBeModel} = "gpt-4o-mini"
+                nvp.ModelName                      {mustBeTextScalar} = "gpt-4o-mini"
                 nvp.Temperature                    {llms.utils.mustBeValidTemperature} = 1
                 nvp.TopP                           {llms.utils.mustBeValidProbability} = 1
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}
@@ -239,7 +239,7 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
             arguments
                 this                    (1,1) openAIChat
                 messages                      {mustBeValidMsgs}
-                nvp.ModelName           (1,1) string {mustBeModel} = this.ModelName
+                nvp.ModelName                 {mustBeTextScalar} = this.ModelName
                 nvp.Temperature               {llms.utils.mustBeValidTemperature} = this.Temperature
                 nvp.TopP                      {llms.utils.mustBeValidProbability} = this.TopP
                 nvp.StopSequences             {llms.utils.mustBeValidStop} = this.StopSequences
@@ -308,6 +308,11 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
             if ~isempty(text)
                 text = llms.internal.reformatOutput(text,nvp.ResponseFormat);
             end
+        end
+
+        function this = set.ModelName(this, model)
+            mustBeTextScalar(model);
+            this.ModelName = string(model);
         end
     end
 
@@ -402,10 +407,6 @@ function mustBeIntegerOrEmpty(value)
         mustBeNumeric(value)
         mustBeInteger(value)
     end
-end
-
-function mustBeModel(model)
-    mustBeMember(model,llms.openai.models);
 end
 
 function mustBeVerbosity(value)
