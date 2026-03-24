@@ -1,19 +1,20 @@
 # OpenAI
 
-Connect to the [OpenAI® Chat Completions API](https://platform.openai.com/docs/guides/text-generation/chat-completions-api)  and [OpenAI Images API](https://platform.openai.com/docs/guides/images) from MATLAB®.
+Connect to the [OpenAI® Chat Completions API](https://platform.openai.com/docs/guides/text-generation/chat-completions-api), OpenAI-compatible APIs, and [OpenAI Images API](https://platform.openai.com/docs/guides/images) from MATLAB®.
 
 1. [Setup](#setup)
 2. [Get Started](#get-started)
-3. [Manage Chat History](#manage-chat-history)
-4. [Images](#images)
+3. [OpenAI-Compatible APIs](#openai-compatible)
+4. [Manage Chat History](#manage-chat-history)
+5. [Images](#images)
    - [Describe Images](#describe-images)
    - [Generate and Edit Images](#generate-and-edit-images)
-5. [JSON\-Formatted and Structured Output](#json-formatted-and-structured-output)
+6. [JSON\-Formatted and Structured Output](#json-formatted-and-structured-output)
    - [JSON Mode](#json-mode)
    - [Structured Output](#structured-output)
-6. [Tool Calling](#tool-calling)
-7. [See Also](#see-also)
-8. [Examples](#examples)
+7. [Tool Calling](#tool-calling)
+8. [See Also](#see-also)
+9. [Examples](#examples)
 
 <a id="setup"></a>
 # Setup
@@ -21,7 +22,7 @@ Connect to the [OpenAI® Chat Completions API](https://platform.openai.com/docs/
 Using the OpenAI API requires an OpenAI API key. For information on how to obtain an OpenAI API key, as well as pricing, terms and conditions of use, and information about available models, see the OpenAI documentation at [https://platform.openai.com/docs/overview](https://platform.openai.com/docs/overview).
 
 
-To connect to the OpenAI API from MATLAB using LLMs with MATLAB, specify the OpenAI® API key as an environment variable and save it to a file called ".env".
+To connect to the OpenAI API from MATLAB using LLMs with MATLAB, specify the OpenAI® API key as an environment variable named `OPEN_AI_KEY` and save it to a file called ".env".
 
 
 ![envExample.png](functions/images/envExample.png)
@@ -64,6 +65,15 @@ For more examples of how to generate text using the OpenAI Chat Completion API f
 -  [Process Generated Text in Real Time by Using ChatGPT in Streaming Mode](../examples/ProcessGeneratedTextinRealTimebyUsingChatGPTinStreamingMode.md) 
 -  [Summarize Large Documents Using ChatGPT and MATLAB](../examples/SummarizeLargeDocumentsUsingChatGPTandMATLAB.md) (requires Text Analytics Toolbox™) 
 -  [Retrieval\-Augmented Generation Using ChatGPT and MATLAB](../examples/RetrievalAugmentedGenerationUsingChatGPTandMATLAB.md) (requires Text Analytics Toolbox) 
+
+<a id="openai-compatible"></a>
+# OpenAI-Compatible APIs
+
+To connect to APIs that are compatible with the OpenAI Chat Completions API, use the [`openAIChat`](functions/openAIChat.md) function with these options:
+
+- Set the `BaseURL` name-value argument to the base URL of the API. For example, for OpenAI, `BaseURL` is `"https://api.openai.com/v1"`.
+- Set the `ModelName` name-value argument to the name of the model you want to use.
+- Specify the OpenAI API key environment variable. If your API does not need an API key, set the environment variable `OPEN_AI_KEY` to `"EMPTY"`. Alternatively, you can set the `APIKey` name-value argument of the `openAIChat` function.
 
 <a id="manage-chat-history"></a>
 # Manage Chat History

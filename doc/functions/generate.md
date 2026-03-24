@@ -211,7 +211,7 @@ Structured output is only supported for models `"gpt-4o-mini"`, `"gpt-4o-mini-20
 `model.ModelName` (default) | `"gpt-4o-mini"` | `"gpt-4"` | `"gpt-3.5-turbo"` | `"dall-e-2"` | ...
 
 
-Name of the OpenAI or Ollama model to use for text generation.
+Name of the model to use for text generation.
 
 To use an Ollama model, first install it following the instructions at [https://ollama.com/library](https://ollama.com/library).
 

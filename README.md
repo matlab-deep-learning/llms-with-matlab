@@ -8,7 +8,8 @@ Large Language Models (LLMs) with MATLAB lets you connect to large language mode
 
 You can connect to:
 
--  [OpenAI® Chat Completions API](https://platform.openai.com/docs/guides/text-generation/chat-completions-api) — For example, connect to ChatGPT™. 
+-  [OpenAI® Chat Completions API](https://platform.openai.com/docs/guides/text-generation/chat-completions-api) — For example, connect to ChatGPT™.
+-  OpenAI-compatible APIs — Connect to APIs that are compatible with the OpenAI Chat Completions API.
 -  [OpenAI Images API](https://platform.openai.com/docs/guides/images) — For example, connect to DALL·E™. 
 -  [Azure® OpenAI Service](https://learn.microsoft.com/en-us/azure/ai-services/openai/) — Connect to OpenAI models from Azure. 
 -  [Ollama™](https://ollama.com/) — Connect to models locally or nonlocally. 

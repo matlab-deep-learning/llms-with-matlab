@@ -97,10 +97,17 @@ Optionally specify these properties at construction using name\-value arguments.
 
 `"gpt-4o-mini"` (default) | `"gpt-4"` | `"o1-mini"` | `"gpt-3.5-turbo"` | ...
 
-
 Name of the OpenAI model to use for text generation.
 
 For information about currently supported models, see the OpenAI documentation at [https://platform.openai.com/docs/overview](https://platform.openai.com/docs/overview).
+
+### `BaseURL` — Base URL
+
+`"https://api.openai.com/v1"` (default) | string scalar | character vector
+
+Base URL, specified as a string scalar or character vector.
+
+Specify this option to use an OpenAI-compatible API. For more information, see [OpenAI-Compatible APIs](../OpenAI.md#openai-compatible).
 
 ### `Temperature` — Temperature
 
