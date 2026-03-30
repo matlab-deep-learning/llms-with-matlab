@@ -25,20 +25,22 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
 %                             environment variable AZURE_OPENAI_API_KEY.
 %
 %   Temperature             - Temperature value for controlling the randomness
-%                             of the output. Default value is 1; higher values
-%                             increase the randomness (in some sense,
+%                             of the output. By default, the software uses
+%                             the default temperature of the model. Higher
+%                             values increase the randomness (in some sense,
 %                             the “creativity”) of outputs, lower values
 %                             reduce it. Setting Temperature=0 removes
 %                             randomness from the output altogether.
 %
 %   TopP                    - Top probability mass value for controlling the
-%                             diversity of the output. Default value is 1;
-%                             lower values imply that only the more likely
-%                             words can appear in any particular place.
-%                             This is also known as top-p sampling.
+%                             diversity of the output. By default, the
+%                             software uses the default top probability mass
+%                             of the model. Lower values imply that only the
+%                             more likely words can appear in any particular
+%                             place. This is also known as top-p sampling.
 %
 %   StopSequences           - Vector of strings that when encountered, will
-%                             stop the generation of tokens. Default
+%                             stop the generation of tokens. The default
 %                             value is empty.
 %                             Example: ["The end.", "And that's all she wrote."]
 %
@@ -46,16 +48,20 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
 %                             "text" (default) | "json" | struct | string with JSON Schema
 %
 %   PresencePenalty         - Penalty value for using a token in the response
-%                             that has already been used. Default value is 0.
-%                             Higher values reduce repetition of words in the output.
+%                             that has already been used. By default, the
+%                             software uses the default presence penalty of
+%                             the model. Higher values reduce repetition of
+%                             words in the output.
 %
 %   FrequencyPenalty        - Penalty value for using a token that is frequent
-%                             in the output. Default value is 0.
-%                             Higher values reduce repetition of words in the output.
+%                             in the output. By default, the software uses
+%                             the default frequency penalty of the model.
+%                             Higher values reduce repetition of words in
+%                             the output.
 %
 %   StreamFun               - Function to callback when streaming the result.
 %
-%   TimeOut                 - Connection Timeout in seconds. Default value is 10.
+%   TimeOut                 - Connection Timeout in seconds. The default value is 10.
 %
 %   Tools                   - A list of tools the model can call.
 %
@@ -127,12 +133,12 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
                 nvp.APIKey                         {llms.utils.mustBeNonzeroLengthTextScalar}
                 nvp.Tools                    (1,:) {mustBeA(nvp.Tools, "openAIFunction")} = openAIFunction.empty
                 nvp.APIVersion               (1,1) string {mustBeAPIVersion} = "2025-04-01-preview"
-                nvp.Temperature                    {llms.utils.mustBeValidTemperature} = 1
-                nvp.TopP                           {llms.utils.mustBeValidProbability} = 1
+                nvp.Temperature                    {llms.utils.mustBeValidTemperature} = "auto"
+                nvp.TopP                           {llms.utils.mustBeValidProbability} = "auto"
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}
                 nvp.ResponseFormat                 {llms.utils.mustBeResponseFormat} = "text"
-                nvp.PresencePenalty                {llms.utils.mustBeValidPenalty} = 0
-                nvp.FrequencyPenalty               {llms.utils.mustBeValidPenalty} = 0
+                nvp.PresencePenalty                {llms.utils.mustBeValidPenalty} = "auto"
+                nvp.FrequencyPenalty               {llms.utils.mustBeValidPenalty} = "auto"
                 nvp.TimeOut                  (1,1) {mustBeNumeric,mustBeReal,mustBePositive} = 10
                 nvp.StreamFun                (1,1) {mustBeA(nvp.StreamFun,'function_handle')}
                 nvp.Verbosity                (1,1) string {mustBeVerbosity} = "auto"
@@ -186,10 +192,10 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
             %   using one or more name-value arguments:
             %
             %       NumCompletions   - Number of completions to generate.
-            %                          Default value is 1.
+            %                          The default value is 1.
             %
             %       MaxNumTokens     - Maximum number of tokens in the generated response.
-            %                          Default value is inf.
+            %                          The default value is inf.
             %
             %       ToolChoice       - Function to execute. "none", "auto", "required",
             %                          or specify the function to call.
@@ -208,35 +214,39 @@ classdef(Sealed) azureChat < llms.internal.textGenerator & ...
             %                          the “creativity”) of outputs, lower values
             %                          reduce it. Setting Temperature=0 removes
             %                          randomness from the output altogether.
+            %                          Use "auto" to use the default value of the model.
             %
             %       TopP             - Top probability mass value for controlling the
-            %                          diversity of the output. Default value is CHAT.TopP;
-            %                          lower values imply that only the more likely
+            %                          diversity of the output. The default value is CHAT.TopP.
+            %                          Lower values imply that only the more likely
             %                          words can appear in any particular place.
             %                          This is also known as top-p sampling.
+            %                          Use "auto" to use the default value of the model.
             %
             %       StopSequences    - Vector of strings that when encountered, will
-            %                          stop the generation of tokens. Default
+            %                          stop the generation of tokens. The default
             %                          value is CHAT.StopSequences.
             %                          Example: ["The end.", "And that's all she wrote."]
             %
             %       ResponseFormat   - The format of response the call returns.
-            %                          Default value is CHAT.ResponseFormat.
+            %                          The default value is CHAT.ResponseFormat.
             %                          "text" | "json" | struct | string with JSON Schema
             %
             %       PresencePenalty  - Penalty value for using a token in the response
-            %                          that has already been used. Default value is 
-            %                          CHAT.PresencePenalty.
-            %                          Higher values reduce repetition of words in the output.
+            %                          that has already been used. The default value is
+            %                          CHAT.PresencePenalty. Higher values reduce
+            %                          repetition of words in the output.
+            %                          Use "auto" to use the default value of the model.
             %
             %       FrequencyPenalty - Penalty value for using a token that is frequent
-            %                          in the output. Default value is CHAT.FrequencyPenalty.
+            %                          in the output. The default value is CHAT.FrequencyPenalty.
             %                          Higher values reduce repetition of words in the output.
+            %                          Use "auto" to use the default value of the model.
             %
             %       StreamFun        - Function to callback when streaming the result.
-            %                          Default value is CHAT.StreamFun.
+            %                          The default value is CHAT.StreamFun.
             %
-            %       TimeOut          - Connection Timeout in seconds. Default value is CHAT.TimeOut.
+            %       TimeOut          - Connection Timeout in seconds. The default value is CHAT.TimeOut.
             %
             %
             % Currently, GPT-4 Turbo with vision does not support the message.name

@@ -134,6 +134,37 @@ classdef (Abstract) hopenAIChat < hstructuredOutput & htoolCalls & htoolChoice
             text = formattedDisplayText(chat);
             testCase.verifyThat(text, ~ContainsSubstring("Verbosity"));
         end
+
+        function autoHyperparametersNotSent(testCase)
+            import matlab.unittest.constraints.HasField
+            [sendRequestMock,sendRequestBehaviour] = ...
+                createMock(testCase, AddedMethods="sendRequest");
+            testCase.assignOutputsWhen( ...
+                withAnyInputs(sendRequestBehaviour.sendRequest),...
+                testCase.responseMessage("Hello"),"This output is unused with Stream=false");
+
+            chat = testCase.constructor(Temperature="auto", TopP="auto", ...
+                PresencePenalty="auto", FrequencyPenalty="auto");
+            chat.sendRequestFcn = @(varargin) sendRequestMock.sendRequest(varargin{:});
+
+            generate(chat, "Hi");
+
+            calls = testCase.getMockHistory(sendRequestMock);
+            testCase.assertSize(calls,[1,1]);
+            sentHistory = calls.Inputs{2};
+            testCase.verifyThat(sentHistory, ~HasField("temperature"));
+            testCase.verifyThat(sentHistory, ~HasField("top_p"));
+            testCase.verifyThat(sentHistory, ~HasField("presence_penalty"));
+            testCase.verifyThat(sentHistory, ~HasField("frequency_penalty"));
+        end
+
+        function defaultHyperparametersAreAuto(testCase)
+            chat = testCase.defaultModel;
+            testCase.verifyEqual(chat.Temperature, "auto");
+            testCase.verifyEqual(chat.TopP, "auto");
+            testCase.verifyEqual(chat.PresencePenalty, "auto");
+            testCase.verifyEqual(chat.FrequencyPenalty, "auto");
+        end
     end
 
     methods (Test) % end-to-end, calling the server

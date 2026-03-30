@@ -94,38 +94,48 @@ To connect to a remote Ollama server, include the server name and port number. O
 
 ### `Temperature` — Temperature
 
-`1` (default) | numeric scalar between `0` and `2`
+`"auto"` (default) | numeric scalar between `0` and `2`
 
 
 Temperature value for controlling the randomness of the output. Higher temperature increases the randomness of the output.
 
+If the model supports `Temperature` and `Temperature` is `"auto"`, then the software uses the default temperature of the model.
+
 ### `TopP` — Top probability mass
 
-`1` (default) | numeric scalar between `0` and `1`
+`"auto"` (default) | numeric scalar between `0` and `1`
 
 
 Top probability mass for controlling the diversity of the generated output. Higher top probability mass corresponds to higher diversity.
 
+If `TopP` is `"auto"`, then the software uses the default top probability mass of the model.
+
 ### `TopK` — Top\-k sampling
 
-`Inf` (default) | positive numeric scalar
+`"auto"` (default) | positive numeric scalar
 
 
 Sample only from the `TopK` most likely next tokens for each token during generation. Higher values of `TopK` correspond to higher diversity.
 
+If `TopK` is `"auto"`, then the software uses the default top\-k sampling of the model.
+
 ### `TailFreeSamplingZ` — Tail free sampling
 
-`1` (default) | numeric scalar
+`"auto"` (default) | numeric scalar
 
 
 Tune the frequency of improbable tokens in generated output. Higher values of `TailFreeSamplingZ` correspond to lower diversity. If `TailFreeSamplingZ` is set to `1`, then the model does not use this sampling technique.
 
+If `TailFreeSamplingZ` is `"auto"`, then the software uses the default tail free sampling value of the model.
+
 ### `MinP` — Minimum probability ratio
 
-`0` (default) | numeric scalar between `0` and `1`
+`"auto"` (default) | numeric scalar between `0` and `1`
 
 
 Tune the frequency of improbable tokens in generated output using min\-p sampling. Higher minimum probability ratio corresponds to lower diversity.
+
+If `MinP` is `"auto"`, then the software uses the default minimum probability ratio of the model.
 
 ### `StopSequences` — Stop sequences
 

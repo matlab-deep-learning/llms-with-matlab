@@ -46,7 +46,7 @@ dict = mapNVPToParameters();
 
 nvpOptions = keys(dict);
 for opt = nvpOptions.'
-    if isfield(nvp, opt) && ~isempty(nvp.(opt))
+    if isfield(nvp, opt) && ~isempty(nvp.(opt)) && ~isequal(nvp.(opt), "auto")
         parameters.(dict(opt)) = nvp.(opt);
     end
 end

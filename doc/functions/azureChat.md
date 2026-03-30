@@ -127,17 +127,21 @@ Specify the Azure OpenAI API version. For more information, see [https://learn.m
 
 ### `Temperature` — Temperature
 
-`1` (default) | numeric scalar between `0` and `2`
+`"auto"` (default) | numeric scalar between `0` and `2`
 
 
 Temperature value for controlling the randomness of the output. Higher temperature increases the randomness of the output.
 
+If the model supports `Temperature` and `Temperature` is `"auto"`, then the software uses the default temperature of the model.
+
 ### `TopP` — Top probability mass
 
-`1` (default) | numeric scalar between `0` and `1`
+`"auto"` (default) | numeric scalar between `0` and `1`
 
 
 Top probability mass for controlling the diversity of the generated output. Higher top probability mass corresponds to higher diversity.
+
+If `TopP` is `"auto"`, then the software uses the default top probability mass of the model.
 
 ### `StopSequences` — Stop sequences
 
@@ -151,20 +155,24 @@ Sequences that stop generation of tokens.
 
 ### `PresencePenalty` — Presence penalty
 
-`0` (default) | numeric scalar between `-2` and `2`
+`"auto"` (default) | numeric scalar between `-2` and `2`
 
 
 Penalty value for using a token that has already been used at least once in the generated output. Higher values reduce the repetition of tokens. Negative values increase the repetition of tokens.
+
+If `PresencePenalty` is `"auto"`, then the software uses the default presence penalty of the model.
 
 
 The presence penalty is independent of the number of incidents of a token, so long as it has been used at least once. To increase the penalty for every additional time a token is generated, use the `FrequencyPenalty` name\-value argument.
 
 ### `FrequencyPenalty` — Frequency penalty
 
-`0` (default) | numeric scalar between `-2` and `2`
+`"auto"` (default) | numeric scalar between `-2` and `2`
 
 
 Penalty value for repeatedly using the same token in the generated output. Higher values reduce the repetition of tokens. Negative values increase the repetition of tokens.
+
+If `FrequencyPenalty` is `"auto"`, then the software uses the default frequency penalty of the model.
 
 
 The frequency penalty increases with every instance of a token in the generated output. To use a constant penalty for a repeated token, independent of the number of instances that token is generated, use the `PresencePenalty` name\-value argument.

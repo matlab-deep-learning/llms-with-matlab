@@ -15,17 +15,19 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
 %                             The default value is "gpt-4o-mini".
 %
 %   Temperature             - Temperature value for controlling the randomness
-%                             of the output. Default value is 1; higher values
-%                             increase the randomness (in some sense,
+%                             of the output. By default, the software uses
+%                             the default temperature of the model. Higher
+%                             values increase the randomness (in some sense,
 %                             the “creativity”) of outputs, lower values
 %                             reduce it. Setting Temperature=0 removes
 %                             randomness from the output altogether.
 %
 %   TopP                    - Top probability mass value for controlling the
-%                             diversity of the output. Default value is 1;
-%                             lower values imply that only the more likely
-%                             words can appear in any particular place.
-%                             This is also known as top-p sampling.
+%                             diversity of the output. By default, the
+%                             software uses the default top probability mass
+%                             of the model. Lower values imply that only the
+%                             more likely words can appear in any particular
+%                             place. This is also known as top-p sampling.
 %
 %   Tools                   - Array of openAIFunction objects representing
 %                             custom functions to be used during chat completions.
@@ -36,12 +38,16 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
 %                             Example: ["The end.", "And that's all she wrote."]
 %
 %   PresencePenalty         - Penalty value for using a token in the response
-%                             that has already been used. Default value is 0.
-%                             Higher values reduce repetition of words in the output.
+%                             that has already been used. By default, the
+%                             software uses the default presence penalty of
+%                             the model. Higher values reduce repetition of
+%                             words in the output.
 %
 %   FrequencyPenalty        - Penalty value for using a token that is frequent
-%                             in the output. Default value is 0.
-%                             Higher values reduce repetition of words in the output.
+%                             in the output. By default, the software uses
+%                             the default frequency penalty of the model.
+%                             Higher values reduce repetition of words in
+%                             the output.
 %
 %   TimeOut                 - Connection Timeout in seconds. Default value is 10.
 %
@@ -116,13 +122,13 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
                 systemPrompt                       {llms.utils.mustBeTextOrEmpty} = []
                 nvp.Tools                    (1,:) {mustBeA(nvp.Tools, "openAIFunction")} = openAIFunction.empty
                 nvp.ModelName                      {mustBeTextScalar} = "gpt-4o-mini"
-                nvp.Temperature                    {llms.utils.mustBeValidTemperature} = 1
-                nvp.TopP                           {llms.utils.mustBeValidProbability} = 1
+                nvp.Temperature                    {llms.utils.mustBeValidTemperature} = "auto"
+                nvp.TopP                           {llms.utils.mustBeValidProbability} = "auto"
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}
                 nvp.ResponseFormat                 {llms.utils.mustBeResponseFormat} = "text"
                 nvp.APIKey                         {llms.utils.mustBeNonzeroLengthTextScalar}
-                nvp.PresencePenalty                {llms.utils.mustBeValidPenalty} = 0
-                nvp.FrequencyPenalty               {llms.utils.mustBeValidPenalty} = 0
+                nvp.PresencePenalty                {llms.utils.mustBeValidPenalty} = "auto"
+                nvp.FrequencyPenalty               {llms.utils.mustBeValidPenalty} = "auto"
                 nvp.TimeOut                  (1,1) {mustBeNumeric,mustBeReal,mustBePositive} = 10
                 nvp.StreamFun                (1,1) {mustBeA(nvp.StreamFun,'function_handle')}
                 nvp.Verbosity                (1,1) string {mustBeVerbosity} = "auto"
@@ -196,17 +202,19 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
             %                          The default value is CHAT.ModelName.
             %
             %       Temperature      - Temperature value for controlling the randomness
-            %                          of the output. Default value is CHAT.Temperature;
-            %                          higher values increase the randomness (in some sense,
+            %                          of the output. Default value is CHAT.Temperature.
+            %                          Higher values increase the randomness (in some sense,
             %                          the “creativity”) of outputs, lower values
             %                          reduce it. Setting Temperature=0 removes
             %                          randomness from the output altogether.
+            %                          Use “auto” to use the default value of the model.
             %
             %       TopP             - Top probability mass value for controlling the
-            %                          diversity of the output. Default value is CHAT.TopP;
-            %                          lower values imply that only the more likely
+            %                          diversity of the output. Default value is CHAT.TopP.
+            %                          Lower values imply that only the more likely
             %                          words can appear in any particular place.
             %                          This is also known as top-p sampling.
+            %                          Use "auto" to use the default value of the model.
             %
             %       StopSequences    - Vector of strings that when encountered, will
             %                          stop the generation of tokens. Default
@@ -217,10 +225,12 @@ classdef(Sealed) openAIChat < llms.internal.textGenerator & ...
             %                          that has already been used. Default value is
             %                          CHAT.PresencePenalty. Higher values reduce repetition
             %                          of words in the output.
+            %                          Use "auto" to use the default value of the model.
             %
             %       FrequencyPenalty - Penalty value for using a token that is frequent
             %                          in the output. Default value is CHAT.FrequencyPenalty.
             %                          Higher values reduce repetition of words in the output.
+            %                          Use "auto" to use the default value of the model.
             %
             %       TimeOut          - Connection Timeout in seconds.
             %                          Default value is CHAT.TimeOut.

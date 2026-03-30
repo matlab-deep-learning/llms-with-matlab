@@ -123,17 +123,21 @@ Specify a random seed to ensure deterministic outputs.
 
 ### `Temperature` — Temperature
 
-`model.Temperature` (default) | numeric scalar between `0` and `2`
+`model.Temperature` (default) | `"auto"` | numeric scalar between `0` and `2`
 
 
 Temperature value for controlling the randomness of the output. Higher temperature increases the randomness of the output.
 
+If the model supports `Temperature` and `Temperature` is `"auto"`, then the software uses the default temperature of the model.
+
 ### `TopP` — Top probability mass
 
-`model.TopP` (default) | numeric scalar between `0` and `1`
+`model.TopP` (default) | `"auto"` | numeric scalar between `0` and `1`
 
 
 Top probability mass for controlling the diversity of the generated output. Higher top probability mass corresponds to higher diversity.
+
+If `TopP` is `"auto"`, then the software uses the default top probability mass of the model.
 
 ### `StopSequences` — Stop sequences
 
@@ -220,10 +224,12 @@ This option is only supported for [`openAIChat`](openAIChat.md) and [`ollamaChat
 
 ### `PresencePenalty` — Presence penalty
 
-`model.PresencePenalty` (default) | numeric scalar between `-2` and `2`
+`model.PresencePenalty` (default) | `"auto"` | numeric scalar between `-2` and `2`
 
 
 Penalty value for using a token that has already been used at least once in the generated output. Higher values reduce the repetition of tokens. Negative values increase the repetition of tokens.
+
+If `PresencePenalty` is `"auto"`, then the software uses the default presence penalty of the model.
 
 
 The presence penalty is independent of the number of incidents of a token, so long as it has been used at least once. To increase the penalty for every additional time a token is generated, use the `FrequencyPenalty` name\-value argument.
@@ -231,15 +237,17 @@ The presence penalty is independent of the number of incidents of a token, so lo
 
 This option is only supported for these chat completion APIs:
 
--  [`openAIChat`](openAIChat.md) objects 
--  [`azureChat`](azureChat.md) objects 
+-  [`openAIChat`](openAIChat.md) objects
+-  [`azureChat`](azureChat.md) objects
 
 ### `FrequencyPenalty` — Frequency penalty
 
-`model.FrequencyPenalty` (default) | numeric scalar between `-2` and `2`
+`model.FrequencyPenalty` (default) | `"auto"` | numeric scalar between `-2` and `2`
 
 
 Penalty value for repeatedly using the same token in the generated output. Higher values reduce the repetition of tokens. Negative values increase the repetition of tokens.
+
+If `FrequencyPenalty` is `"auto"`, then the software uses the default frequency penalty of the model.
 
 
 The frequency penalty increases with every instance of a token in the generated output. To use a constant penalty for a repeated token, independent of the number of instances that token is generated, use the `PresencePenalty` name\-value argument.
@@ -247,8 +255,8 @@ The frequency penalty increases with every instance of a token in the generated 
 
 This option is only supported for these chat completion APIs:
 
--  [`openAIChat`](openAIChat.md) objects 
--  [`azureChat`](azureChat.md) objects 
+-  [`openAIChat`](openAIChat.md) objects
+-  [`azureChat`](azureChat.md) objects
 ### `NumCompletions` — Number of generated outputs
 
 `model.NumCompletions` (default) | positive integer
@@ -291,30 +299,36 @@ This option is only supported for these chat completion APIs:
 
 ### `MinP` — Minimum probability ratio
 
-`model.MinP` (default) | numeric scalar between `0` and `1`
+`model.MinP` (default) | `"auto"` | numeric scalar between `0` and `1`
 
 
 Tune the frequency of improbable tokens in generated output using min\-p sampling. Higher minimum probability ratio corresponds to lower diversity.
+
+If `MinP` is `"auto"`, then the software uses the default minimum probability ratio of the model.
 
 
 This option is only supported for [`ollamaChat`](ollamaChat.md) objects.
 
 ### `TopK` — Top\-k sampling
 
-`model.TopK` (default) | positive numeric scalar
+`model.TopK` (default) | `"auto"` | positive numeric scalar
 
 
 Sample only from the `TopK` most likely next tokens for each token during generation. Higher top\-k sampling corresponds to higher diversity.
+
+If `TopK` is `"auto"`, then the software uses the default top\-k sampling of the model.
 
 
 This option is only supported for [`ollamaChat`](ollamaChat.md) objects.
 
 ### `TailFreeSamplingZ` — Tail free sampling
 
-`model.TailFreeSamplingZ` (default) | numeric scalar
+`model.TailFreeSamplingZ` (default) | `"auto"` | numeric scalar
 
 
 Tune the frequency of improbable tokens in generated output. Higher tail free sampling corresponds to lower diversity. If `TailFreeSamplingZ` is set to `1`, then the model does not use this sampling technique.
+
+If `TailFreeSamplingZ` is `"auto"`, then the software uses the default tail free sampling value of the model.
 
 
 This option is only supported for [`ollamaChat`](ollamaChat.md) objects.

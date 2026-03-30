@@ -11,36 +11,41 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator & ...
 %   using one or more name-value arguments:
 %
 %   Temperature             - Temperature value for controlling the randomness
-%                             of the output. Default value depends on the model;
-%                             if not specified in the model, defaults to 0.8.
-%                             Higher values increase the randomness (in some
-%                             sense, the “creativity”) of outputs, lower
-%                             values reduce it. Setting Temperature=0 removes
+%                             of the output. By default, the software uses
+%                             the default temperature of the model. Higher
+%                             values increase the randomness (in some sense,
+%                             the “creativity”) of outputs, lower values
+%                             reduce it. Setting Temperature=0 removes
 %                             randomness from the output altogether.
 %
 %   TopP                    - Top probability mass value for controlling the
-%                             diversity of the output. Default value is 1;
-%                             lower values imply that only the more likely
-%                             words can appear in any particular place.
-%                             This is also known as top-p sampling.
+%                             diversity of the output. By default, the
+%                             software uses the default top probability mass
+%                             of the model. Lower values imply that only the
+%                             more likely words can appear in any particular
+%                             place. This is also known as top-p sampling.
 %
 %   MinP                    - Minimum probability ratio for controlling the
-%                             diversity of the output. Default value is 0;
-%                             higher values imply that only the more likely
-%                             words can appear in any particular place.
+%                             diversity of the output. By default, the
+%                             software uses the default minimum probability
+%                             ratio of the model. Higher values imply that
+%                             only the more likely words can appear in any
+%                             particular place.
 %                             This is also known as min-p sampling.
 %
 %   TopK                    - Maximum number of most likely tokens that are
-%                             considered for output. Default is Inf, allowing
-%                             all tokens. Smaller values reduce diversity in
-%                             the output.
+%                             considered for output. By default, the software
+%                             uses the default top-k value of the model.
+%                             Smaller values reduce diversity in the output.
 %
 %   TailFreeSamplingZ       - Reduce the use of less probable tokens, based on
 %                             the second-order differences of ordered
-%                             probabilities. Default value is 1, disabling
-%                             tail-free sampling. Lower values reduce
-%                             diversity, with some authors recommending
-%                             values around 0.95. Tail-free sampling is
+%                             probabilities. By default, the software uses
+%                             the default tail free sampling value of the
+%                             model. Lower values reduce diversity, with
+%                             some authors recommending values around 0.95.
+%                             Setting TailFreeSamplingZ=1 disables
+%                             tail free sampling. Tail free sampling is
 %                             slower than using TopP or TopK.
 %
 %   StopSequences           - Vector of strings that when encountered, will
@@ -68,14 +73,14 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator & ...
 %
 %       SystemPrompt         - System prompt.
 
-% Copyright 2024-2025 The MathWorks, Inc.
+% Copyright 2024-2026 The MathWorks, Inc.
 
     properties
         ModelName         (1,1) string
         Endpoint          (1,1) string
-        TopK              (1,1) {mustBeNumeric,mustBeReal,mustBePositive} = Inf
-        MinP              (1,1) {llms.utils.mustBeValidProbability} = 0
-        TailFreeSamplingZ (1,1) {mustBeNumeric,mustBeReal} = 1
+        TopK              {llms.utils.mustBeValidTopK} = "auto"
+        MinP              {llms.utils.mustBeValidProbability} = "auto"
+        TailFreeSamplingZ {llms.utils.mustBeValidTailFreeSamplingZ} = "auto"
     end
 
     properties (Hidden)
@@ -84,19 +89,31 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator & ...
     end
 
     methods
+        function this = set.MinP(this,value)
+            this.MinP = convertCharsToStrings(value);
+        end
+
+        function this = set.TopK(this,value)
+            this.TopK = convertCharsToStrings(value);
+        end
+
+        function this = set.TailFreeSamplingZ(this,value)
+            this.TailFreeSamplingZ = convertCharsToStrings(value);
+        end
+
         function this = ollamaChat(modelName, systemPrompt, nvp)
             arguments
                 modelName                          {mustBeTextScalar}
                 systemPrompt                       {llms.utils.mustBeTextOrEmpty} = []
-                nvp.Temperature                    {llms.utils.mustBeValidTemperature} = 1
+                nvp.Temperature                    {llms.utils.mustBeValidTemperature} = "auto"
                 nvp.Tools                    (1,:) {mustBeA(nvp.Tools, "openAIFunction")} = openAIFunction.empty
-                nvp.TopP                           {llms.utils.mustBeValidProbability} = 1
-                nvp.MinP                           {llms.utils.mustBeValidProbability} = 0
-                nvp.TopK                     (1,1) {mustBeReal,mustBePositive} = Inf
+                nvp.TopP                           {llms.utils.mustBeValidProbability} = "auto"
+                nvp.MinP                           {llms.utils.mustBeValidProbability} = "auto"
+                nvp.TopK                           {llms.utils.mustBeValidTopK} = "auto"
                 nvp.StopSequences                  {llms.utils.mustBeValidStop} = {}
                 nvp.ResponseFormat                 {llms.utils.mustBeResponseFormat} = "text"
                 nvp.TimeOut                  (1,1) {mustBeNumeric,mustBeReal,mustBePositive} = 120
-                nvp.TailFreeSamplingZ        (1,1) {mustBeNumeric,mustBeReal} = 1
+                nvp.TailFreeSamplingZ              {llms.utils.mustBeValidTailFreeSamplingZ} = "auto"
                 nvp.StreamFun                (1,1) {mustBeA(nvp.StreamFun,'function_handle')}
                 nvp.Endpoint                 (1,1) string = "127.0.0.1:11434"
             end
@@ -186,7 +203,7 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator & ...
             %                           Default value is CHAT.TailFreeSamplingZ.
             %                           Lower values reduce diversity, with
             %                           some authors recommending values
-            %                           around 0.95. Tail-free sampling is
+            %                           around 0.95. Tail free sampling is
             %                           slower than using TopP or TopK.
             %
             %       StopSequences     - Vector of strings that when encountered, will
@@ -211,11 +228,11 @@ classdef (Sealed) ollamaChat < llms.internal.textGenerator & ...
                 nvp.Temperature               {llms.utils.mustBeValidTemperature} = this.Temperature
                 nvp.TopP                      {llms.utils.mustBeValidProbability} = this.TopP
                 nvp.MinP                      {llms.utils.mustBeValidProbability} = this.MinP
-                nvp.TopK                (1,1) {mustBeNumeric,mustBeReal,mustBePositive} = this.TopK
+                nvp.TopK                      {llms.utils.mustBeValidTopK} = this.TopK
                 nvp.StopSequences             {llms.utils.mustBeValidStop} = this.StopSequences
                 nvp.ResponseFormat            {llms.utils.mustBeResponseFormat} = this.ResponseFormat
                 nvp.TimeOut             (1,1) {mustBeNumeric,mustBeReal,mustBePositive} = this.TimeOut
-                nvp.TailFreeSamplingZ   (1,1) {mustBeNumeric,mustBeReal} = this.TailFreeSamplingZ
+                nvp.TailFreeSamplingZ         {llms.utils.mustBeValidTailFreeSamplingZ} = this.TailFreeSamplingZ
                 nvp.StreamFun           (1,1) {mustBeA(nvp.StreamFun,'function_handle')}
                 nvp.Endpoint            (1,1) string = this.Endpoint
                 nvp.MaxNumTokens        (1,1) {mustBeNumeric,mustBePositive} = inf
