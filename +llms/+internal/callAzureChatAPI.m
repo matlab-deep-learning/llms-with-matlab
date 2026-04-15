@@ -104,10 +104,10 @@ if response.StatusCode=="OK"
                 "content", streamedText);
         end
     end
-    if isfield(message, "tool_choice")
-        text = "";
-    else
+    if isfield(message, "content")
         text = string(message.content);
+    else
+        text = "";
     end
 else
     text = "";

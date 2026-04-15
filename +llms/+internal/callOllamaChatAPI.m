@@ -72,7 +72,11 @@ if response.StatusCode=="OK"
         message = struct("role", "assistant", ...
             "content", streamedText);
     end
-    text = string(message.content);
+    if isfield(message, "content")
+        text = string(message.content);
+    else
+        text = "";
+    end
 else
     text = "";
     message = struct();
