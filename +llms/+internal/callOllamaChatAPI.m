@@ -59,7 +59,7 @@ parameters = llms.internal.buildOllamaParameters(model, messages, functions, nvp
 [response, streamedText] = nvp.sendRequestFcn(parameters,[],URL,nvp.TimeOut,nvp.StreamFun);
 
 % If call errors, "choices" will not be part of response.Body.Data, instead
-% we get response.Body.Data.error
+% we get response.Body.Data.error, which will be checked in ollamaChat.
 if response.StatusCode=="OK"
     % Outputs the first generation
     if isempty(nvp.StreamFun)

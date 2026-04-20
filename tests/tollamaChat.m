@@ -373,11 +373,8 @@ classdef tollamaChat < hstructuredOutput & htoolCalls
         end
 
         function doReturnErrors(testCase)
-            testCase.assumeFalse( ...
-                any(startsWith(ollamaChat.models,"abcdefghijklmnop")), ...
-                "We want a model name that does not exist on this server");
-            chat = ollamaChat("abcdefghijklmnop");
-            testCase.verifyError(@() generate(chat,"hi!"), "llms:apiReturnedError");
+            testCase.verifyError(@() generate(testCase.defaultModel, "Hello", ResponseFormat="{bad json}"), ...
+                "llms:apiReturnedError");
         end
 
         function errorNoOllamaServer(testCase)

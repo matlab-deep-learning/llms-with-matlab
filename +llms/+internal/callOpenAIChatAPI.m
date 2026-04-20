@@ -69,7 +69,7 @@ parameters = llms.internal.buildOpenAIParameters(messages, functions, nvp);
 [response, streamedText] = nvp.sendRequestFcn(parameters,nvp.APIKey, END_POINT, nvp.TimeOut, nvp.StreamFun);
 
 % If call errors, "choices" will not be part of response.Body.Data, instead
-% we get response.Body.Data.error
+% we get response.Body.Data.error, which will be checked in openAIChat.
 if response.StatusCode=="OK"
     % Outputs the first generation
     if isempty(nvp.StreamFun)

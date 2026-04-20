@@ -46,10 +46,15 @@ else
     streamedText = consumer.ResponseText;
 end
 
-% When the server sends jsonl or ndjson back, we do not get the automatic conversion.
+% There are situations where server returns raw bytes.
 if isnumeric(response.Body.Data)
     txt = native2unicode(response.Body.Data.',"UTF-8");
-    % convert to JSON array
+    % The message may be valid JSON, most likely a struct with an error
+    try
+        response.Body.Data = jsondecode(txt);
+        return
+    end
+    % The server may send jsonl/ndjson; convert to a JSON array.
     json = "[" + replace(strtrim(txt),newline,',') + "]";
     try
         response.Body.Data = jsondecode(json);
