@@ -73,7 +73,7 @@ To connect to APIs that are compatible with the OpenAI Chat Completions API, use
 
 - Set the `BaseURL` name-value argument to the base URL of the API. For example, for OpenAI, `BaseURL` is `"https://api.openai.com/v1"`.
 - Set the `ModelName` name-value argument to the name of the model you want to use.
-- Specify the OpenAI API key environment variable. If your API does not need an API key, set the environment variable `OPEN_AI_KEY` to `"EMPTY"`. Alternatively, you can set the `APIKey` name-value argument of the `openAIChat` function.
+- Specify the OpenAI API key environment variable. If your API does not need an API key, set the environment variable `OPENAI_API_KEY` to `"EMPTY"`. Alternatively, you can set the `APIKey` name-value argument of the `openAIChat` function.
 
 <a id="manage-chat-history"></a>
 # Manage Chat History
