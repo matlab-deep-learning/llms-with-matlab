@@ -332,7 +332,7 @@ classdef (Abstract) hopenAIChat < hstructuredOutput & htoolCalls & htoolChoice
         function toolCallingAndStructuredOutput(testCase)
             import matlab.unittest.constraints.HasField
 
-            f = openAIFunction("addTwoNumbers", "Add two numbers");
+            f = openAIFunction("multiplyTwoNumbers", "Multiply two numbers");
             f = addParameter(f, "a");
             f = addParameter(f, "b");
 
@@ -340,9 +340,9 @@ classdef (Abstract) hopenAIChat < hstructuredOutput & htoolCalls & htoolChoice
             
             chat = testCase.constructor("You are a helpful agent.", ...
                 Tools=f, ResponseFormat=responseFormat);
-            prompt = "What's 1+1?";
+            prompt = "What's 123*321?";
             
-            [reply, complete] = testCase.verifyWarningFree(@() generate(chat, prompt));
+            [reply, complete] = testCase.verifyWarningFree(@() generate(chat, prompt, ToolChoice="multiplyTwoNumbers"));
             testCase.verifyEmpty(reply);
             testCase.verifyThat(complete, HasField("tool_calls"));
         end

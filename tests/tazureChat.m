@@ -14,8 +14,17 @@ classdef tazureChat < hopenAIChat
     properties
         constructor = @azureChat;
         defaultModel = azureChat;
-        visionModel = azureChat(Deployment="gpt-4o");
-        structuredModel = azureChat("Deployment","gpt-4o-2024-08-06");
+        visionModel = azureChat;
+        structuredModel = azureChat;
+    end
+
+    methods (TestClassSetup)
+
+        function setDefaultDeployment(testCase)
+            import matlab.unittest.fixtures.EnvironmentVariableFixture
+            testCase.applyFixture(EnvironmentVariableFixture("AZURE_OPENAI_DEPLOYMENT","CI"));
+        end
+
     end
 
     methods (Test) % not calling the server
@@ -133,7 +142,7 @@ classdef tazureChat < hopenAIChat
         end
 
         function jsonFormatWithSystemPrompt(testCase)
-            chat = azureChat("Respond in JSON format.","Deployment","gpt-4o-2024-08-06");
+            chat = azureChat("Respond in JSON format.");
             testCase.verifyClass( ...
                 generate(chat,"create some address",ResponseFormat='json'), ...
                 "string");
@@ -146,12 +155,12 @@ classdef tazureChat < hopenAIChat
             % them after the model deployed is not a guarantee), that is a
             % somewhat painful distinction.
             testCase.verifyWarningFree(@() generate( ...
-                azureChat(DeploymentID="o4-mini"), ...
+                azureChat, ...
                 "What is object oriented design?", MaxNumTokens=23));
         end
 
         function generateWithImage(testCase)
-            chat = azureChat(DeploymentID="gpt-4o");
+            chat = azureChat;
             image_path = "peppers.png";
             emptyMessages = messageHistory;
             messages = addUserMessageWithImages(emptyMessages,"What is in the image?",image_path);
@@ -162,7 +171,7 @@ classdef tazureChat < hopenAIChat
 
         function generateWithMultipleImages(testCase)
             import matlab.unittest.constraints.ContainsSubstring
-            chat = azureChat(DeploymentID="gpt-4o");
+            chat = azureChat;
             image_path = "peppers.png";
             emptyMessages = messageHistory;
             messages = addUserMessageWithImages(emptyMessages,"Compare these images.",[image_path,image_path]);
@@ -189,7 +198,7 @@ classdef tazureChat < hopenAIChat
             % azureChat.generate
 
             testCase.assumeTrue(isenv("AZURE_OPENAI_API_KEY"),"end-to-end test requires environment variables AZURE_OPENAI_API_KEY, AZURE_OPENAI_ENDPOINT, and AZURE_OPENAI_DEPLOYMENT.");
-            chat = azureChat("APIVersion", APIVersions);
+            chat = azureChat("APIVersion", APIVersions, ReasoningEffort="none");
 
             response = testCase.verifyWarningFree(@() generate(chat,"How similar is the DNA of a cat and a tiger?"));
             testCase.verifyClass(response,'string');
