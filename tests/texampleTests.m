@@ -172,16 +172,6 @@ classdef texampleTests < matlab.unittest.TestCase
             evalc("SummarizeLargeDocumentsUsingChatGPTandMATLAB");
         end
 
-        function testUsingDALLEToEditImages(testCase)
-            testCase.startCapture("UsingDALLEToEditImages");
-            evalc("UsingDALLEToEditImages");
-        end
-
-        function testUsingDALLEToGenerateImages(testCase)
-            testCase.startCapture("UsingDALLEToGenerateImages");
-            evalc("UsingDALLEToGenerateImages");
-        end
-
         function testVisualizeTableDataUsingChatGPTExample(testCase)
             % Note: When in recording mode, running this test generates
             % modal dialogs that must be interacted with manually. For

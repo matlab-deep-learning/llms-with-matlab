@@ -196,22 +196,15 @@ loadenv(".env")
 Connect to the OpenAI Images API.
 
 ```matlab
-model = openAIImages(ModelName="dall-e-2");
+model = openAIImages(ModelName="gpt-image-1-mini");
 ```
 
-Generate and display an image based on a natural language prompt using the [`openAIImages.generate`](functions/openAIImages.generate.md) function.
+Generate an image based on a natural language prompt using the [`generate`](functions/openAIImages.generate.md) function.
 
 ```matlab
 im = generate(model,"Draw an intellectual octopus.");
-imshow(im{1})
 ```
-
-![octopus.png](functions/images/octopus.png)
-
-For more examples of how to generate and edit images using OpenAI from MATLAB, see:
-
--  [Using DALL·E To Edit Images](../examples/UsingDALLEToEditImages.md) 
--  [Using DALL·E To Generate Images](../examples/UsingDALLEToGenerateImages.md) 
+You can edit the image using the [`edit`](functions/edit.md) function.
 
 <a id="json-formatted-and-structured-output"></a>
 # JSON\-Formatted and Structured Output
@@ -261,7 +254,7 @@ For some examples of how to use tool calling with this add\-on, see:
 <a id="see-also"></a>
 # See Also
 
-[openAIChat](functions/openAIChat.md) | [generate](functions/generate.md) | [openAIFunction](functions/openAIFunction.md) | [addParameter](functions/addParameter.md) | [openAIImages](functions/openAIImages.md) | [openAIImages.generate](functions/openAIImages.generate.md) | [edit](functions/edit.md) | [createVariation](functions/createVariation.md) | [messageHistory](functions/messageHistory.md) | [addSystemMessage](functions/addSystemMessage.md) | [addUserMessage](functions/addUserMessage.md) | [addUserMessageWithImages](functions/addUserMessageWithImages.md) | [addToolMessage](functions/addToolMessage.md) | [addResponseMessage](functions/addResponseMessage.md) | [removeMessage](functions/removeMessage.md)
+[openAIChat](functions/openAIChat.md) | [generate](functions/generate.md) | [openAIFunction](functions/openAIFunction.md) | [addParameter](functions/addParameter.md) | [openAIImages](functions/openAIImages.md) | [openAIImages.generate](functions/openAIImages.generate.md) | [edit](functions/edit.md) | [messageHistory](functions/messageHistory.md) | [addSystemMessage](functions/addSystemMessage.md) | [addUserMessage](functions/addUserMessage.md) | [addUserMessageWithImages](functions/addUserMessageWithImages.md) | [addToolMessage](functions/addToolMessage.md) | [addResponseMessage](functions/addResponseMessage.md) | [removeMessage](functions/removeMessage.md)
 
 <a id="examples"></a>
 # Examples
@@ -274,9 +267,7 @@ For some examples of how to use tool calling with this add\-on, see:
 - [Analyze Text Data Using Parallel Function Calls with ChatGPT](../examples/AnalyzeTextDataUsingParallelFunctionCallwithChatGPT.md)
 - [Retrieval-Augmented Generation Using ChatGPT and MATLAB](../examples/RetrievalAugmentedGenerationUsingChatGPTandMATLAB.md) (requires Text Analytics Toolbox)
 - [Describe Images Using ChatGPT](../examples/DescribeImagesUsingChatGPT.md)
-- [Using DALL·E To Edit Images](../examples/UsingDALLEToEditImages.md)
-- [Using DALL·E To Generate Images](../examples/UsingDALLEToGenerateImages.md)
 - [Solve Simple Math Problem Using AI Agent](/examples/SolveSimpleMathProblemUsingAIAgent.md)
 - [Fit Polynomial to Data Using AI Agent](/examples/FitPolynomialToDataUsingAIAgentExample.md) (requires Curve Fitting Toolbox)
 
-*Copyright 2024-2025 The MathWorks, Inc.*
+*Copyright 2024-2026 The MathWorks, Inc.*

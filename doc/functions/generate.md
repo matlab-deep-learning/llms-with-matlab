@@ -212,7 +212,7 @@ Structured output is only supported for models `"gpt-4o-mini"`, `"gpt-4o-mini-20
 
 ### `ModelName` — Model name
 
-`model.ModelName` (default) | `"gpt-4o-mini"` | `"gpt-4"` | `"gpt-3.5-turbo"` | `"dall-e-2"` | ...
+`model.ModelName` (default) | `"gpt-4o-mini"` | `"gpt-4"` | `"gpt-3.5-turbo"` | ...
 
 
 Name of the model to use for text generation.

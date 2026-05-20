@@ -10,7 +10,7 @@ You can connect to:
 
 -  [OpenAI® Chat Completions API](https://platform.openai.com/docs/guides/text-generation/chat-completions-api) — For example, connect to ChatGPT™.
 -  OpenAI-compatible APIs — Connect to APIs that are compatible with the OpenAI Chat Completions API.
--  [OpenAI Images API](https://platform.openai.com/docs/guides/images) — For example, connect to DALL·E™. 
+-  [OpenAI Images API](https://platform.openai.com/docs/guides/images) — Connect to image generation models from OpenAI.
 -  [Azure® OpenAI Service](https://learn.microsoft.com/en-us/azure/ai-services/openai/) — Connect to OpenAI models from Azure. 
 -  [Ollama™](https://ollama.com/) — Connect to models locally or nonlocally. 
 
@@ -73,8 +73,6 @@ For more information about how to connect to the different APIs from MATLAB, inc
 - [Retrieval-Augmented Generation Using Ollama and MATLAB](/examples/RetrievalAugmentedGenerationUsingOllamaAndMATLAB.md) (requires Text Analytics Toolbox)
 ### Image Workflows
 - [Describe Images Using ChatGPT](/examples/DescribeImagesUsingChatGPT.md)
-- [Using DALL·E To Edit Images](/examples/UsingDALLEToEditImages.md)
-- [Using DALL·E To Generate Images](/examples/UsingDALLEToGenerateImages.md)
 ### See Also
 - [Add OpenTelemetry Observability to AI Agent](https://github.com/mathworks/OpenTelemetry-MATLAB/blob/main/examples/ai_agent/AddObservabilityToAIAgent.md) (OpenTelemetry-MATLAB)
 
@@ -89,8 +87,7 @@ For more information about how to connect to the different APIs from MATLAB, inc
 | [addParameter](/doc/functions/addParameter.md) | Add input argument to `openAIFunction` object |
 | [openAIImages](/doc/functions/openAIImages.md) | Connect to OpenAI Image Generation API from MATLAB |
 | [openAIImages.generate](/doc/functions/openAIImages.generate.md) | Generate image using OpenAI image generation API |
-| [edit](/doc/functions/edit.md) | Edit images using DALL·E 2 |
-| [createVariation](/doc/functions/createVariation.md) | Generate image variations using DALL·E 2 |
+| [edit](/doc/functions/edit.md) | Edit images using OpenAI image generation API |
 | [messageHistory](/doc/functions/messageHistory.md) | Manage and store messages in a conversation |
 | [addSystemMessage](/doc/functions/addSystemMessage.md) | Add system message to message history |
 | [addUserMessage](/doc/functions/addUserMessage.md) | Add user message to message history |

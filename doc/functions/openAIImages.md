@@ -37,7 +37,7 @@ To connect to the OpenAI API, you need a valid API key. For information on how t
 character vector | string scalar
 
 
-OpenAI API key to access OpenAI APIs such as DALL·E. 
+OpenAI API key to access OpenAI APIs.
 
 
 Instead of using the `APIKey` name\-value argument, you can also set the environment variable OPEN\_API\_KEY. For more information, see [OpenAI API](http://../OpenAI.md).
@@ -48,13 +48,13 @@ Optionally specify these properties at construction using name\-value arguments.
 
 ### `ModelName` — Model name
 
-`"dall-e-2"` (default) | `"dall-e-3"`
+`"gpt-image-1-mini"` (default) |  `"gpt-image-1"` |  `"gpt-image-1.5"` |  `"gpt-image-2"`
 
 
 After construction, this property is read\-only.
 
 
-Name of the OpenAI model to use for image generation. To use DALL·E 2, set `ModelName` to `"dall-e-2"`. To use DALL·E 3, set `ModelName` to `"dall-e-3"`.
+Name of the OpenAI model to use for image generation.
 
 ### `TimeOut` — Connection timeout in seconds
 
@@ -71,13 +71,11 @@ If the OpenAI server does not respond within the timeout, then the function thro
 [`generate`](openAIImages.generate.md) — Generate image using OpenAI image generation API
 
 
-[`edit`](edit.md) — Edit images using DALL·E 2
+[`edit`](edit.md) — Edit images
 
-
-[`createVariation`](createVariation.md) — Generate image variations using DALL·E 2
 
 # Examples
-## Generate Image Using DALL·E 2
+## Generate Image
 
 First, specify the OpenAI API key as an environment variable and save it to a file called `".env"`. Next, load the environment file using the `loadenv` function.
 
@@ -85,19 +83,10 @@ First, specify the OpenAI API key as an environment variable and save it to a fi
 loadenv(".env")
 ```
 
-Connect to the OpenAI Images API. By default, the model is DALL·E 2.
+Connect to the OpenAI Images API.
 
 ```matlab
-model = openAIImages
-```
-
-```matlabTextOutput
-model = 
-  openAIImages with properties:
-
-    ModelName: "dall-e-2"
-      TimeOut: 10
-
+model = openAIImages;
 ```
 
 Generate and display an image based on a natural language prompt.
@@ -110,10 +99,7 @@ imshow(catImage{1})
 ![An image of a sad cartoon cat pondering a skein of red wool.](images/openAIImages1.png)
 # See Also
 
-[`openAIChat`](openAIChat.md) | [`generate`](openAIImages.generate.md) | [`edit`](edit.md) | [`createVariation`](createVariation.md)
+[`openAIChat`](openAIChat.md) | [`generate`](openAIImages.generate.md) | [`edit`](edit.md)
 
--  [Using DALL·E to Generate Images](../../examples/UsingDALLEToGenerateImages.md) 
--  [Using DALL·E to Edit Images](../../examples/UsingDALLEToEditImages.md) 
-
-*Copyright 2024 The MathWorks, Inc.*
+*Copyright 2024-2026 The MathWorks, Inc.*
 

@@ -62,9 +62,7 @@ catalog("llms:keyMustBeSpecified") = "Unable to find API key. Either set environ
 catalog("llms:mustHaveMessages") = "Message history must not be empty.";
 catalog("llms:mustSetFunctionsForCall") = "When Tools is empty, ToolChoice must be ""none"" or ""auto"".";
 catalog("llms:mustBeMessagesOrTxt") = "Message must be nonempty string, character array, cell array of character vectors, or messageHistory object.";
-catalog("llms:invalidOptionAndValueForModel") = "'{1}' with value '{2}' is not supported for model ""{3}"".";
 catalog("llms:invalidOptionForModel") = "Invalid argument name {1} for model ""{2}"".";
-catalog("llms:functionNotAvailableForModel") = "Image editing is not supported for model ""{1}"".";
 catalog("llms:promptLimitCharacter") = "Prompt must contain at most {1} characters for model ""{2}"".";
 catalog("llms:pngExpected") = "Image must be a PNG file (*.png).";
 catalog("llms:apiReturnedError") = "Server returned error indicating: ""{1}""";
@@ -75,4 +73,6 @@ catalog("llms:unsupportedDatatypeInPrototype") = "Invalid data type ''{1}'' in p
 catalog("llms:incorrectResponseFormat") = "Invalid response format. Response format must be ""text"", ""json"", a struct, or a string with a JSON Schema definition.";
 catalog("llms:OllamaStructuredOutputNeeds05") = "Structured output is not supported for Ollama version {1}. Use version 0.5.0 or newer.";
 catalog("llms:noOllamaFound") = "Unable to connect to Ollama. Check that {1} is a valid endpoint and ensure that Ollama is installed and running.";
+catalog("llms:deprecatedMethod") = "Models supporting {1} method have been deprecated.";
+catalog("llms:deprecatedOption") = "Models supporting the {1} have been deprecated.";
 end

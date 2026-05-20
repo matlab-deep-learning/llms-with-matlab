@@ -162,6 +162,35 @@
             {"name":"response","type":"matlab.net.http.ResponseMessage"}
         ]
     },
+    "openAIImages.openAIImages":
+    {
+        "inputs":
+        [
+            {"name":"ModelName","kind":"namevalue","type":"choices=llms.openai.imageModels"},
+            {"name":"APIKey","kind":"namevalue","type":["string","scalar"]},
+            {"name":"TimeOut","kind":"namevalue","type":["numeric","scalar","real","positive"]}
+        ],
+        "outputs":
+        [
+            {"name":"this","type":"openAIImages"}
+        ]
+    },
+    "openAIImages.generate":
+    {
+        "inputs":
+        [
+            {"name":"this","kind":"required","type":["openAIImages","scalar"]},
+            {"name":"prompt","kind":"required","type":["string","scalar"]},
+            {"name":"NumImages","kind":"namevalue","type":["numeric","scalar","integer","positive","<=10"]},
+            {"name":"Size","kind":"namevalue","type":"choices={'auto','1024x1024','1536x1024','1024x1536'}"},
+            {"name":"Quality","kind":"namevalue","type":"choices={'auto','high','medium','low'}"}
+        ],
+        "outputs":
+        [
+            {"name":"images","type":"cell"},
+            {"name":"response","type":"matlab.net.http.ResponseMessage"}
+        ]
+    },
     "openAIFunction.openAIFunction":
     {
         "inputs":

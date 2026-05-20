@@ -1,7 +1,7 @@
 
 # edit
 
-Edit images using DALL·E 2
+Edit images using OpenAI Images API
 
 
 `[editedImages,httpResponse] = edit(model,image,prompt)`
@@ -11,7 +11,7 @@ Edit images using DALL·E 2
 
 # Description
 
-Edit images using the OpenAI® image generation model DALL·E 2. 
+Edit images using the OpenAI® image generation API. 
 
 
 Specify the area that you want to edit using a mask. The transparent areas of the mask, that is, anywhere that the mask is equal to zero, determine the parts of the source image that are edited. 
@@ -20,13 +20,13 @@ Specify the area that you want to edit using a mask. The transparent areas of th
 You can specify a mask using the `MaskImagePath` name\-value argument. If you do not specify a mask, then your input image must include a transparency layer. The function then uses the transparency as the mask.
 
 
-`[editedImages,httpResponse] = edit(model,image,prompt)` edits an existing image using DALL·E 2 and a natural language prompt. 
+`[editedImages,httpResponse] = edit(model,image,prompt)` edits an existing image using a natural language prompt. 
 
 
 `___ = edit(___,Name=Value)` specifies additional options using one or more name\-value arguments.
 
 # Examples
-## Edit Image Using DALL·E 2
+## Edit Image
 
 First, specify the OpenAI® API key as an environment variable and save it to a file called `".env"`. Next, load the environment file using the `loadenv` function.
 
@@ -34,10 +34,10 @@ First, specify the OpenAI® API key as an environment variable and save it to a 
 loadenv(".env")
 ```
 
-Connect to the OpenAI Images API. By default, the model is DALL·E 2.
+Connect to the OpenAI Images API.
 
 ```matlab
-model = openAIImages;
+model = openAIImages(ModelName="gpt-image-1-mini");
 ```
 
 Load and display the source image.
@@ -61,22 +61,7 @@ imwrite(mask,"topLeftMask.png");
 Edit the image.
 
 ```matlab
-[editedImages,httpResponse] = edit(model,imagePath,"Add a big red apple to the tree.",MaskImagePath="topLeftMask.png")
-```
-
-```matlabTextOutput
-editedImages = 1x1 cell array
-    {1024x1024x3 uint8}
-
-httpResponse = 
-  ResponseMessage with properties:
-
-    StatusLine: 'HTTP/1.1 200 OK'
-    StatusCode: OK
-        Header: [1x18 matlab.net.http.HeaderField]
-          Body: [1x1 matlab.net.http.MessageBody]
-     Completed: 0
-
+[editedImages,httpResponse] = edit(model,imagePath,"Add a big red apple to the tree.",MaskImagePath="topLeftMask.png");
 ```
 
 Display the new image.
@@ -92,14 +77,14 @@ imshow(editedImages{1})
 `openAIImages` object
 
 
-Image generation model, specified as an [`openAIImages`](openAIImages.md) object. The model name `model.ModelName` must be `"dall-e-2"`.
+Image generation model, specified as an [`openAIImages`](openAIImages.md) object.
 
 ### `image` — Input image
 
 string scalar | character vector
 
 
-Input image, specified as a PNG (\*.png) file. The size of the image must be less than 4MB and the image must be square.
+Input image, specified in a format that the model supports.
 
 
 If you do not specify an editing mask, then the image must include a transparency dimension. The model will then use the transparency as the mask.
@@ -114,10 +99,6 @@ character vector | string scalar
 
 Natural language prompt instructing the model what to do.
 
-
-The user prompt must include fewer than or equal to 1000 characters.
-
-
 **Example:** `"Please add an ice cream sundae to the picture."`
 
 ## Name\-Value Arguments
@@ -126,7 +107,7 @@ The user prompt must include fewer than or equal to 1000 characters.
 string scalar | character vector
 
 
-Mask, specified as a gray scale PNG (\*.png) file. The size of the mask must be less than 4MB and the mask must have the same dimensions as the input image.
+Mask, specified as a gray scale image file. The mask must have the same size as the input image.
 
 
 The transparent areas of the mask, that is, anywhere that the mask is equal to zero, determine the parts of the source image to edit. 
@@ -143,16 +124,16 @@ Specify the number of images to generate.
 
 ### `Size` — Size of generated image
 
-`"1024x1024"` (default) | `"256x256"` | `"512x512"`
-
+`"auto"` (default) | `1024x1024` | `1536x1024` | `1024x1536`
 
 Size of the generated image in pixels.
+
+If you specify `Size` as `"auto"`, the software uses the default size of the model.
 
 # Output Argument
 ### `editedImages` — Edited images
 
 cell array of numerical matrices
-
 
 Images that the model generates, returned as a cell array with `NumImages` elements. Each element of the cell array contains a generated image specified as an RGB image of the same size as the input image.
 
@@ -165,10 +146,7 @@ Response message returned by the server, specified as a [`matlab.net.http.Respon
 
 # See Also
 
-[`openAIImages`](openAIImages.md) | [`generate`](openAIImages.generate.md) | [`createVariation`](createVariation.md)
+[`openAIImages`](openAIImages.md) | [`generate`](openAIImages.generate.md) 
 
--  [Using DALL·E to Generate Images](../../examples/UsingDALLEToGenerateImages.md) 
--  [Using DALL·E to Edit Images](../../examples/UsingDALLEToEditImages.md) 
-
-*Copyright 2024 The MathWorks, Inc.*
+*Copyright 2024-2026 The MathWorks, Inc.*
 

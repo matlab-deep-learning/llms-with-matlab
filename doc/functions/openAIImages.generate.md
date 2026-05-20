@@ -17,7 +17,7 @@ Generate image using OpenAI® image generation API
 `___ = generate(___,Name=Value)` specifies additional options using one or more name\-value arguments.
 
 # Examples
-## Generate Image Using DALL·E 2
+## Generate Image
 
 First, specify the OpenAI API key as an environment variable and save it to a file called `".env"`. Next, load the environment file using the `loadenv` function.
 
@@ -25,29 +25,18 @@ First, specify the OpenAI API key as an environment variable and save it to a fi
 loadenv(".env")
 ```
 
-Connect to the OpenAI Images API. By default, the model is DALL·E 2.
+Connect to the OpenAI Images API.
 
 ```matlab
-model = openAIImages
+model = openAIImages(ModelName="gpt-image-1-mini");
 ```
 
-```matlabTextOutput
-model = 
-  openAIImages with properties:
-
-    ModelName: "dall-e-2"
-      TimeOut: 10
-
-```
-
-Generate and display an image based on a natural language prompt.
+Generate an image based on a natural language prompt.
 
 ```matlab
 catImage = generate(model,"An image of a cat confused by a complicated knitting pattern.");
-imshow(catImage{1})
 ```
 
-![An image of a cartoon cat thinking about the tangle of red wool in front of it.](images/openAIImages.generate1.png)
 # Input Arguments
 ### `model` — Image generation model
 
@@ -75,49 +64,25 @@ Natural language prompt instructing the model what to do.
 Specify the number of images to generate.
 
 
-Generating more than one image at once is only supported for DALL·E 2.
-
 ### `Size` — Size of generated image
 
-`"1024x1024"` (default) | `"256x256"` | `"512x512"` | `"1792x1024"` | `"1024x1792"`
+`"auto"` (default) | `1024x1024` | `1536x1024` | `1024x1536`
 
 
 Size of the generated image in pixels.
 
+If you specify `Size` as `"auto"`, the software uses the default size of the model.
 
-Sizes supported for DALL·E 2:
 
--  `"1024x1024"` 
--  `"256x256"` 
--  `"512x512"` 
-
-Sizes supported for DALL·E 3:
-
--  `"1024x1024"` 
--  `"1024x1792"` 
--  `"1792x1024"` 
 ### `Quality` — Quality of generated image
 
-`"standard"` (default) | `"hd"`
+`"auto"` (default) | `"high"` | `"medium"` | `"low"`
 
 
-Specify the OpenAI `"quality"` parameter. This option is only supported for DALL·E 3.
+Specify the OpenAI `"quality"` parameter.
 
+If you specify `"Quality"` as `"auto"`, then the software uses the default value of the model.
 
-If you specify the quality to be `"hd"`, then the cost per generated image increases.
-
-
-For more information on the differences between standard and HD quality, see [https://cookbook.openai.com/articles/what\_is\_new\_with\_dalle\_3](https://cookbook.openai.com/articles/what_is_new_with_dalle_3).
-
-### `Style` — Style of generated image
-
-`"vivid"` (default) | `"natural"`
-
-
-Specify the OpenAI `"style"` parameter. This option is only supported for DALL·E 3.
-
-
-For more information on the differences between vivid and natural style, see [https://cookbook.openai.com/articles/what\_is\_new\_with\_dalle\_3](https://cookbook.openai.com/articles/what_is_new_with_dalle_3).
 
 # Output Argument
 ### `images` — Generated images
@@ -125,7 +90,7 @@ For more information on the differences between vivid and natural style, see [ht
 cell array of numerical matrices
 
 
-Images that the model generates, returned as a cell array with `NumImages` elements. Each element of the cell array contains a generated image specified as an RGB images of size `Size`. For example, if you specify `Size="1024x1024"`, then the generated images have size `1024x1024x3`. 
+Images that the model generates, returned as a cell array with `NumImages` elements. Each element of the cell array contains a generated image specified as an RGB images of size `Size`. For example, if you specify `Size="1024x1024"`, then the generated images have size `1024x1024x3`.
 
 ### `httpResponse` — HTTP response message
 
@@ -136,10 +101,6 @@ Response message returned by the server, specified as a [`matlab.net.http.Respon
 
 # See Also
 
-[`openAIImages`](openAIImages.md) | [`edit`](edit.md) | [`createVariation`](createVariation.md)
+[`openAIImages`](openAIImages.md) | [`edit`](edit.md)
 
--  [Using DALL·E to Generate Images](../../examples/UsingDALLEToGenerateImages.md) 
--  [Using DALL·E to Edit Images](../../examples/UsingDALLEToEditImages.md) 
-
-*Copyright 2024 The MathWorks, Inc.*
-
+*Copyright 2024-2026 The MathWorks, Inc.*

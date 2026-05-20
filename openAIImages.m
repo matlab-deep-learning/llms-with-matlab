@@ -1,12 +1,13 @@
 classdef openAIImages < llms.internal.needsAPIKey
 %openAIImages Connect to Images API from OpenAI.
 %
-%   MDL = openAIImages creates an openAIImages object with dall-e-2
+%   MDL = openAIImages creates an openAIImages object with gpt-image-1-mini
 %
 %   MDL = openAIImages(ModelName) uses the specified model
 %
 %       ModelName            - Name of the model to use for image generation.
-%                             "dall-e-2" (default) or "dall-e-3".
+%                             "gpt-image-1-mini" (default), "gpt-image-1",
+%                             "gpt-image-1.5", or "gpt-image-2".
 %
 %   MDL = openAIImages(ModelName, APIKey=key) uses the specified API key
 %
@@ -16,19 +17,19 @@ classdef openAIImages < llms.internal.needsAPIKey
 %       TimeOut              - Connection Timeout in seconds (default: 10 secs)
 %
 %   openAIImages Functions:
-%       openAIImages    - Text to Images API from OpenAI.
+%       openAIImages         - Text to Images API from OpenAI.
 %       generate             - Generate images using the openAIImages instance.
 %       edit                 - Edit image from a given image and prompt.
-%       createVariation      - Generate variations for a given image.
 %
 %   openAIImages Properties:
 %       ModelName            - Name of the model to use for image generation.
-%                             "dall-e-2" (default) or "dall-e-3"
+%                             "gpt-image-1-mini" (default), "gpt-image-1",
+%                             "gpt-image-1.5", or "gpt-image-2"
 %
 %       TimeOut              - Connection Timeout in seconds (default: 10 secs)
 %
 
-% Copyright 2024 The MathWorks, Inc.
+% Copyright 2024-2026 The MathWorks, Inc.
 
     properties(SetAccess=private)
         %ModelName   Model name.
@@ -41,7 +42,7 @@ classdef openAIImages < llms.internal.needsAPIKey
     methods
         function this = openAIImages(nvp)
             arguments
-                nvp.ModelName   (1,1) {mustBeMember(nvp.ModelName,["dall-e-2", "dall-e-3"])} = "dall-e-2"
+                nvp.ModelName   (1,1) string {mustBeTextScalar} = "gpt-image-1-mini"
                 nvp.APIKey            {llms.utils.mustBeNonzeroLengthTextScalar}
                 nvp.TimeOut     (1,1) {mustBeNumeric,mustBeReal,mustBePositive} = 10
             end
@@ -62,73 +63,45 @@ classdef openAIImages < llms.internal.needsAPIKey
             %   additional options.
             %
             %       NumImages        - Number of images to generate.
-            %                          Default value is 1.
-            %                          For "dall-e-3" only 1 output is supported.
+            %                          Default value is 1. The max is 10.
             %
             %       Size             - Size of the generated images.
-            %                          Defaults to 1024x1024
-            %                          "dall-e-2" supports 256x256,
-            %                          512x512, or 1024x1024.
-            %                          "dall-e-3" supports 1024x1024,
-            %                          1792x1024, or 1024x1792
+            %                          "auto" (default), "1024x1024",
+            %                          "1536x1024" (landscape), or
+            %                          "1024x1536" (portrait).
             %
             %       Quality          - Quality of the images to generate.
-            %                          "standard" (default) or "hd".
-            %                          Only "dall-e-3" supports this parameter.
-            %
-            %       Style            - The style of the generated images.
-            %                          "vivid" (default) or "natural".
-            %                          Only "dall-e-3" supports this parameter.
+            %                          "auto" (default), "high", "medium",
+            %                          or "low".
 
             arguments
                 this                    (1,1) openAIImages
                 prompt                        {llms.utils.mustBeNonzeroLengthTextScalar}
                 nvp.NumImages           (1,1) {mustBeNumeric,mustBePositive,mustBeInteger,...
                                                 mustBeLessThanOrEqual(nvp.NumImages,10)} = 1
-                nvp.Size                (1,1) string {mustBeMember(nvp.Size, ["256x256", "512x512", ...
-                                                                "1024x1024", "1792x1024", ...
-                                                                "1024x1792"]), ...
-                                                    mustBeValidSize(this,nvp.Size)} = "1024x1024"
-                nvp.Quality             (1,1) string {mustBeMember(nvp.Quality,["standard", "hd"])} 
-                nvp.Style               (1,1) string {mustBeMember(nvp.Style,["vivid", "natural"])} 
+                nvp.Size                (1,1) string = "auto"
+                nvp.Quality             (1,1) string {mustBeMember(nvp.Quality, ...
+                                                ["auto", "high", "medium", "low"])} = "auto"
+                nvp.Style
             end
+
+            if isfield(nvp, "Style")
+                error("llms:deprecatedOption", ...
+                    llms.utils.errorMessageCatalog.getMessage("llms:deprecatedOption", ...
+                    "Style"));
+            end
+
+            validateSize(this.ModelName, nvp.Size)
 
             endpoint = "https://api.openai.com/v1/images/generations";
 
             validatePromptSize(this.ModelName, prompt)
 
-             params = struct("prompt",prompt,...
+            params = struct("prompt",prompt,...
                 "model",this.ModelName,...
                 "n",nvp.NumImages,...
-                "size",nvp.Size);
-
-            if this.ModelName=="dall-e-2"
-                % dall-e-3 only params
-                if isfield(nvp, "Quality")
-                    error("llms:invalidOptionForModel", ...
-                        llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", ...
-                        "Quality", this.ModelName));
-                end
-                if isfield(nvp, "Style")
-                    error("llms:invalidOptionForModel", ...
-                        llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionForModel", ...
-                        "Style", this.ModelName));
-                end
-            else
-                % dall-e-3 only supports NumImages==1
-                if nvp.NumImages>1
-                    error("llms:invalidOptionAndValueForModel", ...
-                        llms.utils.errorMessageCatalog.getMessage("llms:invalidOptionAndValueForModel", ...
-                        "NumImages", string(nvp.NumImages), this.ModelName));
-                end
-
-                if isfield(nvp, "Quality")
-                    params.quality = nvp.Quality;
-                end
-                if isfield(nvp, "Style")
-                    params.style = nvp.Style;
-                end
-            end
+                "size",nvp.Size,...
+                "quality",nvp.Quality);
 
             % Send the HTTP Request
             response = sendRequest(this, endpoint, params);
@@ -150,7 +123,7 @@ classdef openAIImages < llms.internal.needsAPIKey
             %                          will be used as the mask.
             %
             %       prompt           - A text description of the desired image(s).
-            %                          The maximum length: 1000 characters
+            %                          The maximum length: 32000 characters
             %
             %   [IMAGES, RESPONSE] = edit(__, Name=Value) specifies
             %   additional options.
@@ -166,8 +139,9 @@ classdef openAIImages < llms.internal.needsAPIKey
             %                          Default value is 1. The max is 10.
             %
             %       Size             - Size of the generated images.
-            %                          Must be one of 256x256, 512x512, or
-            %                          1024x1024 (default)
+            %                          "auto" (default), "1024x1024",
+            %                          "1536x1024" (landscape), or
+            %                          "1024x1536" (portrait).
 
             arguments
                 this                    (1,1)  openAIImages
@@ -176,18 +150,10 @@ classdef openAIImages < llms.internal.needsAPIKey
                 nvp.MaskImagePath             {mustBeValidFileType(nvp.MaskImagePath)}
                 nvp.NumImages           (1,1) {mustBeNumeric,mustBePositive,mustBeInteger,...
                                                 mustBeLessThanOrEqual(nvp.NumImages,10)} = 1
-                nvp.Size                (1,1) string {mustBeMember(nvp.Size,...
-                                                ["256x256", "512x512","1024x1024"]), ...
-                                                mustBeValidSize(this,nvp.Size)} = "1024x1024"
+                nvp.Size                (1,1) string = "auto"
             end
 
-            % For now, this is only supported for "dall-e-2"
-            if this.ModelName~="dall-e-2"
-                error("llms:functionNotAvailableForModel", ...
-                        llms.utils.errorMessageCatalog.getMessage("llms:functionNotAvailableForModel", ...
-                        this.ModelName));
-            end
-
+            validateSize(this.ModelName, nvp.Size)
             validatePromptSize(this.ModelName, prompt)
 
             endpoint = 'https://api.openai.com/v1/images/edits';
@@ -195,6 +161,7 @@ classdef openAIImages < llms.internal.needsAPIKey
             % Required params
             numImages = num2str(nvp.NumImages);
             body = matlab.net.http.io.MultipartFormProvider( ...
+                'model',matlab.net.http.io.FormProvider(this.ModelName), ...
                 'image',matlab.net.http.io.FileProvider(imagePath), ...
                 'prompt',matlab.net.http.io.FormProvider(prompt), ...
                 'n',matlab.net.http.io.FormProvider(numImages),...
@@ -205,57 +172,6 @@ classdef openAIImages < llms.internal.needsAPIKey
                 body.Names = [body.Names,"mask"];
                 body.Parts = [body.Parts,{matlab.net.http.io.FileProvider(nvp.MaskImagePath)}];
             end
-
-            % Send the HTTP Request
-            response = sendRequest(this, endpoint, body);
-            % Output the images
-            images = extractImages(response);
-        end
-
-        function [images, response] = createVariation(this,imagePath,nvp)
-            %createVariation Generate variations from a given image
-            %
-            %   [IMAGES, RESPONSE] = createVariation(MDL, IMAGEPATH) generates new images
-            %   from an original image
-            %
-            %       imagePath        - The path to the source image file.
-            %                          Must be a valid PNG file, less than 4MB,
-            %                          and square.
-            %
-            %   [IMAGES, RESPONSE] = createVariation(__, Name=Value) specifies
-            %   additional options.
-            %
-            %       NumImages        - Number of images to generate.
-            %                          Default value is 1. The max is 10.
-            %
-            %       Size             - Size of the generated images.
-            %                          Must be one of "256x256", "512x512", or
-            %                          "1024x1024" (default)
-
-            arguments
-                this                    (1,1) openAIImages
-                imagePath                     {mustBeValidFileType(imagePath)}
-                nvp.NumImages           (1,1) {mustBeNumeric,mustBePositive,mustBeInteger,...
-                                                mustBeLessThanOrEqual(nvp.NumImages,10)} = 1
-                nvp.Size                (1,1) string {mustBeMember(nvp.Size,...
-                                                ["256x256", "512x512","1024x1024"]), ...
-                                                mustBeValidSize(this,nvp.Size)} = "1024x1024"
-            end
-
-            % For now, this is only supported for "dall-e-2"
-            if this.ModelName~="dall-e-2"
-                error("llms:functionNotAvailableForModel", ...
-                        llms.utils.errorMessageCatalog.getMessage("llms:functionNotAvailableForModel", ...
-                        this.ModelName));
-            end
-
-            endpoint = 'https://api.openai.com/v1/images/variations';
-
-            numImages = num2str(nvp.NumImages);
-            body = matlab.net.http.io.MultipartFormProvider(...
-                'image',matlab.net.http.io.FileProvider(imagePath),...
-                'n',matlab.net.http.io.FormProvider(numImages),...
-                'size',matlab.net.http.io.FormProvider(nvp.Size));
 
             % Send the HTTP Request
             response = sendRequest(this, endpoint, body);
@@ -278,50 +194,37 @@ classdef openAIImages < llms.internal.needsAPIKey
     end
 
     methods(Hidden)
-        % Argument Validation Functions
-        function mustBeValidSize(this, imagesize)
-            if strcmp(this.ModelName,"dall-e-2")
-                mustBeMember(imagesize,["256x256", "512x512","1024x1024"]);
-            else
-                mustBeMember(imagesize,["1024x1024","1792x1024","1024x1792"])
-            end
+        function [images, response] = createVariation(~, varargin) %#ok<VANUS>
+            error("llms:deprecatedMethod", ...
+                llms.utils.errorMessageCatalog.getMessage("llms:deprecatedMethod", ...
+                "createVariation"));
         end
     end
 end
 
 function images = extractImages(response)
 
-if response.StatusCode=="OK" &&  isfield(response.Body.Data.data,"url")
-    % Output the images
-    if isfield(response.Body.Data.data,"url")
-        urls = arrayfun(@(x) string(x.url), response.Body.Data.data);
-        images = arrayfun(@myImread,urls,UniformOutput=false);
-    else
-        images = [];
-    end
-
+if response.StatusCode=="OK" && isfield(response.Body.Data.data, "b64_json")
+    b64data = arrayfun(@(x) string(x.b64_json), response.Body.Data.data);
+    images = cellfun(@b64ToImage, num2cell(b64data), UniformOutput=false);
 else
     images = [];
 end
 end
 
+function validateSize(model, sz)
+if ismember(model, ["gpt-image-1", "gpt-image-1-mini", "gpt-image-1.5"])
+    mustBeMember(sz, ["auto", "1024x1024", "1536x1024", "1024x1536"])
+end
+end
+
 function validatePromptSize(model, prompt)
 numChars = numel(char(prompt));
-if model=="dall-e-3"
-    limitDalle3 = 4000;
-    if numChars>limitDalle3
-        error("llms:promptLimitCharacter", ...
-            llms.utils.errorMessageCatalog.getMessage("llms:promptLimitCharacter", ...
-            string(limitDalle3), model));
-    end
-else
-    % dall-e-2
-    limitDalle2 = 1000;
-    if numChars>limitDalle2
-        error("llms:promptLimitCharacter", ...
-            llms.utils.errorMessageCatalog.getMessage("llms:promptLimitCharacter", ...
-            string(limitDalle2), model));
-    end
+limit = 32000;
+if numChars>limit
+    error("llms:promptLimitCharacter", ...
+        llms.utils.errorMessageCatalog.getMessage("llms:promptLimitCharacter", ...
+        string(limit), model));
 end
 end
 
@@ -337,12 +240,12 @@ function mustBeValidFileType(filePath)
     mustBeLessThan(s.bytes,4e+6)
 end
 
-function data = myImread(URI)
-    % imread usually, but not always, fails to read from the
-    % https://oaidalleapiprodscus.blob.core.windows.net URLs returned by
-    % DALL•E. Use websave instead.
+function data = b64ToImage(b64str)
+    bytes = matlab.net.base64decode(b64str);
     filename = tempname + ".png";
     clean = onCleanup(@() delete(filename));
-    websave(filename,URI);
+    fid = fopen(filename, 'w');
+    fwrite(fid, bytes);
+    fclose(fid);
     data = imread(filename);
 end
