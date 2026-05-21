@@ -12,3 +12,4 @@ examples/mlx-scripts/data/*
 .DS_Store
 AGENTS.md
 .agents/
+.claude/
