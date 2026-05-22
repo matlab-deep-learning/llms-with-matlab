@@ -39,6 +39,26 @@ classdef (Abstract) hstructuredOutput < matlab.mock.TestCase
                 " start with the letter A?", ...
                 ResponseFormat = prototype, MaxNumTokens=3), "llms:apiReturnedIncompleteJSON");
         end
+
+        function generateWithNestedStructs(testCase)
+            stubbedJson = '{"steps":[{"explanation":"factor","assumptions":"none"},{"explanation":"solve","assumptions":"none"}],"final_answer":"1"}';
+            [sendRequestStub,sendRequestBehaviour] = ...
+                createMock(testCase, AddedMethods="sendRequest");
+            testCase.assignOutputsWhen( ...
+                withAnyInputs(sendRequestBehaviour.sendRequest),...
+                testCase.responseMessage(stubbedJson),...
+                "This output is unused with Stream=false");
+
+            stepsPrototype = struct("explanation",{"a","b"},"assumptions",{"a","b"});
+            prototype = struct("steps",stepsPrototype,"final_answer","a");
+
+            chat = testCase.structuredModel;
+            chat.sendRequestFcn = @(varargin) sendRequestStub.sendRequest(varargin{:});
+
+            res = generate(chat,"What is the positive root of x^2-2*x+1?", ...
+                ResponseFormat=prototype);
+            testCase.verifyCompatibleStructs(res,prototype);
+        end
     end
 
     methods (Test) % calling the server, end-to-end tests
@@ -62,14 +82,6 @@ classdef (Abstract) hstructuredOutput < matlab.mock.TestCase
                 "ignore", missing);
             res = generate(testCase.structuredModel,"What is harvested in August?", ResponseFormat = prototype);
             testCase.verifyCompatibleStructs(res, prototype);
-        end
-
-        function generateWithNestedStructs(testCase)
-            stepsPrototype = struct("explanation",{"a","b"},"assumptions",{"a","b"});
-            prototype = struct("steps",stepsPrototype,"final_answer","a");
-            res = generate(testCase.structuredModel,"What is the positive root of x^2-2*x+1?", ...
-                ResponseFormat=prototype);
-            testCase.verifyCompatibleStructs(res,prototype);
         end
 
         function generateWithExplicitSchema(testCase)

@@ -90,6 +90,31 @@ classdef tjsonSchemaFromPrototype < matlab.unittest.TestCase
             testCase.verifyEqual(schema.properties.missing.type,"null");
         end
 
+        function nestedStructs(testCase)
+            import matlab.unittest.constraints.IsSameSetAs
+
+            stepsPrototype = struct("explanation",{"a","b"},"assumptions",{"a","b"});
+            prototype = struct("steps",stepsPrototype,"final_answer","a");
+            schema = llms.internal.jsonSchemaFromPrototype(prototype);
+
+            testCase.assertClassSchema(schema);
+            testCase.verifyThat(schema.required, ...
+                IsSameSetAs(string(fieldnames(prototype))));
+
+            % steps should be an array of objects
+            testCase.verifyEqual(schema.properties.steps.type, "array");
+            items = schema.properties.steps.items;
+            testCase.verifyEqual(items.type, "object");
+            testCase.assertThat(items.required, ...
+                IsSameSetAs(["explanation","assumptions"]));
+            testCase.verifyEqual(items.properties.explanation.type, "string");
+            testCase.verifyEqual(items.properties.assumptions.type, "string");
+            testCase.verifyEqual(items.additionalProperties, false);
+
+            % final_answer should be a string
+            testCase.verifyEqual(schema.properties.final_answer.type, "string");
+        end
+
         function userFrontend(testCase)
             import matlab.unittest.constraints.StartsWithSubstring
             import matlab.unittest.constraints.EndsWithSubstring
