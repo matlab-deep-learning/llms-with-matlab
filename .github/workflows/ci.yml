@@ -40,6 +40,8 @@ jobs:
           products: >
             Text_Analytics_Toolbox
             Curve_Fitting_Toolbox
+            Optimization_Toolbox
+            Global_Optimization_Toolbox
           cache: true
       - name: Run tests and generate artifacts
         env:

@@ -85,6 +85,16 @@ classdef texampleTests < matlab.unittest.TestCase
             evalc("AnalyzeTextDataUsingParallelFunctionCallwithOllama");
         end
 
+        function testBuildOptimizationProblemUsingChatGPTExample(testCase)
+            % Note: When in recording mode, running this test generates
+            % modal dialogs that must be interacted with manually. For
+            % security purposes, AI-generated code should be viewed by a
+            % human before running. In replay mode, the code has already
+            % been approved, so the dialog is bypassed.
+            testCase.startCapture("BuildOptimizationProblemUsingChatGPTExample");
+            evalc("BuildOptimizationProblemUsingChatGPTExample");
+        end
+
         function testCreateSimpleChatBot(testCase,ChatBotExample)
             testCase.startCapture(ChatBotExample);
             % set up a fake input command, returning canned user prompts

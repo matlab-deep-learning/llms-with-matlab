@@ -62,6 +62,7 @@ For more information about how to connect to the different APIs from MATLAB, inc
 - [Fit Polynomial to Data Using AI Agent](/examples/FitPolynomialToDataUsingAIAgentExample.md) (requires Curve Fitting Toolbox™)
 - [Analyze Table Data Using ChatGPT](/examples/AnalyzeTableDataUsingChatGPTExample.md)
 - [Visualize Table Data Using ChatGPT](/examples/VisualizeTableDataUsingChatGPTExample.md)
+- [Build Optimization Problem Using ChatGPT](/examples/BuildOptimizationProblemUsingChatGPTExample.md) (requires Optimization Toolbox™ and Global Optimization Toolbox™)
 ### Tool Calling
 - [Analyze Scientific Papers Using ChatGPT Function Calls](/examples/AnalyzeScientificPapersUsingFunctionCalls.md)
 - [Analyze Text Data Using Parallel Function Calls with ChatGPT](/examples/AnalyzeTextDataUsingParallelFunctionCallwithChatGPT.md)
