@@ -5,10 +5,14 @@
 
 Large Language Models (LLMs) with MATLAB lets you connect to large language model APIs using MATLAB®. 
 
+>[!NOTE]
+>For a simplified approach to building LLM and agentic applications in MATLAB, see the research preview of [MATLAB AI Agent SDK](https://www.mathworks.com/matlabcentral/fileexchange/184377-matlab-ai-agent-sdk/).
+
+Large Language Models (LLMs) with MATLAB will no longer get new features.
 
 You can connect to:
 
--  [OpenAI® Chat Completions API](https://platform.openai.com/docs/guides/text-generation/chat-completions-api) — For example, connect to ChatGPT™.
+-  [OpenAI® Chat Completions API](https://developers.openai.com/api/reference/chat-completions/overview) — For example, connect to ChatGPT™.
 -  OpenAI-compatible APIs — Connect to APIs that are compatible with the OpenAI Chat Completions API.
 -  [OpenAI Images API](https://platform.openai.com/docs/guides/images) — Connect to image generation models from OpenAI.
 -  [Azure® OpenAI Service](https://learn.microsoft.com/en-us/azure/ai-services/openai/) — Connect to OpenAI models from Azure. 
